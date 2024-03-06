@@ -1,7 +1,7 @@
 import { AuthCard } from "@/components/AuthCard";
 import { useContext, useEffect, useState } from "react";
 import { AuthContext, fromRegisterContext } from "../context";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import {
   isSignInWithEmailLink,
   signInWithEmailLink,
@@ -16,7 +16,6 @@ import { toast } from "sonner";
 import { formatErrorMessage } from "../firebase/firestore";
 
 const Login = () => {
-  const [modalVisible, setModalVisible] = useState(false);
   const [err, setErr] = useState<ErrorMessasge>(null);
   const { user, userLoading } = useContext(AuthContext);
   const { fromRegister, setFromRegister } =
@@ -32,7 +31,6 @@ const Login = () => {
 
   const modalHandler = () => {
     if (fromRegister) {
-      setModalVisible(true);
       setFromRegister(false);
       return;
     }

@@ -16,11 +16,9 @@ import { ErrorMessasge, FirebaseError } from "../interfaces";
 import { fromRegisterContextType } from "../interfaces/interfaces";
 import { CustomToaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
-import { set } from "firebase/database";
 import Background from "../assets/background.gif";
 import {
   AlertDialog,
-  AlertDialogTrigger,
   AlertDialogContent,
   AlertDialogOverlay,
   AlertDialogTitle,

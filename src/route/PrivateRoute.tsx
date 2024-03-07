@@ -1,7 +1,7 @@
 import { useContext } from 'react';
 import { Outlet, Navigate } from 'react-router-dom';
 import { AuthContext } from '../context';
-import { Progress } from "@/components/ui/progress"
+import Loading from '@/components/Loading';
 
 const Privateroute = () => {
     const { user, userLoading } = useContext(AuthContext);
@@ -9,7 +9,7 @@ const Privateroute = () => {
         return <Navigate to="/login" />;
     }
     return userLoading ? (
-        <Progress value={33} />
+        <Loading />
     ) : (
         <>
             {/* <Navbar /> */}

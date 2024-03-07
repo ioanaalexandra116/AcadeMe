@@ -27,21 +27,23 @@ import {
   AlertDialogCancel,
   AlertDialogFooter,
 } from "@/components/ui/alert-dialog";
+import Loading from "@/components/Loading";
 
 const Register = () => {
   const [err, setErr] = useState<ErrorMessasge>(null);
   const [success, setSuccess] = useState<boolean>(false);
-    const { user, userLoading } = useContext(AuthContext);
+  const [loading, setLoading] = useState<boolean>(false);
+  const { user, userLoading } = useContext(AuthContext);
   const { setFromRegister } = (useContext(
     fromRegisterContext
   ) as fromRegisterContextType) ?? { setFromRegister: () => {} };
   const navigate = useNavigate();
 
-    useEffect(() => {
-      if (!userLoading && user && user.emailVerified) {
-        navigate("/");
-      }
-    }, [userLoading, user]);
+  useEffect(() => {
+    if (!userLoading && user && user.emailVerified) {
+      navigate("/");
+    }
+  }, [userLoading, user]);
 
   useEffect(() => {
     if (err) {
@@ -83,6 +85,7 @@ const Register = () => {
       return;
     }
 
+    setLoading(true);
     try {
       const userCredential = await createUserWithEmailAndPassword(
         auth,
@@ -90,8 +93,9 @@ const Register = () => {
         password
       );
       if (userCredential.user) {
-        setFromRegister(true);
+        setLoading(false);
         setSuccess(true);
+        setFromRegister(true);
         await sendEmailVerification(userCredential.user, actionCodeSettings);
         await createUserCollection(userCredential.user, username);
       }
@@ -126,6 +130,13 @@ const Register = () => {
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
+        </div>
+      ) : loading ? (
+        <div
+          className="bg-cover bg-center h-screen w-screen flex items-center justify-center"
+          style={{ backgroundImage: `url(${Background})` }}
+        >
+          <Loading />
         </div>
       ) : (
         <div>

@@ -49,7 +49,7 @@ export function AuthCard({
       style={{ backgroundImage: `url(${Background})` }}
     >
       <div className="absolute inset-0 flex items-center justify-center">
-        <Card className="max-w-md bg-white">
+        <Card className="max-w-md bg-white border-black">
           <CardHeader className="flex flex-col items-center">
             <img src={Logo} alt="Logo" className="w-32 h-32 mb-3" />
             <CardTitle>{title}</CardTitle>

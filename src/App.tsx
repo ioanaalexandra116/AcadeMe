@@ -4,6 +4,7 @@ import ErrorPage from "./pages/ErrorPage";
 import PrivateRoute from "./route/PrivateRoute";
 import Test from "./pages/Test";
 import Login from "./pages/Login";
+import Profile from "./pages/Profile";
 
 const router = createBrowserRouter([
   {
@@ -35,6 +36,10 @@ const router = createBrowserRouter([
             //         </div>
             //     </body>
           },
+          {
+            path: "/profile",
+            element: <Profile />,
+          }
         ],
       },
     ],

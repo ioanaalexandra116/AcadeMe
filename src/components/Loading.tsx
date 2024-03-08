@@ -1,5 +1,4 @@
 import styled, { keyframes, CSSProperties } from "styled-components";
-import Background from "../assets/background.gif";
 
 interface LoadingProps {
   style?: CSSProperties;
@@ -50,9 +49,7 @@ const BookPage = styled.svg<{ style?: CSSProperties }>`
 
 const Loading: React.FC<LoadingProps> = ({ style }) => {
   return (
-    <div
-      className="h-screen w-screen flex items-center justify-center"
-    >
+    <div className="h-screen w-screen flex items-center justify-center">
       <Loader
         style={{
           backgroundColor: "rgba(255, 255, 255, 0.4)",
@@ -91,25 +88,25 @@ const Loading: React.FC<LoadingProps> = ({ style }) => {
                 x1="63.5"
               />
               <path
-                stroke-linecap="round"
+                strokeLinecap="round"
                 strokeWidth="4"
                 stroke="#A4DEF7"
                 d="M25 20H50"
               />
               <path
-                stroke-linecap="round"
+                strokeLinecap="round"
                 strokeWidth="4"
                 stroke="#A4DEF7"
                 d="M101 20H76"
               />
               <path
-                stroke-linecap="round"
+                strokeLinecap="round"
                 strokeWidth="4"
                 stroke="#A4DEF7"
                 d="M16 30L50 30"
               />
               <path
-                stroke-linecap="round"
+                strokeLinecap="round"
                 strokeWidth="4"
                 stroke="#A4DEF7"
                 d="M110 30L76 30"
@@ -123,19 +120,19 @@ const Loading: React.FC<LoadingProps> = ({ style }) => {
             className="book-page"
           >
             <path
-              stroke-linecap="round"
-              stroke-width="4"
+              strokeLinecap="round"
+              strokeWidth="4"
               stroke="#A4DEF7"
               d="M40 20H15"
             ></path>
             <path
-              stroke-linecap="round"
-              stroke-width="4"
+              strokeLinecap="round"
+              strokeWidth="4"
               stroke="#A4DEF7"
               d="M49 30L15 30"
             ></path>
             <path
-              stroke-width="5"
+              strokeWidth="5"
               stroke="#F987AF"
               d="M2.5 2.5H55C59.1421 2.5 62.5 5.85786 62.5 10V65C62.5 69.1421 59.1421 72.5 55 72.5H2.5V2.5Z"
             ></path>

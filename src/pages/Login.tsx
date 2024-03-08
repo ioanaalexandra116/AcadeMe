@@ -80,7 +80,6 @@ const Login = () => {
         email,
         password
       );
-      console.log(userCredential);
       if (!userCredential.user.emailVerified) {
         setErr("You have to verify your email address before logging in");
         auth.signOut();

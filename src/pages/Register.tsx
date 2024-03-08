@@ -58,7 +58,6 @@ const Register = () => {
     password: string;
   }) => {
     const { username, email, password } = formData;
-    console.log(username, email, password);
     setErr(null);
     if (!username) {
       setErr("Username is required");
@@ -85,7 +84,6 @@ const Register = () => {
       return;
     }
 
-    setLoading(true);
     try {
       const userCredential = await createUserWithEmailAndPassword(
         auth,
@@ -93,10 +91,11 @@ const Register = () => {
         password
       );
       if (userCredential.user) {
-        setLoading(false);
-        setSuccess(true);
+        setLoading(true);
         setFromRegister(true);
         await sendEmailVerification(userCredential.user, actionCodeSettings);
+        setSuccess(true);
+        setLoading(false);
         await createUserCollection(userCredential.user, username);
       }
     } catch (error) {

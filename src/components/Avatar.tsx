@@ -37,18 +37,18 @@ function darkenColor(rgbColor: string, darkenAmount: number): string {
 const Avatar = ({
   gender,
   backgroundColor,
-  skinColor,
-  eyeColor,
   mouthColor,
-  hairColor,
+  eyeColor,
   eyelidsColor,
+  hairColor,
+  skinColor,
   noseColor,
-  bowColor,
   dimensions,
+  bowColor,
 }: AvatarProps) => {
   const [bow, setBow] = useState(false);
 
-  if (bowColor == "transparent") {
+  if (bowColor == "transparent" || bowColor == "noBow") {
     useEffect(() => {
       setBow(false);
     }, [bowColor]);
@@ -59,8 +59,8 @@ const Avatar = ({
   }
   const containerStyle: React.CSSProperties = {
     position: "relative",
-    width: "400px", // Match the width of your SVG
-    height: "180px", // Match the height of your SVG
+    width: "300px", // Match the width of your SVG
+    height: "300px", // Match the height of your SVG
   };
 
   const svgStyle: React.CSSProperties = {

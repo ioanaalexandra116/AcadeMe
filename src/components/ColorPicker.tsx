@@ -10,6 +10,7 @@ import {
 import { Button } from "./ui/button";
 import Avatar from "./Avatar";
 import NoSign from "../assets/no-sign.svg";
+import { useEffect } from "react";
 
 interface ColorPaletteProps {
   onSelectColor: (color: string) => void;
@@ -20,7 +21,7 @@ interface ColorPaletteProps {
 export const ColorPalette = ({
   onSelectColor,
   selectedColor,
-  bow
+  bow = false,
 }: ColorPaletteProps) => {
   const baseColors = [
     "rgb(245, 245, 244)",
@@ -38,7 +39,7 @@ export const ColorPalette = ({
     "rgb(94, 234, 212)",
     "rgb(164, 228, 250)",
     "rgb(8, 51, 68)",
-    "rgb(29, 78, 216)",
+    "rgb(164,222,247)",
     "rgb(70,165,213)",
     "rgb(230,214,251)",
     "rgb(196, 181, 253)",
@@ -53,27 +54,29 @@ export const ColorPalette = ({
     "rgb(242, 212, 207)",
     "rgb(226,189,193)",
     "rgb(238, 217, 200)",
+    "rgb(255,225,189)",
     "rgb(236, 196, 186)",
     "rgb(226, 200, 178)",
-    "rgb(214, 183, 152)",
-    "rgb(204, 165, 136)",
+    "rgb(230,183,150)",
     "rgb(171, 130, 99)",
     "rgb(155, 121, 96)",
     "rgb(137, 95, 65)",
     "rgb(118, 79, 51)",
     "rgb(94,75,69)",
-    "rgb(219,202,194)",
     "rgb(79, 5, 22)",
+    "rgb(102,78,39)",
     "rgb(191,101,67)",
-    "rgb(226,133,115)",
+    "rgb(224,134,114)",
     "rgb(224,194,153)",
-    "rgb(49,28,24)",
+    "rgb(52,37,26)",
     "rgb(227,169,84)",
     "rgb(165,90,85)",
     "rgb(12, 10, 9)",
-  ]
+  ];
 
-  const colors = bow ? baseColors.filter(color => color !== "rgb(12, 10, 9)") : baseColors;
+  const colors = bow
+    ? baseColors.filter((color) => color !== "rgb(12, 10, 9)")
+    : baseColors;
   const handleBow = () => {
     onSelectColor("noBow");
   };
@@ -154,15 +157,24 @@ export const ColorPalette = ({
 
 const ColorPicker = ({
   onColorChange,
-  bow,
+  bow = false,
+  persistentColor,
+  setPersistentColor,
 }: {
   onColorChange: (color: string) => void;
   bow?: boolean;
+  persistentColor: string;
+  setPersistentColor: React.Dispatch<React.SetStateAction<string>>;
 }) => {
   const [selectedColor, setSelectedColor] = useState("");
 
+  useEffect(() => {
+    setSelectedColor(persistentColor);
+  }, [persistentColor]);
+
   const handleColorSelect = (color: string) => {
     setSelectedColor(color);
+    setPersistentColor(color);
     onColorChange(color);
   };
 

@@ -40,20 +40,35 @@ export function CustomAvatarTabs({
   const [characterProperties, setCharacterProperties] =
     useState<AvatarProperties>({
       gender: "man",
-      backgroundColor: "#F9E0AE",
-      mouthColor: "rgb(208,37,71)",
-      eyeColor: "#0a84a5",
-      eyelidsColor: "#231F20",
-      hairColor: "#B4863C",
-      skinColor: "#ecbf9d",
-      noseColor: "#B4863C",
+      backgroundColor: "rgb(164,222,247)",
+      mouthColor: "rgb(224,134,114)",
+      eyeColor: "rgb(102,78,39)",
+      eyelidsColor: "rgb(12,10,9)",
+      hairColor: "rgb(89,70,64)",
+      skinColor: "rgb(255,225,189)",
+      noseColor: "rgb(230,183,150)",
       dimensions: "300px",
-      bowColor: "rgb(208,37,71)",
+      bowColor: "transparent",
     });
   const [bow, setBow] = useState(false);
   const [selectedColor, setSelectedColor] = useState("");
   const [selectedTab, setSelectedTab] = useState("gender");
-  const [selectedAvatar, setSelectedAvatar] = useState("none");
+  const [selectedAvatar, setSelectedAvatar] = useState("man");
+  const [persistentColorSkin, setPersistentColorSkin] =
+    useState("rgb(255,225,189)");
+  const [persistentColorHair, setPersistentColorHair] =
+    useState("rgb(89,70,64)");
+  const [persistentColorEyes, setPersistentColorEyes] =
+    useState("rgb(102,78,39)");
+  const [persistentColorEyelashes, setPersistentColorEyelashes] =
+    useState("rgb(12,10,9)");
+  const [persistentColorNose, setPersistentColorNose] =
+    useState("rgb(230,183,150)");
+  const [persistentColorLips, setPersistentColorLips] =
+    useState("rgb(224,134,114)");
+  const [persistentColorBow, setPersistentColorBow] = useState("noBow");
+  const [persistentColorBackground, setPersistentColorBackground] =
+    useState("rgb(164,222,247)");
 
   useEffect(() => {
     // Call the function from the parent with the updated characterProperties
@@ -69,7 +84,6 @@ export function CustomAvatarTabs({
   };
 
   useEffect(() => {
-    console.log("Selected color: ", selectedColor);
     if (selectedTab == "bow" && selectedColor == "noBow") {
       setCharacterProperties((prevProperties) => ({
         ...prevProperties,
@@ -80,22 +94,6 @@ export function CustomAvatarTabs({
       setBow(true);
     }
   }, [selectedColor, selectedTab]);
-
-  useEffect(() => {
-    console.log(selectedTab);
-    setSelectedTab(selectedTab);
-  }, [selectedTab]);
-
-  const showColorPicker = [
-    "background",
-    "mouth",
-    "eye",
-    "eyelids",
-    "hair",
-    "skin",
-    "nose",
-    "bow",
-  ].includes(selectedTab);
 
   const handleAvatarSelection = (avatar: string) => {
     setSelectedAvatar(avatar);
@@ -112,14 +110,14 @@ export function CustomAvatarTabs({
   return (
     <Card
       cardWidth={480}
-      className="flex flex-col items-center justify-center padding-0 bg-background border-0"
+      className="flex flex-col padding-0 bg-background border-0"
       style={{
         border: "0px solid rgba(255, 255, 255, 0)",
         boxShadow: "none",
       }}
     >
       <Tabs
-        defaultValue="avatar"
+        defaultValue="gender"
         className="w-[480px] display:flex align-items:center justify-content:center"
       >
         <TabsList className="grid w-full grid-cols-9">
@@ -231,22 +229,69 @@ export function CustomAvatarTabs({
             </CardContent>
           </Card>
         </TabsContent>
-        <TabsContent
-          value={selectedTab}
-          className="flex flex-col items-center justify-center"
-        >
-          {showColorPicker &&
-            (bow && selectedTab === "bow" ? (
-              <ColorPicker
-                onColorChange={handleColorChange(selectedTab)}
-                bow={true}
-              />
-            ) : (
-              <ColorPicker
-                onColorChange={handleColorChange(selectedTab)}
-                bow={false}
-              />
-            ))}
+        <TabsContent value="skin">
+          <ColorPicker
+            onColorChange={handleColorChange(selectedTab)}
+            bow={false}
+            persistentColor={persistentColorSkin}
+            setPersistentColor={setPersistentColorSkin}
+          />
+        </TabsContent>
+        <TabsContent value="hair">
+          <ColorPicker
+            onColorChange={handleColorChange(selectedTab)}
+            bow={false}
+            persistentColor={persistentColorHair}
+            setPersistentColor={setPersistentColorHair}
+          />
+        </TabsContent>
+        <TabsContent value="eye">
+          <ColorPicker
+            onColorChange={handleColorChange(selectedTab)}
+            bow={false}
+            persistentColor={persistentColorEyes}
+            setPersistentColor={setPersistentColorEyes}
+          />
+        </TabsContent>
+        <TabsContent value="eyelids">
+          <ColorPicker
+            onColorChange={handleColorChange(selectedTab)}
+            bow={false}
+            persistentColor={persistentColorEyelashes}
+            setPersistentColor={setPersistentColorEyelashes}
+          />
+        </TabsContent>
+        <TabsContent value="nose">
+          <ColorPicker
+            onColorChange={handleColorChange(selectedTab)}
+            bow={false}
+            persistentColor={persistentColorNose}
+            setPersistentColor={setPersistentColorNose}
+          />
+        </TabsContent>
+        <TabsContent value="mouth">
+          <ColorPicker
+            onColorChange={handleColorChange(selectedTab)}
+            bow={false}
+            persistentColor={persistentColorLips}
+            setPersistentColor={setPersistentColorLips}
+          />
+        </TabsContent>
+        <TabsContent value="bow">
+          <ColorPicker
+            onColorChange={handleColorChange(selectedTab)}
+            bow={bow}
+            persistentColor={persistentColorBow}
+            setPersistentColor={setPersistentColorBow}
+          />
+        </TabsContent>
+        <TabsContent value="background">
+          <ColorPicker
+            onColorChange={handleColorChange(selectedTab)}
+            bow={false}
+            persistentColor={persistentColorBackground}
+            setPersistentColor={setPersistentColorBackground}
+          />
         </TabsContent>
       </Tabs>
     </Card>

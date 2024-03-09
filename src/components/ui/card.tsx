@@ -1,48 +1,53 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
 
-const Card = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, color, ...props }, ref) => {
-  const [cardStyles, setCardStyles] = React.useState({
-    width: "100%",
-    padding: "16px",
-    margin: "auto",
-  });
+interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
+  cardWidth?: number;
+}
 
-  React.useEffect(() => {
-    const handleResize = () => {
-      const newStyles = {
-        width: window.innerWidth > 440 ? "440px" : "100%",
-        padding: "16px",
-        margin: "auto",
+const Card = React.forwardRef<HTMLDivElement, CardProps>(
+  ({ className, cardWidth = 440, color, ...props }, ref) => {
+    // Default cardWidth value as an example
+    const [cardStyles, setCardStyles] = React.useState({
+      width: "100%",
+      padding: "16px",
+      margin: "auto",
+    });
+
+    React.useEffect(() => {
+      const handleResize = () => {
+        const newStyles = {
+          // width: window.innerWidth > 440 ? "440px" : "100%",
+          width: window.innerWidth > cardWidth ? `${cardWidth}px` : "100%",
+          padding: "16px",
+          margin: "auto",
+        };
+        setCardStyles(newStyles);
       };
-      setCardStyles(newStyles);
-    };
 
-    handleResize(); // Initial call
+      handleResize(); // Initial call
 
-    window.addEventListener("resize", handleResize);
+      window.addEventListener("resize", handleResize);
 
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, []); // Empty dependency array means this effect runs once after the initial render
+      return () => {
+        window.removeEventListener("resize", handleResize);
+      };
+    }, []); // Empty dependency array means this effect runs once after the initial render
 
-  return (
-    <div
-      ref={ref}
-      className={cn(
-        "rounded-xl border bg-card text-card-foreground shadow",
-        color && `text-${color}`,
-        className
-      )}
-      style={cardStyles}
-      {...props}
-    />
-  );
-});
+    return (
+      <div
+        ref={ref}
+        className={cn(
+          "rounded-xl border bg-card text-card-foreground shadow",
+          color && `text-${color}`,
+          className
+        )}
+        style={cardStyles}
+        {...props}
+      />
+    );
+  }
+);
 
 Card.displayName = "Card";
 

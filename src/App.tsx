@@ -5,6 +5,7 @@ import PrivateRoute from "./route/PrivateRoute";
 import Test from "./pages/Test";
 import Login from "./pages/Login";
 import Profile from "./pages/Profile";
+import EditAvatar from "./pages/EditAvatar";
 
 const router = createBrowserRouter([
   {
@@ -39,6 +40,10 @@ const router = createBrowserRouter([
           {
             path: "/profile",
             element: <Profile />,
+          },
+          {
+            path: "/edit-avatar",
+            element: <EditAvatar/>,
           }
         ],
       },

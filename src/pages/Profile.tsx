@@ -4,7 +4,7 @@ const Profile = () => {
   return (
     <div>
       <Avatar
-        gender="woman"
+        gender="man"
         backgroundColor="#F9E0AE"
         mouthColor="rgb(208,37,71)"
         eyeColor="#0a84a5"
@@ -13,7 +13,7 @@ const Profile = () => {
         skinColor="#ecbf9d"
         noseColor="#B4863C"
         bowColor="rgb(208,37,71)"
-        dimensions="256px"
+        dimensions="300px"
       />
     </div>
   );

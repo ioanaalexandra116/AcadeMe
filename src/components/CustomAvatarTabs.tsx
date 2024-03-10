@@ -68,6 +68,8 @@ export function CustomAvatarTabs({
     characterProperties.backgroundColor
   );
 
+  const cardHeight = window.innerWidth > 480 ? 580 : 450;
+
   const [cardStyle, setCardStyle] = useState<React.CSSProperties>({
     zIndex: 10,
     position: "relative",
@@ -78,7 +80,7 @@ export function CustomAvatarTabs({
 
   const updateCardStyles = () => {
     const windowWidth = window.innerWidth;
-    const newElementSize = windowWidth > 480 ? 150 : windowWidth / 3; // Adjust the size based on the screen width
+    const newElementSize = windowWidth > 480 ? 150 : (windowWidth / 3); // Adjust the size based on the screen width
 
     const newCardStyle: React.CSSProperties = {
       ...cardStyle,
@@ -151,53 +153,54 @@ export function CustomAvatarTabs({
     >
       <Tabs
         defaultValue="gender"
-        className="w-[480px] display:flex shadow-2xl border-0 flex-col"
+        className="display:flex shadow-2xl border-0 flex-col"
       >
-        <TabsList className="grid w-full grid-cols-9 bg-transparent flex flex-wrap items-center justify-center allign-center space-x-3">
+        <TabsList className="grid grid-cols-9 bg-transparent flex flex-wrap items-center justify-center allign-center space-x-2"
+        style={window.innerWidth > 480 ? {width: 480} : {width: "100%"}}>
           <TabsTrigger value="gender" onClick={() => setSelectedTab("gender")}>
-            <img src={Gender} alt="Gender" className="w-6 h-6" />
+            <img src={Gender} alt="Gender" style={ window.innerWidth > 480 ? {width: 24, height: 24} : {width: window.innerWidth/20, height: window.innerWidth/20}} />
           </TabsTrigger>
           <TabsTrigger value="skin" onClick={() => setSelectedTab("skin")}>
-            <img src={Smiley} alt="Smiley" className="w-6 h-6" />
+            <img src={Smiley} alt="Smiley" style={ window.innerWidth > 480 ? {width: 24, height: 24} : {width: window.innerWidth/20, height: window.innerWidth/20}} />
           </TabsTrigger>
           <TabsTrigger value="hair" onClick={() => setSelectedTab("hair")}>
             {" "}
             {selectedAvatar == "woman" ? (
-              <img src={HairstyleWoman} alt="Hairstyle" className="w-6 h-6" />
+              <img src={HairstyleWoman} alt="Hairstyle" style={ window.innerWidth > 480 ? {width: 24, height: 24} : {width: window.innerWidth/20, height: window.innerWidth/20}} />
             ) : (
-              <img src={HairstyleMan} alt="Hairstyle" className="w-6 h-6" />
+              <img src={HairstyleMan} alt="Hairstyle" style={ window.innerWidth > 480 ? {width: 24, height: 24} : {width: window.innerWidth/20, height: window.innerWidth/20}} />
             )}
           </TabsTrigger>
           <TabsTrigger value="eye" onClick={() => setSelectedTab("eye")}>
-            <img src={Eye} alt="Eyes" className="w-6 h-6" />
+            <img src={Eye} alt="Eyes" style={ window.innerWidth > 480 ? {width: 24, height: 24} : {width: window.innerWidth/20, height: window.innerWidth/20}} />
           </TabsTrigger>
           <TabsTrigger
             value="eyelids"
             onClick={() => setSelectedTab("eyelids")}
           >
-            <img src={Eyelashes} alt="Eyelashes" className="w-6 h-6" />
+            <img src={Eyelashes} alt="Eyelashes" style={ window.innerWidth > 480 ? {width: 24, height: 24} : {width: window.innerWidth/20, height: window.innerWidth/20}} />
           </TabsTrigger>
           <TabsTrigger value="nose" onClick={() => setSelectedTab("nose")}>
             <img src={Nose} alt="Nose" className="w-5 h-5" />
           </TabsTrigger>
           <TabsTrigger value="mouth" onClick={() => setSelectedTab("mouth")}>
-            <img src={Lips} alt="Lips" className="w-6 h-6" />
+            <img src={Lips} alt="Lips" style={ window.innerWidth > 480 ? {width: 24, height: 24} : {width: window.innerWidth/20, height: window.innerWidth/20}} />
           </TabsTrigger>
           <TabsTrigger value="bow" onClick={() => setSelectedTab("bow")}>
-            <img src={Bow} alt="Bow" className="w-6 h-6" />
+            <img src={Bow} alt="Bow" style={ window.innerWidth > 480 ? {width: 24, height: 24} : {width: window.innerWidth/20, height: window.innerWidth/20}} />
           </TabsTrigger>
           <TabsTrigger
             value="background"
             onClick={() => setSelectedTab("background")}
           >
-            <img src={Frame} alt="Frame" className="w-6 h-6" />
+            <img src={Frame} alt="Frame" style={ window.innerWidth > 480 ? {width: 24, height: 24} : {width: window.innerWidth/20, height: window.innerWidth/20}} />
           </TabsTrigger>
         </TabsList>
-        <TabsContent value="gender">
+        <TabsContent value="gender" style={ window.innerWidth > 480 ? {width: 480} : {width: window.innerWidth}}>
           <Card
-            className="flex flex-col items-center justify-center h-[560px] relative border-0 rounded-xl shadow-2xl" // Add relative positioning to the Card
+            className="flex flex-col items-center justify-center relative border-0 rounded-xl shadow-2xl" // Add relative positioning to the Card
             cardWidth={480}
-            style={cardStyle}
+            style={{ height: cardHeight }}
           >
             <CardHeader className="absolute top-0 left-0 right-0 flex flex-col items-top justify-center text-center"></CardHeader>
             <CardTitle className="absolute top-20 flex flex-col items-top justify-center mb-2">
@@ -218,7 +221,8 @@ export function CustomAvatarTabs({
                   padding: 0,
                   borderRadius: "50%",
                   overflow: "hidden",
-                  height: "150px",
+                  height: elementSize,
+                  width: elementSize,
                 }}
               >
                 <img
@@ -238,7 +242,8 @@ export function CustomAvatarTabs({
                   padding: 0, // Remove default padding
                   borderRadius: "50%", // Make it circular
                   overflow: "hidden", // Ensure the circular shape
-                  height: "150px",
+                  height: elementSize, // Set the height
+                  width: elementSize,
                 }}
               >
                 <img
@@ -250,7 +255,7 @@ export function CustomAvatarTabs({
             </CardContent>
           </Card>
         </TabsContent>
-        <TabsContent value="skin" style={triggerStyle}>
+        <TabsContent value="skin" style={ window.innerWidth > 480 ? {width: 480} : {width: window.innerWidth}}>
           <ColorPicker
             onColorChange={handleColorChange(selectedTab)}
             bow={false}
@@ -258,7 +263,7 @@ export function CustomAvatarTabs({
             setPersistentColor={setPersistentColorSkin}
           />
         </TabsContent>
-        <TabsContent value="hair" style={triggerStyle}>
+        <TabsContent value="hair" style={ window.innerWidth > 480 ? {width: 480} : {width: window.innerWidth}}>
           <ColorPicker
             onColorChange={handleColorChange(selectedTab)}
             bow={false}
@@ -266,7 +271,7 @@ export function CustomAvatarTabs({
             setPersistentColor={setPersistentColorHair}
           />
         </TabsContent>
-        <TabsContent value="eye" style={triggerStyle}>
+        <TabsContent value="eye" style={ window.innerWidth > 480 ? {width: 480} : {width: window.innerWidth}}>
           <ColorPicker
             onColorChange={handleColorChange(selectedTab)}
             bow={false}
@@ -274,7 +279,7 @@ export function CustomAvatarTabs({
             setPersistentColor={setPersistentColorEyes}
           />
         </TabsContent>
-        <TabsContent value="eyelids" style={triggerStyle}>
+        <TabsContent value="eyelids" style={ window.innerWidth > 480 ? {width: 480} : {width: window.innerWidth}}>
           <ColorPicker
             onColorChange={handleColorChange(selectedTab)}
             bow={false}
@@ -282,7 +287,7 @@ export function CustomAvatarTabs({
             setPersistentColor={setPersistentColorEyelashes}
           />
         </TabsContent>
-        <TabsContent value="nose" style={triggerStyle}>
+        <TabsContent value="nose" style={ window.innerWidth > 480 ? {width: 480} : {width: window.innerWidth}}>
           <ColorPicker
             onColorChange={handleColorChange(selectedTab)}
             bow={false}
@@ -290,7 +295,7 @@ export function CustomAvatarTabs({
             setPersistentColor={setPersistentColorNose}
           />
         </TabsContent>
-        <TabsContent value="mouth" style={triggerStyle}>
+        <TabsContent value="mouth" style={ window.innerWidth > 480 ? {width: 480} : {width: window.innerWidth}}>
           <ColorPicker
             onColorChange={handleColorChange(selectedTab)}
             bow={false}
@@ -298,7 +303,7 @@ export function CustomAvatarTabs({
             setPersistentColor={setPersistentColorLips}
           />
         </TabsContent>
-        <TabsContent value="bow" style={triggerStyle}>
+        <TabsContent value="bow" style={ window.innerWidth > 480 ? {width: 480} : {width: window.innerWidth}}>
           <ColorPicker
             onColorChange={handleColorChange(selectedTab)}
             bow={bow}
@@ -306,7 +311,7 @@ export function CustomAvatarTabs({
             setPersistentColor={setPersistentColorBow}
           />
         </TabsContent>
-        <TabsContent value="background" style={triggerStyle}>
+        <TabsContent value="background" style={ window.innerWidth > 480 ? {width: 480} : {width: window.innerWidth}}>
           <ColorPicker
             onColorChange={handleColorChange(selectedTab)}
             bow={false}

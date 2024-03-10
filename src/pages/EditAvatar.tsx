@@ -81,12 +81,21 @@ const EditAvatar = () => {
     fetchAvatarProps();
   }, [user]);
 
+  const fullWidth = window.innerWidth > 700;
+  console.log(window.innerWidth);
+
   const handleCharacterProperties = (properties: AvatarProperties) => {
     setCharacterProperties(properties);
   };
 
   const handleSaveChanges = () => {
-    addAvatarProps(user.uid, characterProperties);
+    const properties = characterProperties as AvatarProperties;
+    if (window.innerWidth < 700) {
+      properties.dimensions = "175px";
+    } else {
+      properties.dimensions = "300px";
+    }
+    addAvatarProps(user.uid, properties);
     navigate("/profile");
   };
 
@@ -94,7 +103,7 @@ const EditAvatar = () => {
     return <Loading />;
   }
 
-  return (
+  return fullWidth ? (
     <div
       className="bg-cover bg-center h-screen w-screen flex items-center justify-center"
       style={{ backgroundImage: `url(${Background})` }}
@@ -121,6 +130,33 @@ const EditAvatar = () => {
           onCharacterPropertiesChange={handleCharacterProperties}
           recievedCharacterProperties={characterProperties}
         />
+      </div>
+    </div>
+  ) : (
+    <div
+      className="bg-cover bg-center h-screen w-screen flex items-center justify-center"
+      style={{ backgroundImage: `url(${Background})` }}
+    >
+      <div
+        style={cardStyles}
+        className="flex flex-col items-center justify-center space-y-8"
+      >
+        <div className="bg-transparent rounded-full shadow-2xl">
+          <Avatar {...characterProperties} />
+        </div>
+        <CustomAvatarTabs
+          onCharacterPropertiesChange={handleCharacterProperties}
+          recievedCharacterProperties={characterProperties}
+        />
+        <Button
+          style={{
+            backgroundColor: "#F987AF",
+            boxShadow: "0px 8px 14px rgba(0, 0, 0, 0.2)",
+          }}
+          onClick={handleSaveChanges}
+        >
+          Save Changes
+        </Button>
       </div>
     </div>
   );

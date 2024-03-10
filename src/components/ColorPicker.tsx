@@ -73,10 +73,20 @@ export const ColorPalette = ({
     onSelectColor("noBow");
   };
 
+  const buttonHeight = window.innerWidth > 480 ? 48 : 32;
+  const buttonWidth = window.innerWidth > 480 ? 48 : 32;
+  const cardHeight = window.innerWidth > 480 ? 580 : 450;
+
   return (
     <Card
-      className="display:flex flex-col items-center justify-center h-[560px] brounded-xl shadow-2xl border-0"
+      className="display:flex flex-col items-center justify-center brounded-xl shadow-2xl border-0"
       cardWidth={480}
+      style={{
+        height: cardHeight,
+        width: "100%",
+        padding: "16px",
+        margin: "auto",
+      }}
     >
       <CardHeader>
         <CardTitle className="flex flex-col items-center justify-center mb-2">
@@ -87,10 +97,10 @@ export const ColorPalette = ({
         <div
           className="flex flex-wrap display:flex items-center justify-center"
           style={{
-            marginBottom: "0.2rem",
-            marginRight: "0.4rem",
-            marginTop: "0.2rem",
-            marginLeft: "0.4rem",
+            marginBottom: "0.3rem",
+            marginRight: "0.3rem",
+            marginTop: "0.3rem",
+            marginLeft: "0.3rem",
           }}
         >
           {bow && (
@@ -104,16 +114,24 @@ export const ColorPalette = ({
               }}
             >
               <Button
-                className={`rounded-xl w-13 h-12`}
+                className={`rounded-xl`}
+                size="icon"
                 onClick={handleBow}
                 style={{
+                  height: buttonHeight,
+                  width: buttonWidth,
                   backgroundColor: "transparent",
-                  ...(selectedColor === "noBow"
+                  ...(selectedColor === "noBow" ||
+                  selectedColor === "transparent"
                     ? { border: "2px solid #000" }
                     : { border: "2px solid rgba(255, 255, 255, 0)" }),
                 }}
               >
-                <img src={NoSign} alt="NoSign" className="w-4 h-4" />
+                <img
+                  src={NoSign}
+                  alt="NoSign"
+                  style={{ height: "70%", width: "70%" }}
+                />
               </Button>
             </div>
           )}
@@ -129,9 +147,11 @@ export const ColorPalette = ({
               }}
             >
               <Button
-                size="lg"
+                size="icon"
                 className={`rounded-xl`}
                 style={{
+                  height: buttonHeight,
+                  width: buttonWidth,
                   backgroundColor: color,
                   ...(selectedColor === color
                     ? { border: "2px solid #000" }

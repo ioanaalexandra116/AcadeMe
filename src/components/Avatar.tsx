@@ -10,7 +10,7 @@ interface AvatarProps {
   eyelidsColor: string;
   noseColor: string;
   bowColor?: string;
-  dimensions: string;
+  dimensions?: string;
 }
 
 function darkenColor(rgbColor: string, darkenAmount: number): string {
@@ -57,10 +57,13 @@ const Avatar = ({
       setBow(true);
     }, [bowColor]);
   }
+
+  dimensions = window.innerWidth > 700 ? "300px" : "175px";
+
   const containerStyle: React.CSSProperties = {
     position: "relative",
-    width: "300px", // Match the width of your SVG
-    height: "300px", // Match the height of your SVG
+    width: window.innerWidth > 700 ? "300px" : "175px",
+    height: window.innerWidth > 700 ? "300px" : "175px",
   };
 
   const svgStyle: React.CSSProperties = {
@@ -70,8 +73,8 @@ const Avatar = ({
   };
   const svgStyleBow: React.CSSProperties = {
     position: "absolute",
-    top: 30,
-    left: 42,
+    top: window.innerWidth > 700 ? "30" : "17.5",
+    left: window.innerWidth > 700 ? "42" : "24.5",
     transform: "rotate(10deg)",
   };
 

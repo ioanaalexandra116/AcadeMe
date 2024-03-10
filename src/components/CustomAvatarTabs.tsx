@@ -22,10 +22,6 @@ import HairstyleWoman from "../assets/hairstyle-woman.svg";
 import HairstyleMan from "../assets/hairstyle-man.svg";
 import Frame from "../assets/frame.svg";
 import { AvatarProperties } from "@/interfaces";
-const cardStyle: React.CSSProperties = {
-  zIndex: 10,
-  position: "relative", // Correctly typed as a literal
-};
 
 const triggerStyle: React.CSSProperties = {
   zIndex: 1,
@@ -34,41 +30,78 @@ const triggerStyle: React.CSSProperties = {
 
 export function CustomAvatarTabs({
   onCharacterPropertiesChange,
+  recievedCharacterProperties,
 }: {
   onCharacterPropertiesChange: (properties: AvatarProperties) => void;
+  recievedCharacterProperties: AvatarProperties; // Declare characterProperties in prop types
 }) {
   const [characterProperties, setCharacterProperties] =
-    useState<AvatarProperties>({
-      gender: "man",
-      backgroundColor: "rgb(164,222,247)",
-      mouthColor: "rgb(224,134,114)",
-      eyeColor: "rgb(102,78,39)",
-      eyelidsColor: "rgb(12,10,9)",
-      hairColor: "rgb(89,70,64)",
-      skinColor: "rgb(255,225,189)",
-      noseColor: "rgb(230,183,150)",
-      dimensions: "300px",
-      bowColor: "transparent",
-    });
+    useState<AvatarProperties>(recievedCharacterProperties);
   const [bow, setBow] = useState(false);
   const [selectedColor, setSelectedColor] = useState("");
   const [selectedTab, setSelectedTab] = useState("gender");
-  const [selectedAvatar, setSelectedAvatar] = useState("man");
-  const [persistentColorSkin, setPersistentColorSkin] =
-    useState("rgb(255,225,189)");
-  const [persistentColorHair, setPersistentColorHair] =
-    useState("rgb(89,70,64)");
-  const [persistentColorEyes, setPersistentColorEyes] =
-    useState("rgb(102,78,39)");
-  const [persistentColorEyelashes, setPersistentColorEyelashes] =
-    useState("rgb(12,10,9)");
-  const [persistentColorNose, setPersistentColorNose] =
-    useState("rgb(230,183,150)");
-  const [persistentColorLips, setPersistentColorLips] =
-    useState("rgb(224,134,114)");
-  const [persistentColorBow, setPersistentColorBow] = useState("noBow");
-  const [persistentColorBackground, setPersistentColorBackground] =
-    useState("rgb(164,222,247)");
+  const [selectedAvatar, setSelectedAvatar] = useState(
+    characterProperties.gender
+  );
+  const [persistentColorSkin, setPersistentColorSkin] = useState(
+    characterProperties.skinColor
+  );
+  const [persistentColorHair, setPersistentColorHair] = useState(
+    characterProperties.hairColor
+  );
+  const [persistentColorEyes, setPersistentColorEyes] = useState(
+    characterProperties.eyeColor
+  );
+  const [persistentColorEyelashes, setPersistentColorEyelashes] = useState(
+    characterProperties.eyelidsColor
+  );
+  const [persistentColorNose, setPersistentColorNose] = useState(
+    characterProperties.noseColor
+  );
+  const [persistentColorLips, setPersistentColorLips] = useState(
+    characterProperties.mouthColor
+  );
+  const [persistentColorBow, setPersistentColorBow] = useState(
+    characterProperties.bowColor || "transparent"
+  );
+  const [persistentColorBackground, setPersistentColorBackground] = useState(
+    characterProperties.backgroundColor
+  );
+
+  const [cardStyle, setCardStyle] = useState<React.CSSProperties>({
+    zIndex: 10,
+    position: "relative",
+    width: "100%", // Set the initial width
+  });
+
+  const [elementSize, setElementSize] = useState<number>(150); // Initial size of the elements
+
+  const updateCardStyles = () => {
+    const windowWidth = window.innerWidth;
+    const newElementSize = windowWidth > 480 ? 150 : windowWidth / 3; // Adjust the size based on the screen width
+
+    const newCardStyle: React.CSSProperties = {
+      ...cardStyle,
+      width: "100%", // Adjust as needed
+    };
+
+    setCardStyle(newCardStyle);
+    setElementSize(newElementSize);
+  };
+
+  useEffect(() => {
+    updateCardStyles(); // Initial call
+
+    const handleResize = () => {
+      updateCardStyles();
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []); // Empty dependency array for initial setup only
 
   useEffect(() => {
     // Call the function from the parent with the updated characterProperties
@@ -100,7 +133,6 @@ export function CustomAvatarTabs({
   };
 
   useEffect(() => {
-    console.log(selectedAvatar);
     setCharacterProperties((prevProperties) => ({
       ...prevProperties,
       ["gender"]: selectedAvatar,
@@ -110,79 +142,68 @@ export function CustomAvatarTabs({
   return (
     <Card
       cardWidth={480}
-      className="flex flex-col padding-0 bg-background border-0"
+      className="flex flex-col padding-0  border-0"
       style={{
         border: "0px solid rgba(255, 255, 255, 0)",
         boxShadow: "none",
+        backgroundColor: "#FCCEDB",
       }}
     >
       <Tabs
         defaultValue="gender"
-        className="w-[480px] display:flex align-items:center justify-content:center"
+        className="w-[480px] display:flex shadow-2xl border-0 flex-col"
       >
-        <TabsList className="grid w-full grid-cols-9">
+        <TabsList className="grid w-full grid-cols-9 bg-transparent flex flex-wrap items-center justify-center allign-center space-x-3">
           <TabsTrigger value="gender" onClick={() => setSelectedTab("gender")}>
-            <img src={Gender} alt="Gender" className="w-6 h-6 mb-3" />
+            <img src={Gender} alt="Gender" className="w-6 h-6" />
           </TabsTrigger>
           <TabsTrigger value="skin" onClick={() => setSelectedTab("skin")}>
-            <img src={Smiley} alt="Smiley" className="w-6 h-6 mb-3" />
+            <img src={Smiley} alt="Smiley" className="w-6 h-6" />
           </TabsTrigger>
           <TabsTrigger value="hair" onClick={() => setSelectedTab("hair")}>
             {" "}
             {selectedAvatar == "woman" ? (
-              <img
-                src={HairstyleWoman}
-                alt="Hairstyle"
-                className="w-6 h-6 mb-3"
-              />
+              <img src={HairstyleWoman} alt="Hairstyle" className="w-6 h-6" />
             ) : (
-              <img
-                src={HairstyleMan}
-                alt="Hairstyle"
-                className="w-6 h-6 mb-3"
-              />
+              <img src={HairstyleMan} alt="Hairstyle" className="w-6 h-6" />
             )}
           </TabsTrigger>
           <TabsTrigger value="eye" onClick={() => setSelectedTab("eye")}>
-            <img src={Eye} alt="Eyes" className="w-6 h-6 mb-3" />
+            <img src={Eye} alt="Eyes" className="w-6 h-6" />
           </TabsTrigger>
           <TabsTrigger
             value="eyelids"
             onClick={() => setSelectedTab("eyelids")}
           >
-            <img src={Eyelashes} alt="Eyelashes" className="w-6 h-6 mb-3" />
+            <img src={Eyelashes} alt="Eyelashes" className="w-6 h-6" />
           </TabsTrigger>
           <TabsTrigger value="nose" onClick={() => setSelectedTab("nose")}>
-            <img src={Nose} alt="Nose" className="w-5 h-5 mb-3" />
+            <img src={Nose} alt="Nose" className="w-5 h-5" />
           </TabsTrigger>
           <TabsTrigger value="mouth" onClick={() => setSelectedTab("mouth")}>
-            <img src={Lips} alt="Lips" className="w-6 h-6 mb-3" />
+            <img src={Lips} alt="Lips" className="w-6 h-6" />
           </TabsTrigger>
           <TabsTrigger value="bow" onClick={() => setSelectedTab("bow")}>
-            <img src={Bow} alt="Bow" className="w-6 h-6 mb-3" />
+            <img src={Bow} alt="Bow" className="w-6 h-6" />
           </TabsTrigger>
           <TabsTrigger
             value="background"
             onClick={() => setSelectedTab("background")}
           >
-            <img src={Frame} alt="Frame" className="w-6 h-6 mb-3" />
+            <img src={Frame} alt="Frame" className="w-6 h-6" />
           </TabsTrigger>
         </TabsList>
         <TabsContent value="gender">
           <Card
-            className="flex flex-col items-center justify-center h-[560px] relative" // Add relative positioning to the Card
+            className="flex flex-col items-center justify-center h-[560px] relative border-0 rounded-xl shadow-2xl" // Add relative positioning to the Card
             cardWidth={480}
             style={cardStyle}
           >
-            <CardHeader className="absolute top-0 left-0 right-0 flex flex-col items-top justify-center text-center">
-              {/* Move the text to the top of the card */}
-            </CardHeader>
+            <CardHeader className="absolute top-0 left-0 right-0 flex flex-col items-top justify-center text-center"></CardHeader>
             <CardTitle className="absolute top-20 flex flex-col items-top justify-center mb-2">
-              {/* Adjust top value as needed */}
               Choose an avatar
             </CardTitle>
             <CardDescription className="absolute top-28 mb-2">
-              {/* Adjust top value as needed */}
               Select the avatar that best represents you
             </CardDescription>
             <CardContent className="flex flex-row items-center justify-center space-x-16">
@@ -194,16 +215,16 @@ export function CustomAvatarTabs({
                     selectedAvatar === "man"
                       ? "2px solid black"
                       : "2px solid rgba(255, 255, 255, 0)",
-                  padding: 0, // Remove default padding
-                  borderRadius: "50%", // Make it circular
-                  overflow: "hidden", // Ensure the circular shape
+                  padding: 0,
+                  borderRadius: "50%",
+                  overflow: "hidden",
                   height: "150px",
                 }}
               >
                 <img
                   src={AvatarMan}
                   alt="AvatarMan"
-                  style={{ width: "150px", height: "150px" }}
+                  style={{ width: elementSize, height: elementSize }}
                 />
               </Button>
               <Button
@@ -223,13 +244,13 @@ export function CustomAvatarTabs({
                 <img
                   src={AvatarWoman}
                   alt="AvatarWoman"
-                  style={{ width: "150px", height: "150px" }}
+                  style={{ width: elementSize, height: elementSize }}
                 />
               </Button>
             </CardContent>
           </Card>
         </TabsContent>
-        <TabsContent value="skin">
+        <TabsContent value="skin" style={triggerStyle}>
           <ColorPicker
             onColorChange={handleColorChange(selectedTab)}
             bow={false}
@@ -237,7 +258,7 @@ export function CustomAvatarTabs({
             setPersistentColor={setPersistentColorSkin}
           />
         </TabsContent>
-        <TabsContent value="hair">
+        <TabsContent value="hair" style={triggerStyle}>
           <ColorPicker
             onColorChange={handleColorChange(selectedTab)}
             bow={false}
@@ -245,7 +266,7 @@ export function CustomAvatarTabs({
             setPersistentColor={setPersistentColorHair}
           />
         </TabsContent>
-        <TabsContent value="eye">
+        <TabsContent value="eye" style={triggerStyle}>
           <ColorPicker
             onColorChange={handleColorChange(selectedTab)}
             bow={false}
@@ -253,7 +274,7 @@ export function CustomAvatarTabs({
             setPersistentColor={setPersistentColorEyes}
           />
         </TabsContent>
-        <TabsContent value="eyelids">
+        <TabsContent value="eyelids" style={triggerStyle}>
           <ColorPicker
             onColorChange={handleColorChange(selectedTab)}
             bow={false}
@@ -261,7 +282,7 @@ export function CustomAvatarTabs({
             setPersistentColor={setPersistentColorEyelashes}
           />
         </TabsContent>
-        <TabsContent value="nose">
+        <TabsContent value="nose" style={triggerStyle}>
           <ColorPicker
             onColorChange={handleColorChange(selectedTab)}
             bow={false}
@@ -269,7 +290,7 @@ export function CustomAvatarTabs({
             setPersistentColor={setPersistentColorNose}
           />
         </TabsContent>
-        <TabsContent value="mouth">
+        <TabsContent value="mouth" style={triggerStyle}>
           <ColorPicker
             onColorChange={handleColorChange(selectedTab)}
             bow={false}
@@ -277,7 +298,7 @@ export function CustomAvatarTabs({
             setPersistentColor={setPersistentColorLips}
           />
         </TabsContent>
-        <TabsContent value="bow">
+        <TabsContent value="bow" style={triggerStyle}>
           <ColorPicker
             onColorChange={handleColorChange(selectedTab)}
             bow={bow}
@@ -285,7 +306,7 @@ export function CustomAvatarTabs({
             setPersistentColor={setPersistentColorBow}
           />
         </TabsContent>
-        <TabsContent value="background">
+        <TabsContent value="background" style={triggerStyle}>
           <ColorPicker
             onColorChange={handleColorChange(selectedTab)}
             bow={false}

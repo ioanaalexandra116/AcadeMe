@@ -16,14 +16,14 @@ import {
   QuerySnapshot,
 } from "firebase/firestore";
 import { User } from "../interfaces";
-import { ErrorMessasge } from "../interfaces/interfaces";
+import { ErrorMessasge, AvatarProperties } from "../interfaces/interfaces";
 
 export async function createUserCollection(user: User, username: string) {
   const docRef = doc(db, "users", user.uid);
   const data = {
     id: user.uid,
     username: username,
-    photoURL: "https://icon-library.com/images/2693a2979d_91160.png",
+    photoURL: "",
     desription: "",
     level: 1,
     following: [],
@@ -76,3 +76,33 @@ export const formatErrorMessage = (err: ErrorMessasge): ErrorMessasge => {
   }
   return err;
 };
+
+export async function getUserData(uid: string) {
+  const docRef = doc(db, "users", uid);
+  const docSnap = await getDoc(docRef);
+  if (docSnap.exists()) {
+    return docSnap.data();
+  } else {
+    console.log("No such document!");
+  }
+}
+
+export async function addAvatarProps(
+  uid: string,
+  avatarProps: AvatarProperties
+) {
+  const docRef = doc(db, "users", uid);
+  await updateDoc(docRef, {
+    avatarProps: avatarProps,
+  });
+}
+
+export async function getAvatarProps(uid: string) {
+  const docRef = doc(db, "users", uid);
+  const docSnap = await getDoc(docRef);
+  if (docSnap.exists()) {
+    return docSnap.data().avatarProps as AvatarProperties;
+  } else {
+    console.log("No such document!");
+  }
+}

@@ -1,14 +1,6 @@
 import React, { useState } from "react";
-import {
-  Card,
-  CardHeader,
-  CardFooter,
-  CardTitle,
-  CardDescription,
-  CardContent,
-} from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "./ui/button";
-import Avatar from "./Avatar";
 import NoSign from "../assets/no-sign.svg";
 import { useEffect } from "react";
 
@@ -83,7 +75,7 @@ export const ColorPalette = ({
 
   return (
     <Card
-      className="display:flex flex-col items-center justify-center h-[560px]"
+      className="display:flex flex-col items-center justify-center h-[560px] brounded-xl shadow-2xl border-0"
       cardWidth={480}
     >
       <CardHeader>

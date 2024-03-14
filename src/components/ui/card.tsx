@@ -17,7 +17,6 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
     React.useEffect(() => {
       const handleResize = () => {
         const newStyles = {
-          // width: window.innerWidth > 440 ? "440px" : "100%",
           width: window.innerWidth > cardWidth ? `${cardWidth}px` : "100%",
           padding: "16px",
           margin: "auto",

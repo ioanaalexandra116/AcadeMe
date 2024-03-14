@@ -23,11 +23,6 @@ import HairstyleMan from "../assets/hairstyle-man.svg";
 import Frame from "../assets/frame.svg";
 import { AvatarProperties } from "@/interfaces";
 
-const triggerStyle: React.CSSProperties = {
-  zIndex: 1,
-  position: "relative", // Correctly typed as a literal
-};
-
 export function CustomAvatarTabs({
   onCharacterPropertiesChange,
   recievedCharacterProperties,

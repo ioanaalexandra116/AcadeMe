@@ -3,6 +3,28 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "./ui/button";
 import NoSign from "../assets/no-sign.svg";
 import { useEffect } from "react";
+import styled, { keyframes } from "styled-components";
+
+const myAnim = keyframes`
+    0% {
+        opacity: 0;
+        transform: translateX(-250px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+`;
+
+interface AnimatedButtonProps {
+  delay: number;
+}
+
+const AnimatedButton = styled(Button)<AnimatedButtonProps>`
+  opacity: 0;
+  animation: ${myAnim} 0.5s ease forwards;
+  animation-delay: ${(props) => props.delay}s;
+`;
 
 interface ColorPaletteProps {
   onSelectColor: (color: string) => void;
@@ -76,6 +98,7 @@ export const ColorPalette = ({
   const buttonHeight = window.innerWidth > 480 ? 48 : 32;
   const buttonWidth = window.innerWidth > 480 ? 48 : 32;
   const cardHeight = window.innerWidth > 480 ? 580 : 450;
+  const delay = 0;
 
   return (
     <Card
@@ -113,7 +136,7 @@ export const ColorPalette = ({
                 marginLeft: "0.3rem",
               }}
             >
-              <Button
+              <AnimatedButton delay={delay}
                 className={`rounded-xl`}
                 size="icon"
                 onClick={handleBow}
@@ -132,10 +155,10 @@ export const ColorPalette = ({
                   alt="NoSign"
                   style={{ height: "70%", width: "70%" }}
                 />
-              </Button>
+              </AnimatedButton>
             </div>
           )}
-          {colors.map((color) => (
+          {colors.map((color, index) => (
             <div
               key={color}
               className="flex flex-wrap justify-center items-center"
@@ -146,7 +169,7 @@ export const ColorPalette = ({
                 marginLeft: "0.3rem",
               }}
             >
-              <Button
+              <AnimatedButton delay={index * 0.005}
                 size="icon"
                 className={`rounded-xl`}
                 style={{
@@ -158,7 +181,7 @@ export const ColorPalette = ({
                     : { border: "2px solid rgba(255, 255, 255, 0)" }),
                 }}
                 onClick={() => onSelectColor(color)}
-              ></Button>
+              ></AnimatedButton>
             </div>
           ))}
         </div>

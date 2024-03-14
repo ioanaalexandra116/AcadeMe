@@ -82,7 +82,6 @@ const EditAvatar = () => {
   }, [user]);
 
   const fullWidth = window.innerWidth > 700;
-  console.log(window.innerWidth);
 
   const handleCharacterProperties = (properties: AvatarProperties) => {
     setCharacterProperties(properties);

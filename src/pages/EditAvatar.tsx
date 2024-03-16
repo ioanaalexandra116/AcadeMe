@@ -16,6 +16,7 @@ const EditAvatar = () => {
     width: "100%",
     padding: "16px",
     margin: "auto",
+    marginTop: "40px"
   });
 
   useEffect(() => {
@@ -25,6 +26,7 @@ const EditAvatar = () => {
         width: window.innerWidth > 480 ? `480px` : "100%",
         padding: "16px",
         margin: "auto",
+        marginTop: "40px"
       };
       setCardStyles(newStyles);
     };

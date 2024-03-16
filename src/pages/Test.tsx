@@ -1,8 +1,6 @@
 import { Button } from "../components/ui/button";
 import { auth } from "../firebase/config";
 import { useNavigate } from "react-router-dom";
-import ColorPicker from "@/components/ColorPicker";
-import { CustomAvatarTabs } from "@/components/CustomAvatarTabs";
 import Background from "@/assets/laptop-background.svg";
 const Test = () => {
   const navigate = useNavigate();
@@ -20,8 +18,8 @@ const Test = () => {
     <>
     <div
       className="bg-cover bg-center h-screen w-screen flex items-center justify-center"
-      style={{ backgroundImage: `url(${Background})` }}
-    ></div>
+      style={{ backgroundImage: `url(${Background})` }}>
+    </div>
       <Button
         onClick={handleLogOut}
         className="absolute top-4 right-4"

@@ -97,7 +97,7 @@ export const ColorPalette = ({
 
   const buttonHeight = window.innerWidth > 480 ? 48 : 32;
   const buttonWidth = window.innerWidth > 480 ? 48 : 32;
-  const cardHeight = window.innerWidth > 480 ? 580 : 450;
+  const cardHeight = window.innerWidth > 480 ? 555 : 450;
   const delay = 0;
 
   return (
@@ -112,7 +112,7 @@ export const ColorPalette = ({
       }}
     >
       <CardHeader>
-        <CardTitle className="flex flex-col items-center justify-center mb-2">
+        <CardTitle className="flex flex-col items-center justify-center mb-1">
           Choose a color
         </CardTitle>
       </CardHeader>

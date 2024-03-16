@@ -63,7 +63,7 @@ export function CustomAvatarTabs({
     characterProperties.backgroundColor
   );
 
-  const cardHeight = window.innerWidth > 480 ? 580 : 450;
+  const cardHeight = window.innerWidth > 480 ? 555 : 450;
 
   const [cardStyle, setCardStyle] = useState<React.CSSProperties>({
     zIndex: 10,

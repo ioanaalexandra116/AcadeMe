@@ -87,6 +87,16 @@ export async function getUserData(uid: string) {
   }
 }
 
+export async function getUsername(uid: string) {
+  const docRef = doc(db, "users", uid);
+  const docSnap = await getDoc(docRef);
+  if (docSnap.exists()) {
+    return docSnap.data().username;
+  } else {
+    console.log("No such document!");
+  }
+}
+
 export async function addAvatarProps(
   uid: string,
   avatarProps: AvatarProperties

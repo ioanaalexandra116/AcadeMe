@@ -19,12 +19,18 @@ import { AuthContext } from "@/context";
 
 import { AvatarUI, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Avatar from "@/components/Avatar";
-import { getAvatarProps } from "@/firebase/firestore";
+import { getAvatarProps, getUsername } from "@/firebase/firestore";
 import { AvatarProperties } from "@/interfaces/interfaces";
 import { useState, useContext, useEffect } from "react";
 import Loading from "@/components/Loading";
 import { useLocation } from "react-router-dom";
-import Girl from "../assets/main-logo.svg";
+import Girl from "../assets/cover.svg";
+import SimpleGirl from "../assets/girl.svg";
+import User from "../assets/user.svg";
+import Logout from "../assets/logout.svg";
+import Create from "../assets/create.svg";
+import Discover from "../assets/discover.svg";
+import Search from "../assets/search.svg";
 import { auth } from "@/firebase/config";
 
 const components: { title: string; href: string; description: string }[] = [
@@ -40,14 +46,16 @@ const components: { title: string; href: string; description: string }[] = [
   },
 ];
 
-const profileMenuItems: { title: string; href: string }[] = [
+const profileMenuItems: { title: string; href: string; img: string }[] = [
   {
     title: "Profile",
     href: "/profile",
+    img: User,
   },
   {
     title: "Log out",
     href: "/login",
+    img: Logout,
   },
 ];
 
@@ -71,6 +79,10 @@ export default function Navbar() {
   const location = useLocation();
   const [characterProperties, setCharacterProperties] =
     useState<AvatarProperties>(defaultCharacterProperties);
+  const [username, setUsername] = useState("");
+  const smallScreen = window.innerWidth < 700;
+  console.log(smallScreen);
+
   const handleLogOut = async () => {
     try {
       await auth.signOut();
@@ -103,7 +115,19 @@ export default function Navbar() {
       }
     };
 
+    const fetchUsername = async () => {
+      try {
+        const username = await getUsername(user.uid);
+        setUsername(username);
+      } catch (error) {
+        console.error("Error fetching username:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchAvatarProps();
+    fetchUsername();
   }, [user, location.pathname]);
 
   if (loading) {
@@ -114,30 +138,37 @@ export default function Navbar() {
     <NavigationMenu className="backdrop-blur-lg fixed z-50 bg-transparent shadow-md">
       <NavigationMenuItem className="flex justify-start items-left absolute left-0">
         <a href="/">
-          <img src={Logo} alt="logo" className="h-8 w-24 ml-12" />
+          {!smallScreen ? (
+          <img src={Logo} alt="logo" className="h-8 w-24"
+          style={{marginLeft: "1.5rem"}} />)
+          :
+          <img src={SimpleGirl} alt="logo" className="h-8 w-8"
+          style={{marginLeft: "1.5rem"}} />
+          }
+          
         </a>
       </NavigationMenuItem>
       <NavigationMenuList className="mb-1.5 mt-1 flex justify-center items-center">
         <NavigationMenuItem>
           <NavigationMenuTrigger onMouseEnter={() => setAvatarHover(false)}>
-            Discover
-          </NavigationMenuTrigger>
+            <div className="flex items-center">
+              <img src={Discover} alt="discover" className="h-5 w-6" />
+              {smallScreen ? "" : "Discover"}
+            </div>
+          </NavigationMenuTrigger >
           <NavigationMenuContent className="flex justify-center items-center">
             <ul className="grid gap-2 p-4 md:w-[200px] lg:w-[500px] lg:grid-cols-[.80fr_1fr] flex items-center justify-center">
               <li className="row-span-2 flex justify-center items-center">
-                <NavigationMenuLink asChild>
+                <NavigationMenuLink asChild className="bg-blue-400">
                   <a className="flex items-center justify-center select-none flex-col justify-end rounded-xl bg-gradient-to-b from-muted/50 to-muted p-4 no-underline outline-none focus:shadow-md">
-                    <img src={Girl} alt="girl" />
+                    <img src={Girl} alt="girl" sizes="400vw" className="h-48 w-80" />
                   </a>
                 </NavigationMenuLink>
               </li>
               <ListItem href="/discover/friends" title="New Friends">
                 Connect with other study enthusiasts sharing similar interests
               </ListItem>
-              <ListItem
-                href="/discover/flascards"
-                title="New Flashcard Sets"
-              >
+              <ListItem href="/discover/flascards" title="New Flashcard Sets">
                 Find flashcard sets recommended for you based on your favorite
                 ones
               </ListItem>
@@ -146,7 +177,10 @@ export default function Navbar() {
         </NavigationMenuItem>
         <NavigationMenuItem>
           <NavigationMenuTrigger onMouseEnter={() => setAvatarHover(false)}>
-            Search
+            <div className="flex items-center">
+              <img src={Search} alt="create" className="h-5 w-5" />
+              {smallScreen ? "" : "Search"}
+            </div>
           </NavigationMenuTrigger>
           <NavigationMenuContent>
             <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-1 lg:w-[280px]">
@@ -164,7 +198,12 @@ export default function Navbar() {
         </NavigationMenuItem>
         <NavigationMenuItem>
           <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-            <a href="/create">Create</a>
+            <a href="/create">
+              <div className="flex items-center">
+                <img src={Create} alt="create" className="h-5 w-5 rotate-90" />
+                {smallScreen ? "" : "Create"}
+              </div>
+            </a>
           </NavigationMenuLink>
         </NavigationMenuItem>
       </NavigationMenuList>
@@ -173,17 +212,20 @@ export default function Navbar() {
             <AvatarFallback>CN</AvatarFallback>
           </AvatarUI> */}
       {/* <NavigationMenuItem className="flex justify-end items-end"> */}
-      <NavigationMenuItem className="flex items-right justify-end absolute right-12">
+      <NavigationMenuItem className="flex items-right justify-end absolute"
+      style={{right: "1rem"}}
+      >
         <NavigationMenuTrigger onMouseEnter={() => setAvatarHover(true)}>
           <Avatar {...characterProperties} />
         </NavigationMenuTrigger>
         <NavigationMenuContent className="flex justify-end items-right absolute right-0">
-          <ul className="grid w-[100px] gap-3 p-4 md:w-[200px] md:grid-cols-1 lg:w-[175px]">
+          <ul className="grid w-[500px] gap-3 p-4 md:w-[200px] md:grid-cols-1 lg:w-[160px]">
             <ListItem className="hover:bg-transparent">
-              Signed in as alex
+              Signed in as {username}
             </ListItem>
             {profileMenuItems.map((component) => (
               <ListItem
+                img={component.img}
                 key={component.title}
                 title={component.title}
                 href={component.href}
@@ -193,10 +235,10 @@ export default function Navbar() {
           </ul>
         </NavigationMenuContent>
       </NavigationMenuItem>
-      {avatarHover ? (
+      {avatarHover && !smallScreen ? (
         <NavigationMenuViewport
           className={cn(
-            "flex justify-end items-right absolute right-3 top-full"
+            "flex justify-end items-right absolute right-7 top-full"
           )}
         />
       ) : (
@@ -209,9 +251,10 @@ export default function Navbar() {
 }
 
 const ListItem = React.forwardRef<
-  React.ElementRef<"a">,
-  React.ComponentPropsWithoutRef<"a">
->(({ className, title, children, ...props }, ref) => {
+  React.ElementRef<"a"> & { img?: string }, // Add the img field to the props
+  React.ComponentPropsWithoutRef<"a"> & { img?: string } // Also include img in the type definition
+>(({ className, title, children, img, ...props }, ref) => {
+  // Destructure img from props
   return (
     <li>
       <NavigationMenuLink asChild>
@@ -223,13 +266,30 @@ const ListItem = React.forwardRef<
           )}
           {...props}
         >
-          <div className="text-sm font-medium leading-none">{title}</div>
-          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-            {children}
-          </p>
+          {img ? (
+            <div>
+              <div className="flex items-center justify-center">
+                <img src={img} alt={title} className="h-5 w-5" />
+                &nbsp;
+                <div className="text-sm font-medium leading-none">{title}</div>
+              </div>
+              <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                {children}
+              </p>
+            </div>
+          ) : (
+            <div>
+              <div className="text-sm font-medium leading-none">{title}</div>
+              <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                {children}
+              </p>
+            </div>
+          )}
         </a>
       </NavigationMenuLink>
     </li>
   );
 });
-ListItem.displayName = "ListItem";
+
+// Change the displayName
+ListItem.displayName = "CustomListItem";

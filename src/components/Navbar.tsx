@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import Logo from "../assets/title.svg"
+import * as React from "react";
+import Logo from "../assets/title.svg";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -12,72 +12,146 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
-} from "@/components/ui/navigation-menu"
+  NavigationMenuViewport,
+} from "@/components/ui/navigation-menu";
 
-import Avatar from "./Avatar"
+import { AuthContext } from "@/context";
+
+import { AvatarUI, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import Avatar from "@/components/Avatar";
+import { getAvatarProps } from "@/firebase/firestore";
+import { AvatarProperties } from "@/interfaces/interfaces";
+import { useState, useContext, useEffect } from "react";
+import Loading from "@/components/Loading";
+import { useLocation } from "react-router-dom";
+import Girl from "../assets/main-logo.svg";
+import { auth } from "@/firebase/config";
 
 const components: { title: string; href: string; description: string }[] = [
   {
-    title: "Find People",
+    title: "People",
     href: "/search/people",
-    description:
-      "Connect with other study enthusiasts",
+    description: "Search for other users on the platform",
   },
   {
-    title: "Find Flashcard Sets",
+    title: "Flashcard Sets",
     href: "/search/flashcards",
-    description:
-      "Discover flashcard sets created by other users",
+    description: "Search for flashcard sets created by other users",
   },
-]
+];
+
+const profileMenuItems: { title: string; href: string }[] = [
+  {
+    title: "Profile",
+    href: "/profile",
+  },
+  {
+    title: "Log out",
+    href: "/login",
+  },
+];
 
 export default function Navbar() {
+  const defaultCharacterProperties: AvatarProperties = {
+    gender: "man",
+    backgroundColor: "rgb(164,222,247)",
+    mouthColor: "rgb(224,134,114)",
+    eyeColor: "rgb(102,78,39)",
+    eyelidsColor: "rgb(12,10,9)",
+    hairColor: "rgb(89,70,64)",
+    skinColor: "rgb(255,225,189)",
+    noseColor: "rgb(230,183,150)",
+    dimensions: "300px",
+    bowColor: "transparent",
+  };
+
+  const { user, userLoading } = useContext(AuthContext);
+  const [loading, setLoading] = useState(true);
+  const [avatarHover, setAvatarHover] = useState(false);
+  const location = useLocation();
+  const [characterProperties, setCharacterProperties] =
+    useState<AvatarProperties>(defaultCharacterProperties);
+  const handleLogOut = async () => {
+    try {
+      await auth.signOut();
+      await auth.updateCurrentUser(null);
+    } catch (error) {
+      alert(error);
+    }
+  };
+
+  if (!user || userLoading) {
+    return <Loading />;
+  }
+
+  useEffect(() => {
+    if (!user) {
+      return;
+    }
+
+    const fetchAvatarProps = async () => {
+      try {
+        const avatarProps = await getAvatarProps(user.uid);
+        if (avatarProps) {
+          avatarProps.dimensions = "40px";
+          setCharacterProperties(avatarProps);
+        }
+      } catch (error) {
+        console.error("Error fetching avatar properties:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAvatarProps();
+  }, [user, location.pathname]);
+
+  if (loading) {
+    return <Loading />;
+  }
+
   return (
     <NavigationMenu className="backdrop-blur-lg fixed z-50 bg-transparent shadow-md">
       <NavigationMenuItem className="flex justify-start items-left absolute left-0">
-          <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-            <img src={Logo} alt="logo" className="h-8 w-24" />
-          </NavigationMenuLink>
-        </NavigationMenuItem>
-      <NavigationMenuList className="mb-2 mt-2 flex justify-center items-center">
+        <a href="/">
+          <img src={Logo} alt="logo" className="h-8 w-24 ml-12" />
+        </a>
+      </NavigationMenuItem>
+      <NavigationMenuList className="mb-1.5 mt-1 flex justify-center items-center">
         <NavigationMenuItem>
-          <NavigationMenuTrigger>Getting started</NavigationMenuTrigger>
+          <NavigationMenuTrigger onMouseEnter={() => setAvatarHover(false)}>
+            Discover
+          </NavigationMenuTrigger>
           <NavigationMenuContent className="flex justify-center items-center">
-            <ul className="grid gap-3 p-4 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
-              <li className="row-span-3">
+            <ul className="grid gap-2 p-4 md:w-[200px] lg:w-[500px] lg:grid-cols-[.80fr_1fr] flex items-center justify-center">
+              <li className="row-span-2 flex justify-center items-center">
                 <NavigationMenuLink asChild>
-                  <a
-                    className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
-                    href="/"
-                  >
-                    <div className="mb-2 mt-4 text-lg font-medium">
-                      shadcn/ui
-                    </div>
-                    <p className="text-sm leading-tight text-muted-foreground">
-                      Beautifully designed components built with Radix UI and
-                      Tailwind CSS.
-                    </p>
+                  <a className="flex items-center justify-center select-none flex-col justify-end rounded-xl bg-gradient-to-b from-muted/50 to-muted p-4 no-underline outline-none focus:shadow-md">
+                    <img src={Girl} alt="girl" />
                   </a>
                 </NavigationMenuLink>
               </li>
-              <ListItem href="/docs" title="Introduction">
-                Re-usable components built using Radix UI and Tailwind CSS.
+              <ListItem href="/discover/friends" title="New Friends">
+                Connect with other study enthusiasts sharing similar interests
               </ListItem>
-              <ListItem href="/docs/installation" title="Installation">
-                How to install dependencies and structure your app.
-              </ListItem>
-              <ListItem href="/docs/primitives/typography" title="Typography">
-                Styles for headings, paragraphs, lists...etc
+              <ListItem
+                href="/discover/flascards"
+                title="New Flashcard Sets"
+              >
+                Find flashcard sets recommended for you based on your favorite
+                ones
               </ListItem>
             </ul>
           </NavigationMenuContent>
         </NavigationMenuItem>
         <NavigationMenuItem>
-          <NavigationMenuTrigger>Search</NavigationMenuTrigger>
-          <NavigationMenuContent className="flex justify-center items-center">
-            <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] flex items-center justify-center">
+          <NavigationMenuTrigger onMouseEnter={() => setAvatarHover(false)}>
+            Search
+          </NavigationMenuTrigger>
+          <NavigationMenuContent>
+            <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-1 lg:w-[280px]">
               {components.map((component) => (
-                <ListItem className="flex items-center justify-center"
+                <ListItem
                   key={component.title}
                   title={component.title}
                   href={component.href}
@@ -89,18 +163,49 @@ export default function Navbar() {
           </NavigationMenuContent>
         </NavigationMenuItem>
         <NavigationMenuItem>
-            <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-              Documentation
-            </NavigationMenuLink>
-        </NavigationMenuItem>
-      </NavigationMenuList>
-      <NavigationMenuItem className="flex items-right justify-end absolute right-0">
           <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-              <img src={Logo} alt="logo" className="h-8 w-24" />
+            <a href="/create">Create</a>
           </NavigationMenuLink>
         </NavigationMenuItem>
+      </NavigationMenuList>
+      {/* <AvatarUI className="flex items-right justify-end absolute right-4">
+            <AvatarImage Avatar fallback={<AvatarFallback>SH</AvatarFallback>} />
+            <AvatarFallback>CN</AvatarFallback>
+          </AvatarUI> */}
+      {/* <NavigationMenuItem className="flex justify-end items-end"> */}
+      <NavigationMenuItem className="flex items-right justify-end absolute right-12">
+        <NavigationMenuTrigger onMouseEnter={() => setAvatarHover(true)}>
+          <Avatar {...characterProperties} />
+        </NavigationMenuTrigger>
+        <NavigationMenuContent className="flex justify-end items-right absolute right-0">
+          <ul className="grid w-[100px] gap-3 p-4 md:w-[200px] md:grid-cols-1 lg:w-[175px]">
+            <ListItem className="hover:bg-transparent">
+              Signed in as alex
+            </ListItem>
+            {profileMenuItems.map((component) => (
+              <ListItem
+                key={component.title}
+                title={component.title}
+                href={component.href}
+                onClick={component.href === "/login" ? handleLogOut : undefined}
+              ></ListItem>
+            ))}
+          </ul>
+        </NavigationMenuContent>
+      </NavigationMenuItem>
+      {avatarHover ? (
+        <NavigationMenuViewport
+          className={cn(
+            "flex justify-end items-right absolute right-3 top-full"
+          )}
+        />
+      ) : (
+        <NavigationMenuViewport
+          className={cn("absolute top-full flex justify-center")}
+        />
+      )}
     </NavigationMenu>
-  )
+  );
 }
 
 const ListItem = React.forwardRef<
@@ -113,8 +218,7 @@ const ListItem = React.forwardRef<
         <a
           ref={ref}
           className={cn(
-
-            "flex items-center justify-center block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
+            "block select-none space-y-1 rounded-xl p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
             className
           )}
           {...props}
@@ -126,6 +230,6 @@ const ListItem = React.forwardRef<
         </a>
       </NavigationMenuLink>
     </li>
-  )
-})
-ListItem.displayName = "ListItem"
+  );
+});
+ListItem.displayName = "ListItem";

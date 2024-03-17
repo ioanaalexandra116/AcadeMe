@@ -58,12 +58,14 @@ const Avatar = ({
     }, [bowColor]);
   }
 
-  dimensions = window.innerWidth > 700 ? "300px" : "175px";
+  if (!dimensions) {
+    dimensions = window.innerWidth > 700 ? "300px" : "175px";
+  }
 
   const containerStyle: React.CSSProperties = {
     position: "relative",
-    width: window.innerWidth > 700 ? "300px" : "175px",
-    height: window.innerWidth > 700 ? "300px" : "175px",
+    width: dimensions,
+    height: dimensions,
   };
 
   const svgStyle: React.CSSProperties = {
@@ -71,10 +73,17 @@ const Avatar = ({
     top: 0,
     left: 0,
   };
+
+  const bowTop: string = window.innerWidth > 700 ? "30" : "28.5";
+  const bowLeft: string = window.innerWidth > 700 ? "42" : "40.5";
+
+  const smallBowTop: string = parseInt(dimensions) < 100 ? "4" : bowTop;
+  const smallBowLeft: string = parseInt(dimensions) < 100 ? "6" : bowLeft;
+
   const svgStyleBow: React.CSSProperties = {
     position: "absolute",
-    top: window.innerWidth > 700 ? "30" : "17.5",
-    left: window.innerWidth > 700 ? "42" : "24.5",
+    top: smallBowTop + "px",
+    left: smallBowLeft + "px",
     transform: "rotate(10deg)",
   };
 

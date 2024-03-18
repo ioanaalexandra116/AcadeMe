@@ -32,6 +32,7 @@ import Create from "../assets/create.svg";
 import Discover from "../assets/discover.svg";
 import Search from "../assets/search.svg";
 import { auth } from "@/firebase/config";
+import {Link} from "react-router-dom";
 
 const components: { title: string; href: string; description: string }[] = [
   {
@@ -81,7 +82,6 @@ export default function Navbar() {
     useState<AvatarProperties>(defaultCharacterProperties);
   const [username, setUsername] = useState("");
   const smallScreen = window.innerWidth < 700;
-  console.log(smallScreen);
 
   const handleLogOut = async () => {
     try {
@@ -137,16 +137,16 @@ export default function Navbar() {
   return (
     <NavigationMenu className="backdrop-blur-lg fixed z-50 bg-transparent shadow-md">
       <NavigationMenuItem className="flex justify-start items-left absolute left-0">
-        <a href="/">
+        <Link to="/">
           {!smallScreen ? (
           <img src={Logo} alt="logo" className="h-8 w-24"
           style={{marginLeft: "1.5rem"}} />)
           :
-          <img src={SimpleGirl} alt="logo" className="h-8 w-8"
+          <img src={SimpleGirl} alt="logo" className="h-10 w-10"
           style={{marginLeft: "1.5rem"}} />
           }
           
-        </a>
+        </Link>
       </NavigationMenuItem>
       <NavigationMenuList className="mb-1.5 mt-1 flex justify-center items-center">
         <NavigationMenuItem>
@@ -160,9 +160,9 @@ export default function Navbar() {
             <ul className="grid gap-2 p-4 md:w-[200px] lg:w-[500px] lg:grid-cols-[.80fr_1fr] flex items-center justify-center">
               <li className="row-span-2 flex justify-center items-center">
                 <NavigationMenuLink asChild className="bg-blue-400">
-                  <a className="flex items-center justify-center select-none flex-col justify-end rounded-xl bg-gradient-to-b from-muted/50 to-muted p-4 no-underline outline-none focus:shadow-md">
+                  <div className="flex items-center justify-center select-none flex-col justify-end rounded-xl bg-gradient-to-b from-muted/50 to-muted p-4 no-underline outline-none focus:shadow-md">
                     <img src={Girl} alt="girl" sizes="400vw" className="h-48 w-80" />
-                  </a>
+                  </div>
                 </NavigationMenuLink>
               </li>
               <ListItem href="/discover/friends" title="New Friends">
@@ -198,12 +198,12 @@ export default function Navbar() {
         </NavigationMenuItem>
         <NavigationMenuItem>
           <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-            <a href="/create">
+            <Link to="/create">
               <div className="flex items-center">
                 <img src={Create} alt="create" className="h-5 w-5 rotate-90" />
                 {smallScreen ? "" : "Create"}
               </div>
-            </a>
+            </Link>
           </NavigationMenuLink>
         </NavigationMenuItem>
       </NavigationMenuList>

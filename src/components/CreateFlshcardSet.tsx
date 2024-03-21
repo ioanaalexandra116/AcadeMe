@@ -95,20 +95,6 @@ const CreateFlashcardSet = ({
 
   return (
     <div className="flex flex-row items-center justify-center space-x-10">
-      <h1
-        className="text-4xl font-bold text-black contoured-text"
-        style={{
-          color: "#f987af",
-          textShadow: `
-      -0.5px -0.5px 0 #000,  
-       2px -0.5px 0 #000,
-      -0.5px  1px 0 #000,
-       2px  1px 0 #000
-    `
-        }}
-      >
-        {`${flashcardKey}.`}
-      </h1>
       <div className="flex flex-row items-center justify-center space-x-3">
         <Textarea
           placeholder="Complete the front side"

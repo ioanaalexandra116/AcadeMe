@@ -22,7 +22,6 @@ const EditAvatar = () => {
   useEffect(() => {
     const handleResize = () => {
       const newStyles = {
-        // width: window.innerWidth > 440 ? "440px" : "100%",
         width: window.innerWidth > 480 ? `480px` : "100%",
         padding: "16px",
         margin: "auto",

@@ -139,7 +139,7 @@ export function CustomAvatarTabs({
   return (
     <Card
       cardWidth={480}
-      className="flex flex-col padding-0  border-0"
+      className="flex flex-col padding-0  border-0 mt-10"
       style={{
         border: "0px solid rgba(255, 255, 255, 0)",
         boxShadow: "none",

@@ -1,10 +1,10 @@
 import CreateFlashcardSet from "@/components/CreateFlshcardSet";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useLayoutEffect } from "react";
 import { Button } from "@/components/ui/button";
 import BubbleBackground from "@/components/BubbleBackground";
 
 const Create = () => {
-  const [contentHeight, setContentHeight] = useState(0);
+  const [contentHeight, setContentHeight] = useState(1183);
   const [flashcardSets, setFlashcardSets] = useState([
     { id: 1, frontContent: "1", backContent: "" },
     { id: 2, frontContent: "2", backContent: "" },
@@ -44,24 +44,23 @@ const Create = () => {
     ]);
   };
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const height = document.body.scrollHeight;
-    setContentHeight(height);
-    console.log(flashcardSets);
+    setContentHeight(height + 20);
   }, [flashcardSets]);
 
   useEffect(() => {
-    if (removedCard) {
+    if (removedCard !== null) {
       const tempFlashcardSets = flashcardSets.map((set) => {
         if (set.id > removedCard) {
-          return { ...set, id: set.id - 1 };
+          return { ...set, id: set.id - 1 }; // Decrement ID for sets after the removed one
         }
         return set;
-      }
-      );
+      });
       setFlashcardSets(tempFlashcardSets);
+      setRemovedCard(null); // Reset removedCard state
     }
-  }, [removedCard]);
+  }, [removedCard, flashcardSets]);
 
   return (
     <div className="flex flex-col items-center justify-center relative">
@@ -79,23 +78,44 @@ const Create = () => {
         >
           Create flashcard set
         </h1>
-        {flashcardSets.map((flashcardSet) => (
-          <CreateFlashcardSet
-            flashcardKey={flashcardSet.id}
-            frontValue={flashcardSet.frontContent}
-            backValue={flashcardSet.backContent}
-            onDelete={removeCard}
-            setFrontValue={(value) =>
-              handleFrontContentChange(flashcardSet.id, value)
-            }
-            setBackValue={(value) =>
-              handleBackContentChange(flashcardSet.id, value)
-            }
-          />
-        ))}
+        {flashcardSets.map((flashcardSet, index) => (
+  <div
+    key={flashcardSet.id}
+    className="flex flex-row items-center justify-center space-x-10"
+  >
+    <h1
+      className="text-4xl font-bold text-black contoured-text"
+      style={{
+        color: "#f987af",
+        textShadow: `
+          -0.5px -0.5px 0 #000,  
+          2px -0.5px 0 #000,
+          -0.5px  1px 0 #000,
+          2px  1px 0 #000
+        `,
+        minWidth: "50px", // Ensure a fixed width for the index number container
+        textAlign: "right", // Align index numbers to the right
+      }}
+    >
+      {index + 1}.
+    </h1>
+    <CreateFlashcardSet
+      flashcardKey={flashcardSet.id}
+      frontValue={flashcardSet.frontContent}
+      backValue={flashcardSet.backContent}
+      onDelete={removeCard}
+      setFrontValue={(value) =>
+        handleFrontContentChange(flashcardSet.id, value)
+      }
+      setBackValue={(value) =>
+        handleBackContentChange(flashcardSet.id, value)
+      }
+    />
+  </div>
+))}
         <Button
           onClick={handlePressButton}
-          className="w-40 h-12 bg-blue-500 text-white rounded-full"
+          className="w-40 h-12 bg-blue-500 text-white rounded-full hover:bg-blue-700"
           style={{ backgroundColor: "#f987af" }}
         >
           + Add New Flashcard

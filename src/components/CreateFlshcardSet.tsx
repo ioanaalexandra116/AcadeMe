@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import styled from "styled-components";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -61,10 +61,23 @@ const CardBack = styled.div`
   transform: rotateY(180deg);
 `;
 
-const CreateFlashcardSet = ({ flashcardKey, onDelete, frontValue, backValue, setFrontValue, setBackValue }: CreateFlashcardSetProps) => {
-  const [frontContent, setFrontContent] = useState("");
-  const [backContent, setBackContent] = useState("");
+const CreateFlashcardSet = ({
+  flashcardKey,
+  onDelete,
+  frontValue,
+  backValue,
+  setFrontValue,
+  setBackValue
+}: CreateFlashcardSetProps) => {
+  const [frontContent, setFrontContent] = useState(frontValue || "");
+  const [backContent, setBackContent] = useState(backValue || "");
   const [isPressed, setIsPressed] = useState(false);
+
+  useEffect(() => {
+    // Update local state when props change
+    setFrontContent(frontValue || "");
+    setBackContent(backValue || "");
+  }, [frontValue, backValue]);
 
   const handleFrontContentChange = (value: string) => {
     setFrontContent(value); // Update local state
@@ -91,7 +104,7 @@ const CreateFlashcardSet = ({ flashcardKey, onDelete, frontValue, backValue, set
        2px -0.5px 0 #000,
       -0.5px  1px 0 #000,
        2px  1px 0 #000
-    `,
+    `
         }}
       >
         {`${flashcardKey}.`}
@@ -100,14 +113,14 @@ const CreateFlashcardSet = ({ flashcardKey, onDelete, frontValue, backValue, set
         <Textarea
           placeholder="Complete the front side"
           value={frontContent}
-          onChange={(e) => setFrontContent(e.target.value)}
+          onChange={(e) => handleFrontContentChange(e.target.value)}
           style={{ width: "300px", height: "175px" }}
           className="bg-white rounded-xl"
         />
         <Textarea
           placeholder="Complete the back side"
           value={backContent}
-          onChange={(e) => setBackContent(e.target.value)}
+          onChange={(e) => handleBackContentChange(e.target.value)}
           style={{ width: "300px", height: "175px" }}
           className="bg-white rounded-xl"
         />
@@ -121,7 +134,9 @@ const CreateFlashcardSet = ({ flashcardKey, onDelete, frontValue, backValue, set
           <CardBack>{backContent}</CardBack>
         </CardInner>
       </StyledCard>
-      <Button onClick={() => onDelete(flashcardKey)} className="text-red-500">Remove</Button>
+      <Button onClick={() => onDelete(flashcardKey)} className="text-red-700 bg-red-200 border-red-700 hover:bg-red-700 hover:text-white">
+        Remove
+      </Button>
     </div>
   );
 };

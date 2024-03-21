@@ -1,16 +1,15 @@
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
 import styled from "styled-components";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 
-interface CardInnerProps {
-  isHovered: boolean;
+interface CreateFlashcardSetProps {
+  flashcardKey: number;
+  onDelete: (key: number) => void;
+  frontValue?: string;
+  backValue?: string;
+  setFrontValue?: (value: string) => void;
+  setBackValue?: (value: string) => void;
 }
 
 const StyledCard = styled.div`
@@ -19,31 +18,34 @@ const StyledCard = styled.div`
   perspective: 1000px;
 `;
 
-const CardInner = styled.div<CardInnerProps>`
+const CardInner = styled.div<{ isPressed: boolean }>`
   width: 100%;
   height: 100%;
   position: relative;
   transform-style: preserve-3d;
-  transition: transform 0.999s;
-  transform: ${props => (props.isHovered ? 'rotateY(180deg)' : 'rotateY(0deg)')};
+  transition: transform 0.85s;
+  transform: ${(props) =>
+    props.isPressed ? "rotateY(180deg)" : "rotateY(0deg)"};
 `;
 
 const CardFront = styled.div`
+  text-align: center;
   position: absolute;
   width: 100%;
   height: 100%;
   backface-visibility: hidden;
-  background-color: #F987AF;
+  background-color: #f987af;
   color: #000;
   display: flex;
   align-items: center;
   border: 1px solid #000;
   border-radius: 10px;
   justify-content: center;
-  font-size: 24px;
+  font-size: 17px;
 `;
 
 const CardBack = styled.div`
+  text-align: center;
   position: absolute;
   width: 100%;
   height: 100%;
@@ -55,19 +57,46 @@ const CardBack = styled.div`
   border: 1px solid #000;
   border-radius: 10px;
   justify-content: center;
-  font-size: 24px;
+  font-size: 17px;
   transform: rotateY(180deg);
 `;
 
-
-const CreateFlashcardSet = () => {
+const CreateFlashcardSet = ({ flashcardKey, onDelete, frontValue, backValue, setFrontValue, setBackValue }: CreateFlashcardSetProps) => {
   const [frontContent, setFrontContent] = useState("");
   const [backContent, setBackContent] = useState("");
-  const [isHovered, setIsHovered] = useState(false);
+  const [isPressed, setIsPressed] = useState(false);
+
+  const handleFrontContentChange = (value: string) => {
+    setFrontContent(value); // Update local state
+    if (setFrontValue) {
+      setFrontValue(value); // Pass value to parent
+    }
+  };
+
+  const handleBackContentChange = (value: string) => {
+    setBackContent(value); // Update local state
+    if (setBackValue) {
+      setBackValue(value); // Pass value to parent
+    }
+  };
 
   return (
     <div className="flex flex-row items-center justify-center space-x-10">
-      <div className="flex flex-row items-center justify-center space-x-2">
+      <h1
+        className="text-4xl font-bold text-black contoured-text"
+        style={{
+          color: "#f987af",
+          textShadow: `
+      -0.5px -0.5px 0 #000,  
+       2px -0.5px 0 #000,
+      -0.5px  1px 0 #000,
+       2px  1px 0 #000
+    `,
+        }}
+      >
+        {`${flashcardKey}.`}
+      </h1>
+      <div className="flex flex-row items-center justify-center space-x-3">
         <Textarea
           placeholder="Complete the front side"
           value={frontContent}
@@ -83,19 +112,16 @@ const CreateFlashcardSet = () => {
           className="bg-white rounded-xl"
         />
       </div>
-      <div className="flex flex-col">
-        Hover for preview
-      <StyledCard>
-        <CardInner isHovered={isHovered} onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}>
-          <CardFront>
-            <p>{frontContent}</p>
-          </CardFront>
-          <CardBack>
-            <p>{backContent}</p>
-          </CardBack>
+      <StyledCard className="flex flex-row items-center justify-center w-300 h-175">
+        <CardInner
+          isPressed={isPressed}
+          onClick={() => setIsPressed(!isPressed)}
+        >
+          <CardFront>{frontContent}</CardFront>
+          <CardBack>{backContent}</CardBack>
         </CardInner>
       </StyledCard>
-      </div>
+      <Button onClick={() => onDelete(flashcardKey)} className="text-red-500">Remove</Button>
     </div>
   );
 };

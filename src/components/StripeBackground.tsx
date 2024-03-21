@@ -1,13 +1,15 @@
-import styled from 'styled-components';
+// StripeBackground.jsx
+import styled from "styled-components";
+
+interface AnimatedStripesProps {
+  height: number;
+}
 
 // Define the styled component
-const AnimatedStripes = styled.div`
+const AnimatedStripes = styled.div<AnimatedStripesProps>`
   /* Basic dimensions and centering */
   width: 100%;
-  height: 100vh; /* Changed to 100vh for full viewport height, adjust as needed */
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  min-height: ${(props) => props.height}px; /* Set the minimum height dynamically */
 
   /* Dark mode colors and gradient */
   background: #56BAE4; /* Fallback for browsers that don't support gradients */
@@ -36,10 +38,19 @@ const AnimatedStripes = styled.div`
   }
 `;
 
-// Then use the styled component in your React component
-const StripeBackground = () => {
+// Wrapper component to contain all content
+const ContentWrapper = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+`;
+
+// StripeBackground component
+const StripeBackground = ({ contentHeight }: { contentHeight: number }) => { // Receive contentHeight as props
   return (
-    <AnimatedStripes/>
+    <AnimatedStripes height={contentHeight}>
+      <ContentWrapper />
+    </AnimatedStripes>
   );
 };
 

@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import BubbleBackground from "@/components/BubbleBackground";
 
 const Create = () => {
-  const [contentHeight, setContentHeight] = useState(1183);
+  const [contentHeight, setContentHeight] = useState(0);
   const [flashcardSets, setFlashcardSets] = useState([
     { id: 1, frontContent: "1", backContent: "" },
     { id: 2, frontContent: "2", backContent: "" },
@@ -44,11 +44,6 @@ const Create = () => {
     ]);
   };
 
-  useLayoutEffect(() => {
-    const height = document.body.scrollHeight;
-    setContentHeight(height + 20);
-  }, [flashcardSets]);
-
   useEffect(() => {
     if (removedCard !== null) {
       const tempFlashcardSets = flashcardSets.map((set) => {
@@ -61,6 +56,11 @@ const Create = () => {
       setRemovedCard(null); // Reset removedCard state
     }
   }, [removedCard, flashcardSets]);
+
+  useLayoutEffect(() => {
+    const height = document.body.scrollHeight;
+    setContentHeight(height);
+  }, [flashcardSets]);
 
   return (
     <div className="flex flex-col items-center justify-center relative">
@@ -79,44 +79,44 @@ const Create = () => {
           Create flashcard set
         </h1>
         {flashcardSets.map((flashcardSet, index) => (
-  <div
-    key={flashcardSet.id}
-    className="flex flex-row items-center justify-center space-x-10"
-  >
-    <h1
-      className="text-4xl font-bold text-black contoured-text"
-      style={{
-        color: "#f987af",
-        textShadow: `
+          <div
+            key={flashcardSet.id}
+            className="flex flex-row items-center justify-center space-x-10"
+          >
+            <h1
+              className="text-4xl font-bold text-black contoured-text"
+              style={{
+                color: "#f987af",
+                textShadow: `
           -0.5px -0.5px 0 #000,  
           2px -0.5px 0 #000,
           -0.5px  1px 0 #000,
           2px  1px 0 #000
         `,
-        minWidth: "50px", // Ensure a fixed width for the index number container
-        textAlign: "right", // Align index numbers to the right
-      }}
-    >
-      {index + 1}.
-    </h1>
-    <CreateFlashcardSet
-      flashcardKey={flashcardSet.id}
-      frontValue={flashcardSet.frontContent}
-      backValue={flashcardSet.backContent}
-      onDelete={removeCard}
-      setFrontValue={(value) =>
-        handleFrontContentChange(flashcardSet.id, value)
-      }
-      setBackValue={(value) =>
-        handleBackContentChange(flashcardSet.id, value)
-      }
-    />
-  </div>
-))}
+                minWidth: "px", // Ensure a fixed width for the index number container
+                textAlign: "right", // Align index numbers to the right
+              }}
+            >
+              {index + 1}.
+            </h1>
+            <CreateFlashcardSet
+              flashcardKey={flashcardSet.id}
+              frontValue={flashcardSet.frontContent}
+              backValue={flashcardSet.backContent}
+              onDelete={removeCard}
+              setFrontValue={(value) =>
+                handleFrontContentChange(flashcardSet.id, value)
+              }
+              setBackValue={(value) =>
+                handleBackContentChange(flashcardSet.id, value)
+              }
+            />
+          </div>
+        ))}
         <Button
           onClick={handlePressButton}
           className="w-40 h-12 bg-blue-500 text-white rounded-full hover:bg-blue-700"
-          style={{ backgroundColor: "#f987af" }}
+          style={{ backgroundColor: "#f987af", marginBottom: "20px" }}
         >
           + Add New Flashcard
         </Button>

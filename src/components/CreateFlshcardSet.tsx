@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import styled from "styled-components";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import RightArrow from "../assets/right-arrow.svg";
 
 interface CreateFlashcardSetProps {
   flashcardKey: number;
@@ -94,8 +95,8 @@ const CreateFlashcardSet = ({
   };
 
   return (
-    <div className="flex flex-row items-center justify-center space-x-10">
-      <div className="flex flex-row items-center justify-center space-x-3">
+    <div className="flex flex-row items-center justify-center space-x-5">
+      <div className="flex flex-row items-center justify-center space-x-5">
         <Textarea
           placeholder="Complete the front side"
           value={frontContent}
@@ -110,6 +111,8 @@ const CreateFlashcardSet = ({
           style={{ width: "300px", height: "175px" }}
           className="bg-white rounded-xl"
         />
+          <img src={RightArrow} alt="right arrow" className="w-10 h-10" />
+
       </div>
       <StyledCard className="flex flex-row items-center justify-center w-300 h-175">
         <CardInner

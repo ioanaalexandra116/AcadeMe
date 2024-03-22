@@ -8,7 +8,9 @@ interface AnimatedBubblesProps {
 const AnimatedBubbles = styled.div<AnimatedBubblesProps>`
   /* Basic dimensions and centering */
   width: 100%;
-  min-height: ${(props) => props.height}px;
+  height: 100%;
+  max-height: ${(props) => props.height}px;
+  min-height: 100vh;
   background: lightblue; /* Default background color */
   position: relative;
   overflow: hidden;
@@ -37,7 +39,6 @@ const AnimatedBubbles = styled.div<AnimatedBubblesProps>`
   }
 `;
 
-// StripeBackground component
 const BubbleBackground = ({ contentHeight }: { contentHeight: number }) => {
   return <AnimatedBubbles height={contentHeight} />;
 };

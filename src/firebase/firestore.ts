@@ -116,3 +116,32 @@ export async function getAvatarProps(uid: string) {
     console.log("No such document!");
   }
 }
+
+export async function getCategories() {
+  const q = query(collection(db, "categories"));
+  const querySnapshot = await getDocs(q);
+  const categories = <string[]>[];
+  querySnapshot.forEach((doc) => {
+    categories.push(doc.id);
+  });
+  return categories;
+}
+
+export async function getSecondCategories(category: string) {
+  const docRef = doc(db, 'categories', category);
+  
+  try {
+    const docSnapshot = await getDoc(docRef);
+    
+    if (docSnapshot.exists()) {
+      const data = docSnapshot.data();
+      return data as string[][];
+    } else {
+      console.log('No such document!');
+      return null;
+    }
+  } catch (error) {
+    console.error('Error getting document:', error);
+    throw error;
+  }
+}

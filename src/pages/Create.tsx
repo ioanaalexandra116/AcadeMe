@@ -1,18 +1,128 @@
 import CreateFlashcardSet from "@/components/CreateFlshcardSet";
-import { useState, useEffect, useLayoutEffect } from "react";
+import {
+  useState,
+  useEffect,
+  useLayoutEffect,
+  useContext,
+  useRef,
+} from "react";
+import { AuthContext } from "@/context";
+import Loading from "@/components/Loading";
 import { Button } from "@/components/ui/button";
 import BubbleBackground from "@/components/BubbleBackground";
+import { getCategories, getSecondCategories } from "@/firebase/firestore";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { storage } from "@/firebase/config";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { v4 } from "uuid";
+import UploadPhoto from "../assets/upload-photo.svg";
+import { Card } from "@/components/ui/card";
 
 const Create = () => {
   const [contentHeight, setContentHeight] = useState(0);
+  const { user, userLoading } = useContext(AuthContext);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [secondCategories, setSecondCategories] = useState<string[][]>([]);
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedSecondCategory, setSelectedSecondCategory] = useState("");
+  const [selectedThirdCategory, setSelectedThirdCategory] = useState("");
+
+  const [loading, setLoading] = useState(true);
+  // getSecondCategories("Biology");
+  const [imageUpload, setImageUpload] = useState<File | null>(null);
+  const [currentPhoto, setCurrentPhoto] = useState("");
+  const [photoLoading, setPhotoLoading] = useState(false);
+
   const [flashcardSets, setFlashcardSets] = useState([
-    { id: 1, frontContent: "1", backContent: "" },
-    { id: 2, frontContent: "2", backContent: "" },
-    { id: 3, frontContent: "3", backContent: "" },
-    { id: 4, frontContent: "4", backContent: "" },
-    { id: 5, frontContent: "5", backContent: "" },
+    { id: 1, frontContent: "", backContent: "" },
+    { id: 2, frontContent: "", backContent: "" },
+    { id: 3, frontContent: "", backContent: "" },
+    { id: 4, frontContent: "", backContent: "" },
+    { id: 5, frontContent: "", backContent: "" },
   ]);
   const [removedCard, setRemovedCard] = useState<number | null>(null);
+
+  if (!user || userLoading) {
+    return <Loading />;
+  }
+
+  useEffect(() => {
+    if (!user) {
+      return;
+    }
+    const fetchCategories = async () => {
+      const data = await getCategories();
+      setCategories(data);
+      setLoading(false);
+    };
+    fetchCategories();
+  }, [user]);
+
+  useEffect(() => {
+    if (!selectedCategory) {
+      return;
+    }
+    const fetchSecondCategories = async () => {
+      const data = await getSecondCategories(selectedCategory);
+      if (data !== null) {
+        setSecondCategories(data);
+        Object.keys(data).forEach((category) => {
+          console.log(
+            `Category: ${category}, Array:`,
+            data[category as keyof typeof data]
+          );
+        });
+      } else {
+        console.error("Data is null");
+      }
+    };
+    fetchSecondCategories();
+  }, [selectedCategory]);
+
+  const handleCategoryChange = (newValue: string) => {
+    setSelectedCategory(newValue);
+    console.log("Selected category:", newValue);
+  };
+
+  const handleSecondCategoryChange = (newValue: string) => {
+    setSelectedSecondCategory(newValue);
+    console.log("Selected second category:", newValue);
+  };
+
+  const handleThirdCategoryChange = (newValue: string) => {
+    setSelectedThirdCategory(newValue);
+    console.log("Selected third category:", newValue);
+  };
+
+  useEffect(() => {
+    setCurrentPhoto(currentPhoto);
+  }, [currentPhoto]);
+
+  const handleUploadPic = () => {
+    setPhotoLoading(true);
+    const imageRef = ref(storage, `covers/${imageUpload?.name + v4()}`);
+    if (!imageUpload) {
+      return;
+    }
+    uploadBytes(imageRef, imageUpload).then(() => {
+      getDownloadURL(imageRef)
+        .then((url) => {
+          setCurrentPhoto(url);
+          setPhotoLoading(false);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    });
+  };
+  const [showUploadButton, setShowUploadButton] = useState(false); // state to show or hide our upload button
 
   const removeCard = (id: number) => {
     const newSet = flashcardSets.filter((set) => set.id !== id);
@@ -48,12 +158,12 @@ const Create = () => {
     if (removedCard !== null) {
       const tempFlashcardSets = flashcardSets.map((set) => {
         if (set.id > removedCard) {
-          return { ...set, id: set.id - 1 }; // Decrement ID for sets after the removed one
+          return { ...set, id: set.id - 1 };
         }
         return set;
       });
       setFlashcardSets(tempFlashcardSets);
-      setRemovedCard(null); // Reset removedCard state
+      setRemovedCard(null);
     }
   }, [removedCard, flashcardSets]);
 
@@ -61,6 +171,39 @@ const Create = () => {
     const height = document.body.scrollHeight;
     setContentHeight(height);
   }, [flashcardSets]);
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files != null) {
+      const file = event.target.files[0];
+      // Handle file upload logic here
+      console.log("File uploaded:", file);
+      if (event.target.files != null) {
+        setImageUpload(event.target.files[0]);
+        setShowUploadButton(true); // set state to true to show upload button
+      } else {
+        setShowUploadButton(false); // set state to false to hide upload button
+      }
+
+      const reader = new FileReader(); // Create a FileReader instance
+      reader.onload = (e) => {
+        if (e.target == null) {
+          return;
+        }
+        setCurrentPhoto(e.target.result as string); // Set the image to the uploaded file
+        setShowUploadButton(true); // Show the upload button
+        setImageUpload(file); // Set the file for upload
+      };
+      reader.readAsDataURL(file); // Read the file as a data URL
+    }
+  };
+
+  const handleClickUpload = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
 
   return (
     <div className="flex flex-col items-center justify-center relative">
@@ -78,10 +221,133 @@ const Create = () => {
         >
           Create flashcard set
         </h1>
+        <Select value={selectedCategory} onValueChange={handleCategoryChange}>
+          <SelectTrigger className="w-[180px] rounded-xl">
+            <SelectValue placeholder="Select a category" />
+          </SelectTrigger>
+          <SelectContent className="rounded-xl">
+            <SelectGroup>
+              {categories.map((category) => (
+                <SelectItem value={category}>{category}</SelectItem>
+              ))}
+            </SelectGroup>
+          </SelectContent>
+        </Select>
+
+        {selectedCategory && selectedCategory !== "Trivia" && (
+          <Select
+            value={selectedSecondCategory}
+            onValueChange={handleSecondCategoryChange}
+          >
+            <SelectTrigger className="w-[180px] rounded-xl">
+              <SelectValue placeholder="Select a category" />
+            </SelectTrigger>
+            <SelectContent className="rounded-xl">
+              <SelectGroup>
+                {Object.keys(secondCategories).map((category) => {
+                  const data =
+                    secondCategories[category as keyof typeof secondCategories];
+                  console.log(`Category: ${category}, Array:`, data);
+                  return <SelectItem value={category}>{category}</SelectItem>;
+                })}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        )}
+
+        {selectedSecondCategory &&
+        Array.isArray(
+          secondCategories[
+            selectedSecondCategory as keyof typeof secondCategories
+          ]
+        ) ? (
+          <Select
+            value={selectedThirdCategory}
+            onValueChange={handleThirdCategoryChange}
+          >
+            <SelectTrigger className="w-[180px] rounded-xl">
+              <SelectValue placeholder="Select a category" />
+            </SelectTrigger>
+            <SelectContent className="rounded-xl">
+              <SelectGroup>
+                {(
+                  secondCategories[
+                    selectedSecondCategory as keyof typeof secondCategories
+                  ] as string[]
+                ).map((category: string) => (
+                  <SelectItem key={category} value={category}>
+                    {category}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        ) : null}
+        <div className="flex flex-row items-center justify-center space-x-7">
+          {photoLoading && <Loading />}
+          {currentPhoto ? (
+            <Card
+              className="relative flex items-center justify-center border-black"
+              style={{ width: "300px", height: "175px"}}
+              onMouseEnter={() => setShowUploadButton(true)}
+              onMouseLeave={() => setShowUploadButton(false)}
+            >
+              <img
+                src={currentPhoto}
+                alt="Current photo"
+                className="transition-opacity duration-300 ease-in-out rounded-xl"
+                style={
+                  showUploadButton
+                    ? { opacity: 0.5, maxWidth: "295px", maxHeight: "170px" }
+                    : { maxWidth: "295px", maxHeight: "170px" }
+                }
+              />
+              {showUploadButton && (
+                <img
+                  src={UploadPhoto}
+                  alt="Upload photo"
+                  onClick={handleClickUpload}
+                  className="absolute flex items-center justify-center w-16 h-16 cursor-pointer top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
+                />
+              )}
+            </Card>
+          ) : (
+            <Card
+              className="relative flex items-center justify-center border-black"
+              style={{ width: "300px", height: "175px" }}
+              onMouseEnter={() => setShowUploadButton(true)}
+              onMouseLeave={() => setShowUploadButton(false)}
+            >
+              <img
+                src={UploadPhoto}
+                alt="Upload photo"
+                onClick={handleClickUpload}
+                className="w-16 h-16 cursor-pointer"
+              />
+            </Card>
+          )}
+
+          <input
+            type="file"
+            ref={fileInputRef}
+            style={{ display: "none" }}
+            onChange={handleFileChange}
+          />
+          {/* {showUploadButton && (
+            <Button
+              onClick={handleUploadPic}
+              className="w-40 h-12 bg-blue-500 text-white rounded-full hover:bg-blue-700"
+              style={{ backgroundColor: "#f987af" }}
+            >
+              Upload
+            </Button>
+          )} */}
+        </div>
+
         {flashcardSets.map((flashcardSet, index) => (
           <div
             key={flashcardSet.id}
-            className="flex flex-row items-center justify-center space-x-10"
+            className="flex flex-row items-center justify-center space-x-7"
           >
             <h1
               className="text-4xl font-bold text-black contoured-text"
@@ -93,8 +359,8 @@ const Create = () => {
           -0.5px  1px 0 #000,
           2px  1px 0 #000
         `,
-                minWidth: "px", // Ensure a fixed width for the index number container
-                textAlign: "right", // Align index numbers to the right
+                minWidth: "50px",
+                textAlign: "right",
               }}
             >
               {index + 1}.
@@ -118,7 +384,7 @@ const Create = () => {
           className="w-40 h-12 bg-blue-500 text-white rounded-full hover:bg-blue-700"
           style={{ backgroundColor: "#f987af", marginBottom: "20px" }}
         >
-          + Add New Flashcard
+          Add New Flashcard
         </Button>
       </div>
     </div>

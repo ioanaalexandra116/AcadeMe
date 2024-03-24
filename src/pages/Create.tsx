@@ -10,7 +10,11 @@ import { AuthContext } from "@/context";
 import Loading from "@/components/Loading";
 import { Button } from "@/components/ui/button";
 import BubbleBackground from "@/components/BubbleBackground";
-import { getCategories, getSecondCategories } from "@/firebase/firestore";
+import {
+  getCategories,
+  getSecondCategories,
+  createFlashcardSet,
+} from "@/firebase/firestore";
 import {
   Select,
   SelectContent,
@@ -23,7 +27,15 @@ import { storage } from "@/firebase/config";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { v4 } from "uuid";
 import UploadPhoto from "../assets/upload-photo.svg";
-import { Card } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { FlashcardSet } from "@/interfaces/interfaces";
 
 const Create = () => {
   const [contentHeight, setContentHeight] = useState(0);
@@ -33,6 +45,9 @@ const Create = () => {
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedSecondCategory, setSelectedSecondCategory] = useState("");
   const [selectedThirdCategory, setSelectedThirdCategory] = useState("");
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [next, setNext] = useState(false);
 
   const [loading, setLoading] = useState(true);
   // getSecondCategories("Biology");
@@ -73,12 +88,6 @@ const Create = () => {
       const data = await getSecondCategories(selectedCategory);
       if (data !== null) {
         setSecondCategories(data);
-        Object.keys(data).forEach((category) => {
-          console.log(
-            `Category: ${category}, Array:`,
-            data[category as keyof typeof data]
-          );
-        });
       } else {
         console.error("Data is null");
       }
@@ -88,17 +97,14 @@ const Create = () => {
 
   const handleCategoryChange = (newValue: string) => {
     setSelectedCategory(newValue);
-    console.log("Selected category:", newValue);
   };
 
   const handleSecondCategoryChange = (newValue: string) => {
     setSelectedSecondCategory(newValue);
-    console.log("Selected second category:", newValue);
   };
 
   const handleThirdCategoryChange = (newValue: string) => {
     setSelectedThirdCategory(newValue);
-    console.log("Selected third category:", newValue);
   };
 
   useEffect(() => {
@@ -170,15 +176,13 @@ const Create = () => {
   useLayoutEffect(() => {
     const height = document.body.scrollHeight;
     setContentHeight(height);
-  }, [flashcardSets]);
+  }, [flashcardSets, selectedCategory, selectedSecondCategory, next]);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files != null) {
       const file = event.target.files[0];
-      // Handle file upload logic here
-      console.log("File uploaded:", file);
       if (event.target.files != null) {
         setImageUpload(event.target.files[0]);
         setShowUploadButton(true); // set state to true to show upload button
@@ -205,12 +209,31 @@ const Create = () => {
     }
   };
 
+  const handlePost = async () => {
+    const flashcardSet: FlashcardSet = {
+      title,
+      description,
+      cover: currentPhoto,
+      category: [
+        selectedCategory,
+        selectedSecondCategory,
+        selectedThirdCategory,
+      ],
+      flashcards: {},
+    };
+    flashcardSets.forEach((flashcard) => {
+      flashcardSet.flashcards[flashcard.frontContent] = flashcard.backContent;
+    });
+    handleUploadPic();
+    createFlashcardSet(flashcardSet, user.uid);
+    console.log("Flashcard set:", flashcardSet);
+  };
+
   return (
-    <div className="flex flex-col items-center justify-center relative">
+    <div className="flex flex-col relative">
       <div className="absolute inset-0 z-0">
         <BubbleBackground contentHeight={contentHeight} />
       </div>
-
       <div className="relative z-10 flex flex-col items-center justify-center space-y-5">
         <h1
           className="text-4xl font-bold text-black mt-20 mb-5 contoured-text"
@@ -221,172 +244,273 @@ const Create = () => {
         >
           Create flashcard set
         </h1>
-        <Select value={selectedCategory} onValueChange={handleCategoryChange}>
-          <SelectTrigger className="w-[180px] rounded-xl">
-            <SelectValue placeholder="Select a category" />
-          </SelectTrigger>
-          <SelectContent className="rounded-xl">
-            <SelectGroup>
-              {categories.map((category) => (
-                <SelectItem value={category}>{category}</SelectItem>
-              ))}
-            </SelectGroup>
-          </SelectContent>
-        </Select>
-
-        {selectedCategory && selectedCategory !== "Trivia" && (
-          <Select
-            value={selectedSecondCategory}
-            onValueChange={handleSecondCategoryChange}
+        {!next ? (
+          <Card
+            cardWidth={480}
+            style={{
+              backgroundColor: "#FCCEDE",
+              width: "480px",
+              border: "1px solid #000",
+              marginBottom: "30px",
+            }}
+            className="rounded-xl"
           >
-            <SelectTrigger className="w-[180px] rounded-xl">
-              <SelectValue placeholder="Select a category" />
-            </SelectTrigger>
-            <SelectContent className="rounded-xl">
-              <SelectGroup>
-                {Object.keys(secondCategories).map((category) => {
-                  const data =
-                    secondCategories[category as keyof typeof secondCategories];
-                  console.log(`Category: ${category}, Array:`, data);
-                  return <SelectItem value={category}>{category}</SelectItem>;
-                })}
-              </SelectGroup>
-            </SelectContent>
-          </Select>
-        )}
+            <CardHeader></CardHeader>
+            <CardContent className="flex flex-col space-y-3 items-center">
+              <div className="flex flex-col space-y-1">
+                <h1 className="text-muted-foreground">Cover</h1>
+                <div className="flex flex-row items-center justify-center space-x-7">
+                  {photoLoading && <Loading />}
+                  {currentPhoto ? (
+                    <Card
+                      className="relative flex items-center justify-center border-black"
+                      style={{ width: "300px", height: "175px" }}
+                      onMouseEnter={() => setShowUploadButton(true)}
+                      onMouseLeave={() => setShowUploadButton(false)}
+                    >
+                      <img
+                        src={currentPhoto}
+                        alt="Current photo"
+                        className="transition-opacity duration-300 ease-in-out rounded-xl"
+                        style={
+                          showUploadButton
+                            ? {
+                                opacity: 0.5,
+                                maxWidth: "295px",
+                                maxHeight: "170px",
+                              }
+                            : { maxWidth: "295px", maxHeight: "170px" }
+                        }
+                      />
+                      {showUploadButton && (
+                        <img
+                          src={UploadPhoto}
+                          alt="Upload photo"
+                          onClick={handleClickUpload}
+                          className="absolute flex items-center justify-center w-16 h-16 cursor-pointer top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
+                        />
+                      )}
+                    </Card>
+                  ) : (
+                    <Card
+                      className="relative flex items-center justify-center border-black"
+                      style={{ width: "300px", height: "175px" }}
+                      onMouseEnter={() => setShowUploadButton(true)}
+                      onMouseLeave={() => setShowUploadButton(false)}
+                    >
+                      <img
+                        src={UploadPhoto}
+                        alt="Upload photo"
+                        onClick={handleClickUpload}
+                        className="w-16 h-16 cursor-pointer"
+                      />
+                    </Card>
+                  )}
 
-        {selectedSecondCategory &&
-        Array.isArray(
-          secondCategories[
-            selectedSecondCategory as keyof typeof secondCategories
-          ]
-        ) ? (
-          <Select
-            value={selectedThirdCategory}
-            onValueChange={handleThirdCategoryChange}
-          >
-            <SelectTrigger className="w-[180px] rounded-xl">
-              <SelectValue placeholder="Select a category" />
-            </SelectTrigger>
-            <SelectContent className="rounded-xl">
-              <SelectGroup>
-                {(
-                  secondCategories[
-                    selectedSecondCategory as keyof typeof secondCategories
-                  ] as string[]
-                ).map((category: string) => (
-                  <SelectItem key={category} value={category}>
-                    {category}
-                  </SelectItem>
-                ))}
-              </SelectGroup>
-            </SelectContent>
-          </Select>
-        ) : null}
-        <div className="flex flex-row items-center justify-center space-x-7">
-          {photoLoading && <Loading />}
-          {currentPhoto ? (
-            <Card
-              className="relative flex items-center justify-center border-black"
-              style={{ width: "300px", height: "175px"}}
-              onMouseEnter={() => setShowUploadButton(true)}
-              onMouseLeave={() => setShowUploadButton(false)}
-            >
-              <img
-                src={currentPhoto}
-                alt="Current photo"
-                className="transition-opacity duration-300 ease-in-out rounded-xl"
-                style={
-                  showUploadButton
-                    ? { opacity: 0.5, maxWidth: "295px", maxHeight: "170px" }
-                    : { maxWidth: "295px", maxHeight: "170px" }
-                }
-              />
-              {showUploadButton && (
-                <img
-                  src={UploadPhoto}
-                  alt="Upload photo"
-                  onClick={handleClickUpload}
-                  className="absolute flex items-center justify-center w-16 h-16 cursor-pointer top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    style={{ display: "none" }}
+                    onChange={handleFileChange}
+                  />
+                </div>
+              </div>
+              <div className="flex flex-col space-y-1">
+                <h1 className="text-muted-foreground">Category</h1>
+                <div className="flex flex-col space-y-2">
+                  <Select
+                    value={selectedCategory}
+                    onValueChange={handleCategoryChange}
+                  >
+                    <SelectTrigger className="w-[300px] rounded-xl">
+                      <SelectValue
+                        placeholder={
+                          <span className="text-muted-foreground">
+                            Select a category
+                          </span>
+                        }
+                      />
+                    </SelectTrigger>
+                    <SelectContent className="rounded-xl">
+                      <SelectGroup>
+                        {categories.map((category) => (
+                          <SelectItem key={category} value={category}>
+                            {category}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+
+                  {selectedCategory && selectedCategory !== "Trivia" && (
+                    <Select
+                      value={selectedSecondCategory}
+                      onValueChange={handleSecondCategoryChange}
+                    >
+                      <SelectTrigger className="w-[300px] rounded-xl">
+                        <SelectValue
+                          placeholder={
+                            <span className="text-muted-foreground">
+                              Select a subcategory
+                            </span>
+                          }
+                        />
+                      </SelectTrigger>
+                      <SelectContent className="rounded-xl">
+                        <SelectGroup>
+                          {Object.keys(secondCategories).map((category) => {
+                            const data =
+                              secondCategories[
+                                category as keyof typeof secondCategories
+                              ];
+                            return (
+                              <SelectItem key={category} value={category}>
+                                {category}
+                              </SelectItem>
+                            );
+                          })}
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+                  )}
+
+                  {selectedSecondCategory &&
+                  Array.isArray(
+                    secondCategories[
+                      selectedSecondCategory as keyof typeof secondCategories
+                    ]
+                  ) ? (
+                    <Select
+                      value={selectedThirdCategory}
+                      onValueChange={handleThirdCategoryChange}
+                    >
+                      <SelectTrigger className="w-[300px] rounded-xl">
+                        <SelectValue
+                          placeholder={
+                            <span className="text-muted-foreground">
+                              Select a subcategory
+                            </span>
+                          }
+                        />
+                      </SelectTrigger>
+                      <SelectContent className="rounded-xl">
+                        <SelectGroup>
+                          {(
+                            secondCategories[
+                              selectedSecondCategory as keyof typeof secondCategories
+                            ] as string[]
+                          ).map((category: string) => (
+                            <SelectItem key={category} value={category}>
+                              {category}
+                            </SelectItem>
+                          ))}
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+                  ) : null}
+                </div>
+              </div>
+              <div className="flex flex-col space-y-1">
+                <h1 className="text-muted-foreground">Title</h1>
+                <Input
+                  type="text"
+                  placeholder="Enter a title"
+                  className="w-[300px] rounded-xl"
+                  style={{ border: "1px solid #000", backgroundColor: "#fff" }}
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
                 />
-              )}
-            </Card>
-          ) : (
-            <Card
-              className="relative flex items-center justify-center border-black"
-              style={{ width: "300px", height: "175px" }}
-              onMouseEnter={() => setShowUploadButton(true)}
-              onMouseLeave={() => setShowUploadButton(false)}
-            >
-              <img
-                src={UploadPhoto}
-                alt="Upload photo"
-                onClick={handleClickUpload}
-                className="w-16 h-16 cursor-pointer"
-              />
-            </Card>
-          )}
-
-          <input
-            type="file"
-            ref={fileInputRef}
-            style={{ display: "none" }}
-            onChange={handleFileChange}
-          />
-          {/* {showUploadButton && (
-            <Button
-              onClick={handleUploadPic}
-              className="w-40 h-12 bg-blue-500 text-white rounded-full hover:bg-blue-700"
-              style={{ backgroundColor: "#f987af" }}
-            >
-              Upload
-            </Button>
-          )} */}
-        </div>
-
-        {flashcardSets.map((flashcardSet, index) => (
-          <div
-            key={flashcardSet.id}
-            className="flex flex-row items-center justify-center space-x-7"
-          >
-            <h1
-              className="text-4xl font-bold text-black contoured-text"
-              style={{
-                color: "#f987af",
-                textShadow: `
+              </div>
+              <div className="flex flex-col space-y-1">
+                <h1 className="text-muted-foreground">Description</h1>
+                <Textarea
+                  placeholder="Enter a description"
+                  className="w-[300px] rounded-xl h-[100px]"
+                  style={{ border: "1px solid #000", backgroundColor: "#fff" }}
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                />
+              </div>
+            </CardContent>
+            <div className="flex flex-row items-center justify-end space-x-7 mr-10 mb-7">
+              <Button
+                className="w-24 h-11 rounded-full"
+                style={{ backgroundColor: "#f987af" }}
+                onClick={() => setNext(true)}
+              >
+                Next
+              </Button>
+            </div>
+          </Card>
+        ) : (
+          <>
+            {flashcardSets.map((flashcardSet, index) => (
+              <div
+                key={flashcardSet.id}
+                className="flex flex-row items-center justify-center space-x-7"
+              >
+                <h1
+                  className="text-4xl font-bold text-black contoured-text"
+                  style={{
+                    color: "#f987af",
+                    textShadow: `
           -0.5px -0.5px 0 #000,  
           2px -0.5px 0 #000,
           -0.5px  1px 0 #000,
           2px  1px 0 #000
         `,
-                minWidth: "50px",
-                textAlign: "right",
-              }}
+                    minWidth: "50px",
+                    textAlign: "right",
+                  }}
+                >
+                  {index + 1}.
+                </h1>
+                <CreateFlashcardSet
+                  flashcardKey={flashcardSet.id}
+                  frontValue={flashcardSet.frontContent}
+                  backValue={flashcardSet.backContent}
+                  onDelete={removeCard}
+                  setFrontValue={(value) =>
+                    handleFrontContentChange(flashcardSet.id, value)
+                  }
+                  setBackValue={(value) =>
+                    handleBackContentChange(flashcardSet.id, value)
+                  }
+                />
+              </div>
+            ))}
+            <Button
+              onClick={handlePressButton}
+              className="w-40 h-12 rounded-full"
+              style={{ backgroundColor: "#f987af", marginBottom: "20px" }}
             >
-              {index + 1}.
-            </h1>
-            <CreateFlashcardSet
-              flashcardKey={flashcardSet.id}
-              frontValue={flashcardSet.frontContent}
-              backValue={flashcardSet.backContent}
-              onDelete={removeCard}
-              setFrontValue={(value) =>
-                handleFrontContentChange(flashcardSet.id, value)
-              }
-              setBackValue={(value) =>
-                handleBackContentChange(flashcardSet.id, value)
-              }
-            />
-          </div>
-        ))}
-        <Button
-          onClick={handlePressButton}
-          className="w-40 h-12 bg-blue-500 text-white rounded-full hover:bg-blue-700"
-          style={{ backgroundColor: "#f987af", marginBottom: "20px" }}
-        >
-          Add New Flashcard
-        </Button>
+              Add New Flashcard
+            </Button>
+          </>
+        )}
       </div>
+      {next && (
+        <div className="flex flex-row">
+          <div className="flex justify-start z-10 ml-7 mb-7 flex-grow">
+            <Button
+              onClick={() => setNext(false)}
+              className="w-40 h-12 bg-blue-500 text-white rounded-full hover:bg-blue-700"
+              style={{ backgroundColor: "#f987af" }}
+            >
+              Back
+            </Button>
+          </div>
+          <div className="flex justify-end z-10 mr-7 mb-7 flex-grow">
+            <Button
+              onClick={handlePost}
+              className="w-40 h-12 bg-blue-500 text-white rounded-full hover:bg-blue-700"
+              style={{ backgroundColor: "#f987af" }}
+            >
+              Post Flashcard Set
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

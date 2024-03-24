@@ -15,8 +15,12 @@ import {
   DocumentSnapshot,
   QuerySnapshot,
 } from "firebase/firestore";
-import { User } from "../interfaces";
-import { ErrorMessasge, AvatarProperties } from "../interfaces/interfaces";
+import {
+  User,
+  ErrorMessasge,
+  AvatarProperties,
+  FlashcardSet,
+} from "../interfaces";
 
 export async function createUserCollection(user: User, username: string) {
   const docRef = doc(db, "users", user.uid);
@@ -128,20 +132,33 @@ export async function getCategories() {
 }
 
 export async function getSecondCategories(category: string) {
-  const docRef = doc(db, 'categories', category);
-  
+  const docRef = doc(db, "categories", category);
+
   try {
     const docSnapshot = await getDoc(docRef);
-    
+
     if (docSnapshot.exists()) {
       const data = docSnapshot.data();
       return data as string[][];
     } else {
-      console.log('No such document!');
+      console.log("No such document!");
       return null;
     }
   } catch (error) {
-    console.error('Error getting document:', error);
+    console.error("Error getting document:", error);
     throw error;
   }
+}
+
+export async function createFlashcardSet(
+  flashcardSet: FlashcardSet,
+  uid: string
+) {
+  const docRef = await addDoc(collection(db, "flashcardSets"), flashcardSet);
+  const SetId = docRef.id;
+  const userRef = doc(db, "users", uid);
+  await updateDoc(userRef, {
+    posts: arrayUnion(SetId),
+  });
+  return SetId;
 }

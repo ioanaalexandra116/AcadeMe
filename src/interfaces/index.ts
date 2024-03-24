@@ -3,3 +3,4 @@ export type { FirebaseError } from 'firebase/app';
 export type { ErrorMessasge } from './interfaces';
 export type {UserData} from './interfaces';
 export type {AvatarProperties} from './interfaces';
+export type {FlashcardSet} from './interfaces';

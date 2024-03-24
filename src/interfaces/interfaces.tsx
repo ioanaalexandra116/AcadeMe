@@ -34,4 +34,12 @@ export type AvatarProperties = {
   dimensions: string;
 }
 
+export type FlashcardSet = {
+  title: string;
+  description: string;
+  cover: string;
+  category: string[];
+  flashcards: { [key: string]: string };
+};
+
 export type ErrorMessasge = string | null;

@@ -151,7 +151,7 @@ const Register = () => {
           <CustomToaster
             toastOptions={{
               classNames: {
-                toast: `group toast group-[.toaster]:bg-red-200 group-[.toaster]:text-red-700 group-[.toaster]:border-red-700`,
+                toast: `group toast group-[.toaster]:bg-red-200 group-[.toaster]:text-red-700 group-[.toaster]:border-red-700 group-[.toaster]:rounded-xl`
               },
             }}
           />

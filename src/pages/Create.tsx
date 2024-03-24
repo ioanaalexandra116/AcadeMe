@@ -27,17 +27,49 @@ import { storage } from "@/firebase/config";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { v4 } from "uuid";
 import UploadPhoto from "../assets/upload-photo.svg";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { FlashcardSet } from "@/interfaces/interfaces";
+import { FlashcardSet, ErrorMessasge } from "@/interfaces/interfaces";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import { CustomToaster } from "@/components/ui/sonner";
+import styled, { keyframes } from "styled-components";
+
+const myAnim = keyframes`
+  0% {
+    opacity: 0;
+    transform: translateX(250px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+`;
+
+const myAnimLeft = keyframes`
+  0% {
+    opacity: 0;
+    transform: translateX(-250px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+`;
+
+const AnimatedNext = styled.div`
+  animation: ${myAnim} 0.8s ease 0s 1 normal forwards;
+`;
+
+const AnimatedFirst = styled.div`
+  animation: ${myAnimLeft} 0.8s ease 0s 1 normal forwards;
+`;
 
 const Create = () => {
+  const [err, setErr] = useState<ErrorMessasge>(null);
   const [contentHeight, setContentHeight] = useState(0);
   const { user, userLoading } = useContext(AuthContext);
   const [categories, setCategories] = useState<string[]>([]);
@@ -48,7 +80,7 @@ const Create = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [next, setNext] = useState(false);
-
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   // getSecondCategories("Biology");
   const [imageUpload, setImageUpload] = useState<File | null>(null);
@@ -67,6 +99,13 @@ const Create = () => {
   if (!user || userLoading) {
     return <Loading />;
   }
+
+  useEffect(() => {
+    if (err) {
+      toast(err);
+    }
+    setErr(null);
+  }, [err]);
 
   useEffect(() => {
     if (!user) {
@@ -195,11 +234,11 @@ const Create = () => {
         if (e.target == null) {
           return;
         }
-        setCurrentPhoto(e.target.result as string); // Set the image to the uploaded file
-        setShowUploadButton(true); // Show the upload button
-        setImageUpload(file); // Set the file for upload
+        setCurrentPhoto(e.target.result as string);
+        setShowUploadButton(true);
+        setImageUpload(file);
       };
-      reader.readAsDataURL(file); // Read the file as a data URL
+      reader.readAsDataURL(file);
     }
   };
 
@@ -209,7 +248,47 @@ const Create = () => {
     }
   };
 
+  const handleNext = () => {
+    if (!currentPhoto) {
+      setErr("Please upload a cover photo");
+      return;
+    }
+    if (!selectedCategory) {
+      setErr("Please select a category");
+      return;
+    }
+    if (selectedCategory !== "Trivia" && !selectedSecondCategory) {
+      setErr("Please select a subcategory");
+      return;
+    }
+    if (selectedSecondCategory && !selectedThirdCategory) {
+      setErr("Please select another subcategory");
+      return;
+    }
+    if (!title) {
+      setErr("Please enter a title");
+      return;
+    }
+    if (!description) {
+      setErr("Please enter a description");
+      return;
+    }
+    setNext(true);
+  };
+
   const handlePost = async () => {
+    if (
+      flashcardSets.some(
+        (flashcard) => !flashcard.frontContent || !flashcard.backContent
+      )
+    ) {
+      setErr("Please fill out all the flashcards ore remove the empty ones");
+      return;
+    }
+    if (flashcardSets.length < 5) {
+      setErr("The set must contain at least 5 flashcards");
+      return;
+    }
     const flashcardSet: FlashcardSet = {
       title,
       description,
@@ -225,8 +304,10 @@ const Create = () => {
       flashcardSet.flashcards[flashcard.frontContent] = flashcard.backContent;
     });
     handleUploadPic();
-    createFlashcardSet(flashcardSet, user.uid);
-    console.log("Flashcard set:", flashcardSet);
+    const response = await createFlashcardSet(flashcardSet, user.uid);
+    if (response) {
+      navigate("/profile");
+    }
   };
 
   return (
@@ -245,161 +326,96 @@ const Create = () => {
           Create flashcard set
         </h1>
         {!next ? (
-          <Card
-            cardWidth={480}
-            style={{
-              backgroundColor: "#FCCEDE",
-              width: "480px",
-              border: "1px solid #000",
-              marginBottom: "30px",
-            }}
-            className="rounded-xl"
-          >
-            <CardHeader></CardHeader>
-            <CardContent className="flex flex-col space-y-3 items-center">
-              <div className="flex flex-col space-y-1">
-                <h1 className="text-muted-foreground">Cover</h1>
-                <div className="flex flex-row items-center justify-center space-x-7">
-                  {photoLoading && <Loading />}
-                  {currentPhoto ? (
-                    <Card
-                      className="relative flex items-center justify-center border-black"
-                      style={{ width: "300px", height: "175px" }}
-                      onMouseEnter={() => setShowUploadButton(true)}
-                      onMouseLeave={() => setShowUploadButton(false)}
-                    >
-                      <img
-                        src={currentPhoto}
-                        alt="Current photo"
-                        className="transition-opacity duration-300 ease-in-out rounded-xl"
-                        style={
-                          showUploadButton
-                            ? {
-                                opacity: 0.5,
-                                maxWidth: "295px",
-                                maxHeight: "170px",
-                              }
-                            : { maxWidth: "295px", maxHeight: "170px" }
-                        }
-                      />
-                      {showUploadButton && (
+          <AnimatedFirst className="flex flex-col items-center justify-center space-y-5">
+            <Card
+              cardWidth={480}
+              style={{
+                backgroundColor: "#FCCEDE",
+                width: "480px",
+                border: "1px solid #000",
+                marginBottom: "30px",
+              }}
+              className="rounded-xl"
+            >
+              <CardHeader></CardHeader>
+              <CardContent className="flex flex-col space-y-3 items-center">
+                <div className="flex flex-col space-y-1">
+                  <h1 className="text-muted-foreground">Cover</h1>
+                  <div className="flex flex-row items-center justify-center space-x-7">
+                    {photoLoading && <Loading />}
+                    {currentPhoto ? (
+                      <Card
+                        className="relative flex items-center justify-center border-black"
+                        style={{ width: "300px", height: "175px" }}
+                        onMouseEnter={() => setShowUploadButton(true)}
+                        onMouseLeave={() => setShowUploadButton(false)}
+                      >
+                        <img
+                          src={currentPhoto}
+                          alt="Current photo"
+                          className="transition-opacity duration-300 ease-in-out rounded-xl"
+                          style={
+                            showUploadButton
+                              ? {
+                                  opacity: 0.5,
+                                  maxWidth: "295px",
+                                  maxHeight: "170px",
+                                }
+                              : { maxWidth: "295px", maxHeight: "170px" }
+                          }
+                        />
+                        {showUploadButton && (
+                          <img
+                            src={UploadPhoto}
+                            alt="Upload photo"
+                            onClick={handleClickUpload}
+                            className="absolute flex items-center justify-center w-16 h-16 cursor-pointer top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
+                          />
+                        )}
+                      </Card>
+                    ) : (
+                      <Card
+                        className="relative flex items-center justify-center border-black"
+                        style={{ width: "300px", height: "175px" }}
+                        onMouseEnter={() => setShowUploadButton(true)}
+                        onMouseLeave={() => setShowUploadButton(false)}
+                      >
                         <img
                           src={UploadPhoto}
                           alt="Upload photo"
                           onClick={handleClickUpload}
-                          className="absolute flex items-center justify-center w-16 h-16 cursor-pointer top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
+                          className="w-16 h-16 cursor-pointer"
                         />
-                      )}
-                    </Card>
-                  ) : (
-                    <Card
-                      className="relative flex items-center justify-center border-black"
-                      style={{ width: "300px", height: "175px" }}
-                      onMouseEnter={() => setShowUploadButton(true)}
-                      onMouseLeave={() => setShowUploadButton(false)}
-                    >
-                      <img
-                        src={UploadPhoto}
-                        alt="Upload photo"
-                        onClick={handleClickUpload}
-                        className="w-16 h-16 cursor-pointer"
-                      />
-                    </Card>
-                  )}
+                      </Card>
+                    )}
 
-                  <input
-                    type="file"
-                    ref={fileInputRef}
-                    style={{ display: "none" }}
-                    onChange={handleFileChange}
-                  />
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      style={{ display: "none" }}
+                      onChange={handleFileChange}
+                    />
+                  </div>
                 </div>
-              </div>
-              <div className="flex flex-col space-y-1">
-                <h1 className="text-muted-foreground">Category</h1>
-                <div className="flex flex-col space-y-2">
-                  <Select
-                    value={selectedCategory}
-                    onValueChange={handleCategoryChange}
-                  >
-                    <SelectTrigger className="w-[300px] rounded-xl">
-                      <SelectValue
-                        placeholder={
-                          <span className="text-muted-foreground">
-                            Select a category
-                          </span>
-                        }
-                      />
-                    </SelectTrigger>
-                    <SelectContent className="rounded-xl">
-                      <SelectGroup>
-                        {categories.map((category) => (
-                          <SelectItem key={category} value={category}>
-                            {category}
-                          </SelectItem>
-                        ))}
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-
-                  {selectedCategory && selectedCategory !== "Trivia" && (
+                <div className="flex flex-col space-y-1">
+                  <h1 className="text-muted-foreground">Category</h1>
+                  <div className="flex flex-col space-y-2">
                     <Select
-                      value={selectedSecondCategory}
-                      onValueChange={handleSecondCategoryChange}
+                      value={selectedCategory}
+                      onValueChange={handleCategoryChange}
                     >
                       <SelectTrigger className="w-[300px] rounded-xl">
                         <SelectValue
                           placeholder={
                             <span className="text-muted-foreground">
-                              Select a subcategory
+                              Select a category
                             </span>
                           }
                         />
                       </SelectTrigger>
                       <SelectContent className="rounded-xl">
                         <SelectGroup>
-                          {Object.keys(secondCategories).map((category) => {
-                            const data =
-                              secondCategories[
-                                category as keyof typeof secondCategories
-                              ];
-                            return (
-                              <SelectItem key={category} value={category}>
-                                {category}
-                              </SelectItem>
-                            );
-                          })}
-                        </SelectGroup>
-                      </SelectContent>
-                    </Select>
-                  )}
-
-                  {selectedSecondCategory &&
-                  Array.isArray(
-                    secondCategories[
-                      selectedSecondCategory as keyof typeof secondCategories
-                    ]
-                  ) ? (
-                    <Select
-                      value={selectedThirdCategory}
-                      onValueChange={handleThirdCategoryChange}
-                    >
-                      <SelectTrigger className="w-[300px] rounded-xl">
-                        <SelectValue
-                          placeholder={
-                            <span className="text-muted-foreground">
-                              Select a subcategory
-                            </span>
-                          }
-                        />
-                      </SelectTrigger>
-                      <SelectContent className="rounded-xl">
-                        <SelectGroup>
-                          {(
-                            secondCategories[
-                              selectedSecondCategory as keyof typeof secondCategories
-                            ] as string[]
-                          ).map((category: string) => (
+                          {categories.map((category) => (
                             <SelectItem key={category} value={category}>
                               {category}
                             </SelectItem>
@@ -407,43 +423,116 @@ const Create = () => {
                         </SelectGroup>
                       </SelectContent>
                     </Select>
-                  ) : null}
+
+                    {selectedCategory && selectedCategory !== "Trivia" && (
+                      <Select
+                        value={selectedSecondCategory}
+                        onValueChange={handleSecondCategoryChange}
+                      >
+                        <SelectTrigger className="w-[300px] rounded-xl">
+                          <SelectValue
+                            placeholder={
+                              <span className="text-muted-foreground">
+                                Select a subcategory
+                              </span>
+                            }
+                          />
+                        </SelectTrigger>
+                        <SelectContent className="rounded-xl">
+                          <SelectGroup>
+                            {Object.keys(secondCategories).map((category) => {
+                              const data =
+                                secondCategories[
+                                  category as keyof typeof secondCategories
+                                ];
+                              return (
+                                <SelectItem key={category} value={category}>
+                                  {category}
+                                </SelectItem>
+                              );
+                            })}
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
+                    )}
+
+                    {selectedSecondCategory &&
+                    Array.isArray(
+                      secondCategories[
+                        selectedSecondCategory as keyof typeof secondCategories
+                      ]
+                    ) ? (
+                      <Select
+                        value={selectedThirdCategory}
+                        onValueChange={handleThirdCategoryChange}
+                      >
+                        <SelectTrigger className="w-[300px] rounded-xl">
+                          <SelectValue
+                            placeholder={
+                              <span className="text-muted-foreground">
+                                Select a subcategory
+                              </span>
+                            }
+                          />
+                        </SelectTrigger>
+                        <SelectContent className="rounded-xl">
+                          <SelectGroup>
+                            {(
+                              secondCategories[
+                                selectedSecondCategory as keyof typeof secondCategories
+                              ] as string[]
+                            ).map((category: string) => (
+                              <SelectItem key={category} value={category}>
+                                {category}
+                              </SelectItem>
+                            ))}
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
+                    ) : null}
+                  </div>
                 </div>
+                <div className="flex flex-col space-y-1">
+                  <h1 className="text-muted-foreground">Title</h1>
+                  <Input
+                    type="text"
+                    placeholder="Enter a title"
+                    className="w-[300px] rounded-xl"
+                    style={{
+                      border: "1px solid #000",
+                      backgroundColor: "#fff",
+                    }}
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                  />
+                </div>
+                <div className="flex flex-col space-y-1">
+                  <h1 className="text-muted-foreground">Description</h1>
+                  <Textarea
+                    placeholder="Enter a description"
+                    className="w-[300px] rounded-xl h-[100px]"
+                    style={{
+                      border: "1px solid #000",
+                      backgroundColor: "#fff",
+                    }}
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                  />
+                </div>
+              </CardContent>
+              <div className="flex flex-row items-center justify-end space-x-7 mr-10 mb-7">
+                <Button
+                  className="w-24 h-11 rounded-full"
+                  style={{ backgroundColor: "#f987af" }}
+                  onClick={handleNext}
+                >
+                  Next
+                </Button>
               </div>
-              <div className="flex flex-col space-y-1">
-                <h1 className="text-muted-foreground">Title</h1>
-                <Input
-                  type="text"
-                  placeholder="Enter a title"
-                  className="w-[300px] rounded-xl"
-                  style={{ border: "1px solid #000", backgroundColor: "#fff" }}
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                />
-              </div>
-              <div className="flex flex-col space-y-1">
-                <h1 className="text-muted-foreground">Description</h1>
-                <Textarea
-                  placeholder="Enter a description"
-                  className="w-[300px] rounded-xl h-[100px]"
-                  style={{ border: "1px solid #000", backgroundColor: "#fff" }}
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                />
-              </div>
-            </CardContent>
-            <div className="flex flex-row items-center justify-end space-x-7 mr-10 mb-7">
-              <Button
-                className="w-24 h-11 rounded-full"
-                style={{ backgroundColor: "#f987af" }}
-                onClick={() => setNext(true)}
-              >
-                Next
-              </Button>
-            </div>
-          </Card>
+            </Card>
+          </AnimatedFirst>
         ) : (
-          <>
+          <AnimatedNext className="flex flex-col items-center justify-center space-y-5">
             {flashcardSets.map((flashcardSet, index) => (
               <div
                 key={flashcardSet.id}
@@ -481,36 +570,43 @@ const Create = () => {
             ))}
             <Button
               onClick={handlePressButton}
-              className="w-40 h-12 rounded-full"
+              className="w-20 h-12 rounded-full"
               style={{ backgroundColor: "#f987af", marginBottom: "20px" }}
             >
-              Add New Flashcard
+              Add
             </Button>
-          </>
+          </AnimatedNext>
         )}
       </div>
       {next && (
-        <div className="flex flex-row">
-          <div className="flex justify-start z-10 ml-7 mb-7 flex-grow">
+        <AnimatedNext className="flex flex-row items-center justify-center space-x-60">
+          <div className="flex z-10 mb-7">
             <Button
               onClick={() => setNext(false)}
-              className="w-40 h-12 bg-blue-500 text-white rounded-full hover:bg-blue-700"
+              className="w-40 h-12 text-white rounded-full"
               style={{ backgroundColor: "#f987af" }}
             >
               Back
             </Button>
           </div>
-          <div className="flex justify-end z-10 mr-7 mb-7 flex-grow">
+          <div className="flex z-10 mb-7">
             <Button
               onClick={handlePost}
-              className="w-40 h-12 bg-blue-500 text-white rounded-full hover:bg-blue-700"
+              className="w-40 h-12 text-white rounded-full"
               style={{ backgroundColor: "#f987af" }}
             >
               Post Flashcard Set
             </Button>
           </div>
-        </div>
+        </AnimatedNext>
       )}
+        <CustomToaster
+          toastOptions={{
+            classNames: {
+              toast: `group toast group-[.toaster]:bg-red-200 group-[.toaster]:text-red-700 group-[.toaster]:border-red-700 group-[.toaster]:rounded-xl`,
+            },
+          }}
+        />
     </div>
   );
 };

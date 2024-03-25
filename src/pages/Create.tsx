@@ -103,8 +103,9 @@ const Create = () => {
   useEffect(() => {
     if (err) {
       toast(err);
+      setErr(null);
     }
-    setErr(null);
+    console.log(err);
   }, [err]);
 
   useEffect(() => {
@@ -213,8 +214,14 @@ const Create = () => {
   }, [removedCard, flashcardSets]);
 
   useLayoutEffect(() => {
+    // if (!next && window.innerHeight < document.body.scrollHeight) {
+    //   const height = window.innerHeight;
+    //   setContentHeight(height);
+    // } else {
     const height = document.body.scrollHeight;
     setContentHeight(height);
+    // }
+    
   }, [flashcardSets, selectedCategory, selectedSecondCategory, next]);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -249,6 +256,7 @@ const Create = () => {
   };
 
   const handleNext = () => {
+    setErr(null);
     if (!currentPhoto) {
       setErr("Please upload a cover photo");
       return;
@@ -277,6 +285,7 @@ const Create = () => {
   };
 
   const handlePost = async () => {
+    setErr(null);
     if (
       flashcardSets.some(
         (flashcard) => !flashcard.frontContent || !flashcard.backContent
@@ -315,6 +324,20 @@ const Create = () => {
       <div className="absolute inset-0 z-0">
         <BubbleBackground contentHeight={contentHeight} />
       </div>
+      {(window.innerWidth < 768) ?
+      (<CustomToaster
+        toastOptions={{
+          classNames: {
+            toast: `group toast group-[.toaster]:top-0 group-[.toaster]:h-16 group-[.toaster]:w-screen group-[.toaster]:fixed  group-[.toaster]:bg-red-200 group-[.toaster]:text-red-700 group-[.toaster]:border-red-700 group-[.toaster]:rounded-xl`,
+          },
+        }}
+      />) : (<CustomToaster
+        toastOptions={{
+          classNames: {
+            toast: `group toast group-[.toaster]:bg-red-200 group-[.toaster]:text-red-700 group-[.toaster]:border-red-700 group-[.toaster]:rounded-xl`,
+          },
+        }}
+      />)}
       <div className="relative z-10 flex flex-col items-center justify-center space-y-5">
         <h1
           className="text-4xl font-bold text-black mt-20 mb-5 contoured-text"
@@ -441,10 +464,6 @@ const Create = () => {
                         <SelectContent className="rounded-xl">
                           <SelectGroup>
                             {Object.keys(secondCategories).map((category) => {
-                              const data =
-                                secondCategories[
-                                  category as keyof typeof secondCategories
-                                ];
                               return (
                                 <SelectItem key={category} value={category}>
                                   {category}
@@ -600,13 +619,6 @@ const Create = () => {
           </div>
         </AnimatedNext>
       )}
-        <CustomToaster
-          toastOptions={{
-            classNames: {
-              toast: `group toast group-[.toaster]:bg-red-200 group-[.toaster]:text-red-700 group-[.toaster]:border-red-700 group-[.toaster]:rounded-xl`,
-            },
-          }}
-        />
     </div>
   );
 };

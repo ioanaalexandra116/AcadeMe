@@ -214,14 +214,8 @@ const Create = () => {
   }, [removedCard, flashcardSets]);
 
   useLayoutEffect(() => {
-    // if (!next && window.innerHeight < document.body.scrollHeight) {
-    //   const height = window.innerHeight;
-    //   setContentHeight(height);
-    // } else {
     const height = document.body.scrollHeight;
     setContentHeight(height);
-    // }
-    
   }, [flashcardSets, selectedCategory, selectedSecondCategory, next]);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -319,25 +313,36 @@ const Create = () => {
     }
   };
 
+  const getSpaceXClass = () => {
+    if (window.innerWidth < 768) {
+      return "space-x-4";
+    } else {
+      return "space-x-80";
+    }
+  };
+
   return (
     <div className="flex flex-col relative">
       <div className="absolute inset-0 z-0">
         <BubbleBackground contentHeight={contentHeight} />
       </div>
-      {(window.innerWidth < 768) ?
-      (<CustomToaster
-        toastOptions={{
-          classNames: {
-            toast: `group toast group-[.toaster]:top-0 group-[.toaster]:h-16 group-[.toaster]:w-screen group-[.toaster]:fixed  group-[.toaster]:bg-red-200 group-[.toaster]:text-red-700 group-[.toaster]:border-red-700 group-[.toaster]:rounded-xl`,
-          },
-        }}
-      />) : (<CustomToaster
-        toastOptions={{
-          classNames: {
-            toast: `group toast group-[.toaster]:bg-red-200 group-[.toaster]:text-red-700 group-[.toaster]:border-red-700 group-[.toaster]:rounded-xl`,
-          },
-        }}
-      />)}
+      {window.innerWidth < 768 && !next ? (
+        <CustomToaster
+          toastOptions={{
+            classNames: {
+              toast: `group toast group-[.toaster]:top-0 group-[.toaster]:h-16 group-[.toaster]:w-screen group-[.toaster]:fixed  group-[.toaster]:bg-red-200 group-[.toaster]:text-red-700 group-[.toaster]:border-red-700 group-[.toaster]:rounded-xl`,
+            },
+          }}
+        />
+      ) : (
+        <CustomToaster
+          toastOptions={{
+            classNames: {
+              toast: `group toast group-[.toaster]:bg-red-200 group-[.toaster]:text-red-700 group-[.toaster]:border-red-700 group-[.toaster]:rounded-xl`,
+            },
+          }}
+        />
+      )}
       <div className="relative z-10 flex flex-col items-center justify-center space-y-5">
         <h1
           className="text-4xl font-bold text-black mt-20 mb-5 contoured-text"
@@ -587,34 +592,49 @@ const Create = () => {
                 />
               </div>
             ))}
-            <Button
-              onClick={handlePressButton}
-              className="w-20 h-12 rounded-full"
-              style={{ backgroundColor: "#f987af", marginBottom: "20px" }}
-            >
-              Add
-            </Button>
+            {window.innerWidth > 768 && (
+              <Button
+                onClick={handlePressButton}
+                className="w-20 h-12 rounded-full"
+                style={{ backgroundColor: "#f987af", marginBottom: "20px" }}
+              >
+                Add
+              </Button>
+            )}
           </AnimatedNext>
         )}
       </div>
       {next && (
-        <AnimatedNext className="flex flex-row items-center justify-center space-x-60">
-          <div className="flex z-10 mb-7">
+        <AnimatedNext
+          className={`flex flex-row items-center justify-center ${getSpaceXClass()}`}
+        >
+          <div className="flex z-10 mb-7 mt-5">
             <Button
               onClick={() => setNext(false)}
-              className="w-40 h-12 text-white rounded-full"
+              className="w-32 h-12 text-white rounded-full"
               style={{ backgroundColor: "#f987af" }}
             >
               Back
             </Button>
           </div>
-          <div className="flex z-10 mb-7">
+          {window.innerWidth < 768 && (
+            <div className="flex z-10 mb-7 mt-5">
+              <Button
+                onClick={handlePressButton}
+                className="w-32 h-12 rounded-full"
+                style={{ backgroundColor: "#f987af" }}
+              >
+                Add
+              </Button>
+            </div>
+          )}
+          <div className="flex z-10 mb-7 mt-5">
             <Button
               onClick={handlePost}
-              className="w-40 h-12 text-white rounded-full"
+              className="w-32 h-12 text-white rounded-full"
               style={{ backgroundColor: "#f987af" }}
             >
-              Post Flashcard Set
+              Post
             </Button>
           </div>
         </AnimatedNext>

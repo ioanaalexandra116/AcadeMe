@@ -3,6 +3,8 @@ import styled from "styled-components";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import RightArrow from "../assets/right-arrow.svg";
+import { StyleSheetManager } from "styled-components";
+import isPropValid from "@emotion/is-prop-valid";
 
 interface CreateFlashcardSetProps {
   flashcardKey: number;
@@ -68,14 +70,13 @@ const CreateFlashcardSet = ({
   frontValue,
   backValue,
   setFrontValue,
-  setBackValue
+  setBackValue,
 }: CreateFlashcardSetProps) => {
   const [frontContent, setFrontContent] = useState(frontValue || "");
   const [backContent, setBackContent] = useState(backValue || "");
   const [isPressed, setIsPressed] = useState(false);
 
   useEffect(() => {
-    // Update local state when props change
     setFrontContent(frontValue || "");
     setBackContent(backValue || "");
   }, [frontValue, backValue]);
@@ -94,7 +95,17 @@ const CreateFlashcardSet = ({
     }
   };
 
+  const forwardProp = (prop: string, target: any) => {
+    if (typeof target === "string") {
+      return isPropValid(prop);
+    }
+    return true;
+  };
+
   return (
+    <StyleSheetManager enableVendorPrefixes shouldForwardProp={forwardProp}>
+
+    {(window.innerWidth) > 768 ? (
     <div className="flex flex-row items-center justify-center space-x-5">
       <div className="flex flex-row items-center justify-center space-x-5">
         <Textarea
@@ -111,8 +122,7 @@ const CreateFlashcardSet = ({
           style={{ width: "300px", height: "175px" }}
           className="bg-white rounded-xl"
         />
-          <img src={RightArrow} alt="right arrow" className="w-10 h-10" />
-
+        <img src={RightArrow} alt="right arrow" className="w-10 h-10" />
       </div>
       <StyledCard className="flex flex-row items-center justify-center w-300 h-175">
         <CardInner
@@ -123,10 +133,55 @@ const CreateFlashcardSet = ({
           <CardBack>{backContent}</CardBack>
         </CardInner>
       </StyledCard>
-      <Button onClick={() => onDelete(flashcardKey)} className="text-red-700 bg-red-200 border-red-700 hover:bg-red-700 hover:text-white">
+      <Button
+        onClick={() => onDelete(flashcardKey)}
+        className="text-red-700 bg-red-200 border-red-700 hover:bg-red-700 hover:text-white"
+      >
         Remove
       </Button>
     </div>
+  ) : (
+    <div className="flex flex-col items-center justify-center space-y-5">
+      <StyledCard className="flex flex-row items-center justify-center w-300 h-175">
+        <CardInner isPressed={isPressed} onClick={() => setIsPressed(isPressed)}>
+          <CardFront className="flex flex-col items-center justify-center space-y-5">
+            <Textarea
+              placeholder="Complete the front side"
+              value={frontContent}
+              onChange={(e) => handleFrontContentChange(e.target.value)}
+              style={{ width: "300px", height: "175px" }}
+              className="bg-white rounded-xl"
+            />
+          </CardFront>
+          <CardBack className="flex flex-col items-center justify-center space-y-5">
+            <Textarea
+              placeholder="Complete the back side"
+              value={backContent}
+              onChange={(e) => handleBackContentChange(e.target.value)}
+              style={{ width: "300px", height: "175px" }}
+              className="bg-green-200 rounded-xl"
+            />
+          </CardBack>
+        </CardInner>
+      </StyledCard>
+      <div className="flex flex-row items-center justify-center space-x-5">
+        <Button
+          onClick={() => setIsPressed(!isPressed)}
+          style={{ width: "86px", backgroundColor: "#3498db", color: "#A4DEF7" }}
+        >
+          Flip
+        </Button>
+        <Button
+          onClick={() => onDelete(flashcardKey)}
+          className="text-red-700 bg-red-200 border-red-700 hover:bg-red-700 hover:text-white"
+          style={{ width: "86px" }}
+        >
+          Remove
+        </Button>
+      </div>
+    </div>
+  )}
+  </StyleSheetManager>
   );
 };
 

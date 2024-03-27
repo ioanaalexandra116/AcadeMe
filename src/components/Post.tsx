@@ -40,12 +40,14 @@ const Post = ({ flashcardSetId }: { flashcardSetId: string }) => {
   return (
     <Card
       className="flex flex-col justify-between"
-      style={{ width: "370px", height: "470px" }}
+      style={{ width: "370px", height: "470px", backgroundColor: "#DDEEF0" }}
     >
       <CardContent className="flex flex-col" style={{ minHeight: "0" }}>
         {" "}
         {/* Use flexbox and set minHeight */}
-        <h1 className="text-xl font-bold flex justify-center mt-3">
+        <h1
+          className="text-2xl font-bold flex justify-center mt-3"
+        >
           {flashcardSet.title}
         </h1>
         <div style={{ position: "relative", flex: "1" }}>
@@ -85,7 +87,7 @@ const Post = ({ flashcardSetId }: { flashcardSetId: string }) => {
           {" "}
           {/* Use flexbox and wrap */}
           {flashcardSet.category.map((category, index) => (
-            <span key={index} className="text-sm text-pink-400">
+            <span key={index} className="text-sm text-blue-400">
               {" " + category}
               {index < flashcardSet.category.length - 1 && " >"}
             </span>

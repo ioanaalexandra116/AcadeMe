@@ -26,7 +26,7 @@ const AnimatedStripes = styled.div<AnimatedStripesProps>`
   background-size: 40px 40px;
 
   /* Animation */
-  animation: move 4s linear infinite;
+  animation: move 10s linear infinite;
 
   @keyframes move {
     0% {

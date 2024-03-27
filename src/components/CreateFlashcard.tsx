@@ -64,7 +64,7 @@ const CardBack = styled.div`
   transform: rotateY(180deg);
 `;
 
-const CreateFlashcardSet = ({
+const CreateFlashcard = ({
   flashcardKey,
   onDelete,
   frontValue,
@@ -112,14 +112,14 @@ const CreateFlashcardSet = ({
           placeholder="Complete the front side"
           value={frontContent}
           onChange={(e) => handleFrontContentChange(e.target.value)}
-          style={{ width: "300px", height: "175px" }}
+          style={{ width: "300px", height: "175px", resize: "none"}}
           className="bg-white rounded-xl"
         />
         <Textarea
           placeholder="Complete the back side"
           value={backContent}
           onChange={(e) => handleBackContentChange(e.target.value)}
-          style={{ width: "300px", height: "175px" }}
+          style={{ width: "300px", height: "175px", resize: "none"}}
           className="bg-white rounded-xl"
         />
         <img src={RightArrow} alt="right arrow" className="w-10 h-10" />
@@ -149,7 +149,7 @@ const CreateFlashcardSet = ({
               placeholder="Complete the front side"
               value={frontContent}
               onChange={(e) => handleFrontContentChange(e.target.value)}
-              style={{ width: "300px", height: "175px" }}
+              style={{ width: "300px", height: "175px", resize: "none"}}
               className="bg-white rounded-xl"
             />
           </CardFront>
@@ -185,4 +185,4 @@ const CreateFlashcardSet = ({
   );
 };
 
-export default CreateFlashcardSet;
+export default CreateFlashcard;

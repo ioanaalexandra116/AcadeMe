@@ -1,20 +1,39 @@
 import Avatar from "@/components/Avatar";
+import { useContext, useEffect, useState } from "react";
+import { AuthContext } from "@/context";
+import Loading from "@/components/Loading";
+import { getFlashcardSetsOfUser } from "@/firebase/firestore";
+import Post from "@/components/Post";
 
 const Profile = () => {
+  const { user, userLoading } = useContext(AuthContext);
+  const [flashcardSets, setFlashcardSets] = useState<string[]>([]);
+
+  if (!user || userLoading) {
+    return <Loading />;
+  }
+
+  useEffect(() => {
+    if (!user) {
+      return;
+    }
+
+    const fetchFlashcardSets = async () => {
+      const flashcardSets = await getFlashcardSetsOfUser(user.uid);
+      setFlashcardSets(flashcardSets);
+      console.log(flashcardSets);
+    };
+
+    fetchFlashcardSets();
+  }, [user]);
+
   return (
-    <div>
-      <Avatar
-        gender="man"
-        backgroundColor="#F9E0AE"
-        mouthColor="rgb(208,37,71)"
-        eyeColor="#0a84a5"
-        eyelidsColor="#231F20"
-        hairColor="#B4863C"
-        skinColor="#ecbf9d"
-        noseColor="#B4863C"
-        bowColor="rgb(208,37,71)"
-        dimensions="300px"
-      />
+    <div className="flex flex-col items-center pt-16">
+      {flashcardSets.map((flashcardSetId) => (
+        <div style={{ marginBottom: '1.5rem' }}>
+          <Post key={flashcardSetId} flashcardSetId={flashcardSetId} />
+        </div>
+      ))}
     </div>
   );
 };

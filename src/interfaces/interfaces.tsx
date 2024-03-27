@@ -35,11 +35,13 @@ export type AvatarProperties = {
 }
 
 export type FlashcardSet = {
+  creator: string;
   title: string;
   description: string;
   cover: string;
   category: string[];
   flashcards: { [key: string]: string };
+  playCount: number;
 };
 
 export type ErrorMessasge = string | null;

@@ -1,4 +1,4 @@
-import CreateFlashcardSet from "@/components/CreateFlshcardSet";
+import CreateFlashcard from "@/components/CreateFlashcard";
 import {
   useState,
   useEffect,
@@ -82,7 +82,6 @@ const Create = () => {
   const [next, setNext] = useState(false);
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
-  // getSecondCategories("Biology");
   const [imageUpload, setImageUpload] = useState<File | null>(null);
   const [currentPhoto, setCurrentPhoto] = useState("");
   const [photoLoading, setPhotoLoading] = useState(false);
@@ -272,7 +271,7 @@ const Create = () => {
       return;
     }
     if (!description) {
-      setErr("Please enter a description");
+      setErr("Please complete the description");
       return;
     }
     setNext(true);
@@ -285,7 +284,7 @@ const Create = () => {
         (flashcard) => !flashcard.frontContent || !flashcard.backContent
       )
     ) {
-      setErr("Please fill out all the flashcards ore remove the empty ones");
+      setErr("Please fill out all the flashcards or remove the empty ones");
       return;
     }
     if (flashcardSets.length < 5) {
@@ -293,6 +292,7 @@ const Create = () => {
       return;
     }
     const flashcardSet: FlashcardSet = {
+      creator: user.uid,
       title,
       description,
       cover: currentPhoto,
@@ -302,6 +302,7 @@ const Create = () => {
         selectedThirdCategory,
       ],
       flashcards: {},
+      playCount: 0,
     };
     flashcardSets.forEach((flashcard) => {
       flashcardSet.flashcards[flashcard.frontContent] = flashcard.backContent;
@@ -381,7 +382,7 @@ const Create = () => {
                         <img
                           src={currentPhoto}
                           alt="Current photo"
-                          className="transition-opacity duration-300 ease-in-out rounded-xl"
+                          className="transition-opacity duration-300 ease-in-out"
                           style={
                             showUploadButton
                               ? {
@@ -533,11 +534,12 @@ const Create = () => {
                 <div className="flex flex-col space-y-1">
                   <h1 className="text-muted-foreground">Description</h1>
                   <Textarea
-                    placeholder="Enter a description"
-                    className="w-[300px] rounded-xl h-[100px]"
+                    placeholder="Enter a short description"
+                    className="w-[300px] rounded-xl h-[80px]"
                     style={{
                       border: "1px solid #000",
                       backgroundColor: "#fff",
+                      resize: "none"
                     }}
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
@@ -578,7 +580,7 @@ const Create = () => {
                 >
                   {index + 1}.
                 </h1>
-                <CreateFlashcardSet
+                <CreateFlashcard
                   flashcardKey={flashcardSet.id}
                   frontValue={flashcardSet.frontContent}
                   backValue={flashcardSet.backContent}

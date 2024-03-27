@@ -162,3 +162,24 @@ export async function createFlashcardSet(
   });
   return SetId;
 }
+
+export async function getFlashcardSet(setId: string) {
+  const docRef = doc(db, "flashcardSets", setId);
+  const docSnap = await getDoc(docRef);
+  if (docSnap.exists()) {
+    return docSnap.data() as FlashcardSet;
+  } else {
+    console.log("No such document!");
+  }
+}
+
+
+export async function getFlashcardSetsOfUser(uid: string) {
+  const docRef = doc(db, "users", uid);
+  const docSnap = await getDoc(docRef);
+  if (docSnap.exists()) {
+    return docSnap.data().posts;
+  } else {
+    console.log("No such document!");
+  }
+}

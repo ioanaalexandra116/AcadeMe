@@ -1,10 +1,13 @@
 import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
 
 const ErrorPage = () => {
     const navigate = useNavigate();
-    setTimeout(() => {
-        navigate('/');
-    }, 3000);
+    useEffect(() => {
+        setTimeout(() => {
+            navigate("/");
+        }, 3000);
+    }, [navigate]);
 
     return (
             <h1 color="#F987AF">

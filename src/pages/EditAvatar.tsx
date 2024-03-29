@@ -96,7 +96,7 @@ const EditAvatar = () => {
       properties.dimensions = "300px";
     }
     addAvatarProps(user.uid, properties);
-    navigate("/profile");
+    navigate(`/profile?userId=${user.uid}`);
   };
 
   if (loading) {

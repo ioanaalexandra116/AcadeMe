@@ -10,6 +10,10 @@ import {
   getFlashcardSet,
   getAvatarProps,
   getUsername,
+  getFavorites,
+  addToFavorites,
+  removeFromFavorites,
+  deleteFlashcardSet,
 } from "@/firebase/firestore";
 import { useState, useEffect } from "react";
 import Loader from "./Loader";
@@ -20,7 +24,7 @@ import MoreIcon from "../assets/more-icon.svg";
 import DeletePost from "../assets/delete-post.svg";
 import EditPost from "../assets/edit-post.svg";
 import Avatar from "./Avatar";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -28,18 +32,23 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useContext } from "react";
+import { AuthContext } from "@/context";
+import Tag from "../assets/tag.svg";
+import AdvanceCateg from "../assets/advance-categ.svg";
 
 const Post = ({ flashcardSetId }: { flashcardSetId: string }) => {
+  const { user } = useContext(AuthContext);
   const navigate = useNavigate();
   const defaultCharacterProperties: AvatarProperties = {
-    gender: "",
-    backgroundColor: "transparent",
-    mouthColor: "transparent",
-    eyeColor: "transparent",
-    eyelidsColor: "transparent",
-    hairColor: "transparent",
-    skinColor: "transparent",
-    noseColor: "transparent",
+    gender: "man",
+    backgroundColor: "rgb(164,222,247)",
+    mouthColor: "rgb(224,134,114)",
+    eyeColor: "rgb(102,78,39)",
+    eyelidsColor: "rgb(12,10,9)",
+    hairColor: "rgb(89,70,64)",
+    skinColor: "rgb(255,225,189)",
+    noseColor: "rgb(230,183,150)",
     dimensions: "40px",
     bowColor: "transparent",
   };
@@ -60,6 +69,17 @@ const Post = ({ flashcardSetId }: { flashcardSetId: string }) => {
   const [isSaved, setIsSaved] = useState(false);
   const [username, setUsername] = useState("");
   const [loadingAvatar, setLoadingAvatar] = useState(true);
+  const [showMore, setShowMore] = useState(false);
+  const [isDeleted, setIsDeleted] = useState(false);
+
+  useEffect(() => {
+    if (!user) {
+      return;
+    }
+    if (flashcardSet.creator === user.uid) {
+      setShowMore(true);
+    }
+  }, [user, flashcardSet.creator]);
 
   useEffect(() => {
     const fetchFlashcardSet = async () => {
@@ -83,11 +103,11 @@ const Post = ({ flashcardSetId }: { flashcardSetId: string }) => {
         if (avatarProps) {
           avatarProps.dimensions = "40px";
           setCharacterProperties(avatarProps);
-          setLoadingAvatar(false);
         }
       } catch (error) {
         console.error("Error fetching avatar properties:", error);
       }
+      setLoadingAvatar(false);
     };
 
     const fetchUsername = async () => {
@@ -99,15 +119,41 @@ const Post = ({ flashcardSetId }: { flashcardSetId: string }) => {
       }
     };
 
+    const isFavorite = async () => {
+      if (!user) {
+        return;
+      }
+      const favorites = await getFavorites(user.uid);
+      if (favorites && favorites.includes(flashcardSetId)) {
+        setIsSaved(true);
+      }
+    };
+    isFavorite();
     fetchAvatarProps();
     fetchUsername();
   }, [flashcardSet.creator]);
 
   const handleSave = () => {
+    if (!user) {
+      return;
+    }
     setIsSaved(!isSaved);
+    if (isSaved) {
+      removeFromFavorites(user.uid, flashcardSetId);
+      return;
+    }
+    addToFavorites(user.uid, flashcardSetId);
   };
 
-  return (
+  const handleDelete = async () => {
+    if (!user) {
+      return;
+    }
+    setIsDeleted(true);
+    await deleteFlashcardSet(flashcardSetId, user.uid);
+  };
+
+  return !isDeleted ? (
     <Card
       className="flex flex-col border-black rounded-xl"
       style={{ width: "370px", height: "470px", backgroundColor: "#fff" }}
@@ -115,75 +161,86 @@ const Post = ({ flashcardSetId }: { flashcardSetId: string }) => {
       <CardHeader>
         <div
           className="flex justify-between items-center"
-          onClick={() => navigate(`/profile?${flashcardSet.creator}`)}
+          onClick={() => navigate(`/profile?userId=${flashcardSet.creator}`)}
         >
-          <div className="flex items-center justify-start cursor-pointer space-x-2">
+          <div className="flex items-center justify-start cursor-pointer">
             {loadingAvatar ? <Loader /> : <Avatar {...characterProperties} />}
+            &nbsp;
             <span className="relative">{username}</span>
           </div>
-          <div className="flex items-center justify-end">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <img
-                  src={MoreIcon}
-                  alt="more icon"
-                  className="w-6 h-6 rotate-90 cursor-pointer"
-                />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="h-24 flex justify-center items-center">
-                <DropdownMenuGroup className="h-24 flex flex-col justify-center items-center">
-                  <DropdownMenuItem className="w-28 h-10 flex justify-center items-center">
-                    <img
-                      src={EditPost}
-                      alt="edit post"
-                      className="w-4 h-4 cursor-pointer"
-                    />
-                    &nbsp; Edit
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="w-28 h-10 flex justify-center items-center">
-                    <img
-                      src={DeletePost}
-                      alt="delete post"
-                      className="w-5 h-5 cursor-pointer"
-                    />
-                    &nbsp; Delete
-                  </DropdownMenuItem>
-                </DropdownMenuGroup>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
+          {showMore && (
+            <div className="flex items-center justify-end">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <img
+                    src={MoreIcon}
+                    alt="more icon"
+                    className="w-6 h-6 rotate-90 cursor-pointer"
+                  />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="h-24 flex justify-center items-center">
+                  <DropdownMenuGroup className="h-24 flex flex-col justify-center items-center">
+                    <DropdownMenuItem
+                      className="w-28 h-10 flex justify-center items-center"
+                      onClick={() =>
+                        navigate(`/edit-post?postId=${flashcardSetId}`)
+                      }
+                    >
+                      <img
+                        src={EditPost}
+                        alt="edit post"
+                        className="w-4 h-4 cursor-pointer"
+                      />
+                      &nbsp; Edit
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      className="w-28 h-10 flex justify-center items-center"
+                      onClick={handleDelete}
+                    >
+                      <img
+                        src={DeletePost}
+                        alt="delete post"
+                        className="w-5 h-5 cursor-pointer"
+                      />
+                      &nbsp; Delete
+                    </DropdownMenuItem>
+                  </DropdownMenuGroup>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          )}
         </div>
       </CardHeader>
       <CardContent
-        className="flex flex-col"
+        className="flex flex-col overflow-hidden"
         style={{
-          minHeight: "0",
+          height: "380px",
           borderBottom: "1px solid black",
           borderTop: "1px solid black",
           backgroundColor: "#F7F3E2",
+          padding: "8px",
         }}
       >
         <div
           className="flex justify-center items-center flex-col mt-1"
-          style={{ height: "44px", color: "#9B7960" }}
+          style={{ color: "#9B7960", height: "40px" }}
         >
           <h1 className="text-xl font-bold text-center">
             {" "}
-            {/* Use text-center class */}
             {flashcardSet.title}
           </h1>
         </div>
         <div style={{ position: "relative", flex: "1" }}>
           <Card
-            className="absolute top-4 right-1 border-black rounded-xl"
+            className="absolute top-4 left-6 border-black rounded-xl"
             style={{ width: "300px", height: "175px", zIndex: 1 }}
           ></Card>
           <Card
-            className="absolute top-2 left-2 border-black rounded-xl"
+            className="absolute top-2 left-8 border-black rounded-xl"
             style={{ width: "300px", height: "175px", zIndex: 0 }}
           ></Card>
           <Card
-            className="relative top-6 right-2 flex items-center justify-center border-black rounded-xl"
+            className="relative top-6 left-4 flex items-center justify-center border-black rounded-xl overflow-hidden"
             style={{ width: "300px", height: "175px", zIndex: 2 }}
           >
             {loading ? (
@@ -204,17 +261,40 @@ const Post = ({ flashcardSetId }: { flashcardSetId: string }) => {
           />
         </div>
         <div className="flex flex-wrap items-center justify-center">
+          <img src={Tag} alt="tag" className="w-5 h-5" />
+          &nbsp;
           {flashcardSet.category.map((category, index) => (
-            <span key={index} className="text-sm text-sky-400">
-              {index > 0 && " >"} {category}
+            <span
+              key={index}
+              className="text-sm text-sky-400"
+              style={{ display: "flex", alignItems: "center" }}
+            >
+              {index > 0 && category && (
+                <img
+                  src={AdvanceCateg}
+                  alt="advance category"
+                  className="w-3 h-3"
+                  style={{
+                    transform: "rotate(180deg)",
+                    marginRight: "2px",
+                    marginLeft: "2px",
+                  }}
+                />
+              )}
+              <Link to={`/search?category=${category}`} className="relative">
+                {category}
+              </Link>
             </span>
           ))}
         </div>
-        <CardDescription style={{ textAlign: "center" }}>
+        <CardDescription style={{ textAlign: "center" }} className="mb-4">
           {flashcardSet.description}
         </CardDescription>
       </CardContent>
-      <CardFooter className="text-sm text-muted-foreground ml-2 mb-1 mr-2 mt-1 flex-col items-start">
+      <CardFooter
+        className="text-sm text-muted-foreground ml-2 mb-1 mr-2 mt-1 flex-col items-start"
+        style={{ height: "28px" }}
+      >
         <div className="flex justify-between items-center w-full">
           <div className="flex flex-row items-center">
             {Object.keys(flashcardSet.flashcards).length}
@@ -249,6 +329,13 @@ const Post = ({ flashcardSetId }: { flashcardSetId: string }) => {
           </div>
         </div>
       </CardFooter>
+    </Card>
+  ) : (
+    <Card
+      className="flex flex-col border-black rounded-xl items-center justify-center"
+      style={{ width: "370px", height: "470px", backgroundColor: "#fff" }}
+    >
+      Post deleted
     </Card>
   );
 };

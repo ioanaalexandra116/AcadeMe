@@ -11,9 +11,8 @@ import {
   collection,
   updateDoc,
   arrayUnion,
+  arrayRemove,
   deleteDoc,
-  DocumentSnapshot,
-  QuerySnapshot,
 } from "firebase/firestore";
 import {
   User,
@@ -182,4 +181,44 @@ export async function getFlashcardSetsOfUser(uid: string) {
   } else {
     console.log("No such document!");
   }
+}
+
+export async function addToFavorites(uid: string, setId: string) {
+  const userRef = doc(db, "users", uid);
+  await updateDoc(userRef, {
+    favorites: arrayUnion(setId),
+  });
+}
+
+export async function removeFromFavorites(uid: string, setId: string) {
+  const userRef = doc(db, "users", uid);
+  await updateDoc(userRef, {
+    favorites: arrayRemove(setId),
+  });
+}
+
+export async function getFavorites(uid: string) {
+  const docRef = doc(db, "users", uid);
+  const docSnap = await getDoc(docRef);
+  if (docSnap.exists()) {
+    return docSnap.data().favorites as string[];
+  } else {
+    console.log("No such document!");
+  }
+}
+
+export async function deleteFlashcardSet(setId: string, uid: string) {
+  const docRef = doc(db, "flashcardSets", setId);
+  await deleteDoc(docRef);
+  const userRef = doc(db, "users", uid);
+  await updateDoc(userRef, {
+    posts: arrayRemove(setId),
+  });
+  const usersRef = collection(db, "users");
+  const usersSnapshot = await getDocs(usersRef);
+  usersSnapshot.forEach((doc) => {
+    updateDoc(doc.ref, {
+      favorites: arrayRemove(setId),
+    });
+  });
 }

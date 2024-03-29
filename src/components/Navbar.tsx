@@ -47,19 +47,6 @@ const components: { title: string; href: string; description: string }[] = [
   },
 ];
 
-const profileMenuItems: { title: string; href: string; img: string }[] = [
-  {
-    title: "Profile",
-    href: "/profile",
-    img: User,
-  },
-  {
-    title: "Log out",
-    href: "/login",
-    img: Logout,
-  },
-];
-
 export default function Navbar() {
   const defaultCharacterProperties: AvatarProperties = {
     gender: "man",
@@ -70,7 +57,7 @@ export default function Navbar() {
     hairColor: "rgb(89,70,64)",
     skinColor: "rgb(255,225,189)",
     noseColor: "rgb(230,183,150)",
-    dimensions: "300px",
+    dimensions: "40px",
     bowColor: "transparent",
   };
 
@@ -95,6 +82,19 @@ export default function Navbar() {
   if (!user || userLoading) {
     return <Loading />;
   }
+
+  const profileMenuItems: { title: string; href: string; img: string }[] = [
+    {
+      title: "Profile",
+      href: `/profile?userId=${user.uid}`,
+      img: User,
+    },
+    {
+      title: "Log out",
+      href: "/login",
+      img: Logout,
+    },
+  ];
 
   useEffect(() => {
     if (!user) {

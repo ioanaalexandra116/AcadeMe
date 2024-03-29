@@ -310,7 +310,7 @@ const Create = () => {
     handleUploadPic();
     const response = await createFlashcardSet(flashcardSet, user.uid);
     if (response) {
-      navigate("/profile");
+      navigate(`/profile?userId=${user.uid}`);
     }
   };
 

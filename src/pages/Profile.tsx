@@ -5,10 +5,15 @@ import Loading from "@/components/Loading";
 import { getFlashcardSetsOfUser } from "@/firebase/firestore";
 import Post from "@/components/Post";
 import DotsBackground from "@/components/DotsBackground";
+import { useLocation } from 'react-router-dom';
+
 const Profile = () => {
   const { user, userLoading } = useContext(AuthContext);
   const [flashcardSets, setFlashcardSets] = useState<string[]>([]);
-  const [numColumns, setNumColumns] = useState(3); // Default to 3 columns
+  const [numColumns, setNumColumns] = useState(3); 
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const userId = queryParams.get('userId');
 
   useEffect(() => {
     function handleResize() {
@@ -17,6 +22,10 @@ const Profile = () => {
       } else if (window.innerWidth <= 1300 && window.innerWidth > 768) {
         setNumColumns(2);
       } else {
+        if (flashcardSets.length < 3) {
+          setNumColumns(flashcardSets.length);
+          return;
+        }
         setNumColumns(3);
       }
     }
@@ -28,7 +37,7 @@ const Profile = () => {
     return () => {
       window.removeEventListener('resize', handleResize);
     };
-  }, []);
+  }, [flashcardSets]);
 
   if (!user || userLoading) {
     return <Loading />;
@@ -40,8 +49,11 @@ const Profile = () => {
     }
 
     const fetchFlashcardSets = async () => {
-      const flashcardSets = await getFlashcardSetsOfUser(user.uid);
-      setFlashcardSets(flashcardSets);
+      if (userId) {
+        const sets = await getFlashcardSetsOfUser(userId);
+        setFlashcardSets(sets);
+        return;
+      }
     };
 
     fetchFlashcardSets();

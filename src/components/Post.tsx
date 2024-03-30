@@ -254,12 +254,10 @@ const Post = ({ flashcardSetId }: { flashcardSetId: string }) => {
             src={PlayButton}
             alt="play button"
             className="relative bottom-4 left-56 w-16 h-16 z-10 cursor-pointer"
-            onClick={() => console.log("Play button clicked")}
+            onClick={() => navigate(`/play?flashcardSetId=${flashcardSetId}`)}
           />
         </div>
         <div className="flex flex-wrap items-center justify-center">
-          <img src={Tag} alt="tag" className="w-5 h-5" />
-          &nbsp;
           {flashcardSet.category.map((category, index) => (
             <span
               key={index}

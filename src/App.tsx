@@ -2,12 +2,13 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Register from "./pages/Register";
 import ErrorPage from "./pages/ErrorPage";
 import PrivateRoute from "./route/PrivateRoute";
-import Test from "./pages/Test";
+import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Profile from "./pages/Profile";
 import EditAvatar from "./pages/EditAvatar";
 import Create from "./pages/Create";
 import EditPost from "./pages/EditPost";
+import Play from "./pages/Play";
 
 const router = createBrowserRouter([
   {
@@ -26,18 +27,7 @@ const router = createBrowserRouter([
         children: [
           {
             path: "/",
-            element: <Test />,
-            // element: <h1>Unicode Character</h1>
-            //     <body>
-            //         <div>
-            //             {/* <h1>AcadeMe</h1>
-            // <h1>Unicode Character</h1>
-            // <h3>(U+1F436)</h3>
-            // <h3>Dog Face</h3>
-            // <h3>&#128054;</h3> */}
-            //             <Register />
-            //         </div>
-            //     </body>
+            element: <Home />,
           },
           {
             path: "/profile",
@@ -54,7 +44,11 @@ const router = createBrowserRouter([
           {
             path: "/edit-post",
             element: <EditPost />,
-          }
+          },
+          {
+            path: "/play",
+            element: <Play />,
+          },
         ],
       },
     ],

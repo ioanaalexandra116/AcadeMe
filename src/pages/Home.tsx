@@ -3,7 +3,7 @@ import { auth } from "../firebase/config";
 import { useNavigate } from "react-router-dom";
 import Background from "@/assets/laptop-background.svg";
 import GirlTitle from "../assets/girl-title.svg";
-const Test = () => {
+const Home = () => {
   return (
     <>
       {/* <div
@@ -17,4 +17,4 @@ const Test = () => {
   );
 };
 
-export default Test;
+export default Home;

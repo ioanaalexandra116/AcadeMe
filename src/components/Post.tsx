@@ -161,9 +161,8 @@ const Post = ({ flashcardSetId }: { flashcardSetId: string }) => {
       <CardHeader>
         <div
           className="flex justify-between items-center"
-          onClick={() => navigate(`/profile?userId=${flashcardSet.creator}`)}
         >
-          <div className="flex items-center justify-start cursor-pointer">
+          <div className="flex items-center justify-start cursor-pointer" onClick={() => navigate(`/profile?userId=${flashcardSet.creator}`)}>
             {loadingAvatar ? <Loader /> : <Avatar {...characterProperties} />}
             &nbsp;
             <span className="relative">{username}</span>
@@ -181,26 +180,24 @@ const Post = ({ flashcardSetId }: { flashcardSetId: string }) => {
                 <DropdownMenuContent className="h-24 flex justify-center items-center">
                   <DropdownMenuGroup className="h-24 flex flex-col justify-center items-center">
                     <DropdownMenuItem
-                      className="w-28 h-10 flex justify-center items-center"
-                      onClick={() =>
-                        navigate(`/edit-post?postId=${flashcardSetId}`)
-                      }
+                      className="w-28 h-10 flex justify-center items-center cursor-pointer"
+                      onClick={() => navigate(`/edit-post?postId=${flashcardSetId}`)}
                     >
                       <img
                         src={EditPost}
                         alt="edit post"
-                        className="w-4 h-4 cursor-pointer"
+                        className="w-4 h-4"
                       />
                       &nbsp; Edit
                     </DropdownMenuItem>
                     <DropdownMenuItem
-                      className="w-28 h-10 flex justify-center items-center"
+                      className="w-28 h-10 flex justify-center items-center cursor-pointer"
                       onClick={handleDelete}
                     >
                       <img
                         src={DeletePost}
                         alt="delete post"
-                        className="w-5 h-5 cursor-pointer"
+                        className="w-5 h-5"
                       />
                       &nbsp; Delete
                     </DropdownMenuItem>
@@ -256,7 +253,7 @@ const Post = ({ flashcardSetId }: { flashcardSetId: string }) => {
           <img
             src={PlayButton}
             alt="play button"
-            className="relative bottom-4 left-52 w-16 h-16 z-10 cursor-pointer"
+            className="relative bottom-4 left-56 w-16 h-16 z-10 cursor-pointer"
             onClick={() => console.log("Play button clicked")}
           />
         </div>

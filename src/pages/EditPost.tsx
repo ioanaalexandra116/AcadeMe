@@ -13,7 +13,8 @@ import BubbleBackground from "@/components/BubbleBackground";
 import {
   getCategories,
   getSecondCategories,
-  createFlashcardSet,
+  getFlashcardSet,
+  updateFlashcardSet
 } from "@/firebase/firestore";
 import {
   Select,
@@ -35,6 +36,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { CustomToaster } from "@/components/ui/sonner";
 import styled, { keyframes } from "styled-components";
+import { useLocation } from "react-router-dom";
 
 const myAnim = keyframes`
   0% {
@@ -68,7 +70,7 @@ const AnimatedFirst = styled.div`
   animation: ${myAnimLeft} 0.8s ease 0s 1 normal forwards;
 `;
 
-const Create = () => {
+const EditPost = () => {
   const [err, setErr] = useState<ErrorMessasge>(null);
   const [contentHeight, setContentHeight] = useState(0);
   const { user, userLoading } = useContext(AuthContext);
@@ -85,7 +87,7 @@ const Create = () => {
   const [imageUpload, setImageUpload] = useState<File | null>(null);
   const [currentPhoto, setCurrentPhoto] = useState("");
   const [photoLoading, setPhotoLoading] = useState(false);
-
+  const [flashcardSet, setFlashcardSet] = useState<FlashcardSet | null>(null);
   const [flashcardSets, setFlashcardSets] = useState([
     { id: 1, frontContent: "", backContent: "" },
     { id: 2, frontContent: "", backContent: "" },
@@ -93,6 +95,38 @@ const Create = () => {
     { id: 4, frontContent: "", backContent: "" },
     { id: 5, frontContent: "", backContent: "" },
   ]);
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const postId = queryParams.get("postId");
+
+  useEffect(() => {
+    const fetchFlashcardSet = async () => {
+      if (!postId) {
+        return;
+      }
+      const flashcardSet = await getFlashcardSet(postId);
+      if (!flashcardSet) {
+        return;
+      }
+      setFlashcardSet(flashcardSet);
+      setCurrentPhoto(flashcardSet.cover);
+      setTitle(flashcardSet.title);
+      setDescription(flashcardSet.description);
+      setSelectedCategory(flashcardSet.category[0]);
+      setSelectedSecondCategory(flashcardSet.category[1]);
+      setSelectedThirdCategory(flashcardSet.category[2]);
+      const flashcards = Object.entries(flashcardSet.flashcards).map(
+        ([frontContent, backContent], index) => ({
+          id: index + 1,
+          frontContent,
+          backContent,
+        })
+      );
+      setFlashcardSets(flashcards);
+      setLoading(false);
+    };
+    fetchFlashcardSet();
+  }, [postId]);
   const [removedCard, setRemovedCard] = useState<number | null>(null);
 
   if (!user || userLoading) {
@@ -212,9 +246,17 @@ const Create = () => {
   }, [removedCard, flashcardSets]);
 
   useLayoutEffect(() => {
-    const height = document.body.scrollHeight;
-    setContentHeight(height);
-  }, [flashcardSets, selectedCategory, selectedSecondCategory, next]);
+    if (!next) {
+      const cardContainer = document.getElementById("card-container");
+      if (cardContainer) {
+        const height = cardContainer.offsetHeight + 300;
+        setContentHeight(height);
+      }
+    } else {
+      const height = document.body.scrollHeight;
+      setContentHeight(height);
+    }
+  }, [flashcardSets, next, flashcardSet]);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -276,7 +318,7 @@ const Create = () => {
     setNext(true);
   };
 
-  const handlePost = async () => {
+  const handleEdit = async () => {
     setErr(null);
     if (
       flashcardSets.some(
@@ -313,10 +355,11 @@ const Create = () => {
       flashcardSet.flashcards[flashcard.frontContent] = flashcard.backContent;
     });
     handleUploadPic();
-    const response = await createFlashcardSet(flashcardSet, user.uid);
-    if (response) {
-      navigate(`/profile?userId=${user.uid}`);
+    if (!postId) {
+      return;
     }
+    await updateFlashcardSet(postId, flashcardSet);
+    navigate(`/profile?userId=${user.uid}`);
   };
 
   const getSpaceXClass = () => {
@@ -357,11 +400,12 @@ const Create = () => {
             textShadow: `-0.5px -0.5px 0 #000, 2px -0.5px 0 #000, -0.5px 1px 0 #000, 2px 1px 0 #000`,
           }}
         >
-          Create flashcard set
+          Edit flashcard set
         </h1>
         {!next ? (
           <AnimatedFirst className="flex flex-col items-center justify-center space-y-5">
             <Card
+              id="card-container"
               cardWidth={480}
               style={{
                 backgroundColor: "#FCCEDE",
@@ -544,7 +588,7 @@ const Create = () => {
                     style={{
                       border: "1px solid #000",
                       backgroundColor: "#fff",
-                      resize: "none"
+                      resize: "none",
                     }}
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
@@ -637,11 +681,11 @@ const Create = () => {
           )}
           <div className="flex z-10 mb-7 mt-5">
             <Button
-              onClick={handlePost}
+              onClick={handleEdit}
               className="w-32 h-12 text-white rounded-full"
               style={{ backgroundColor: "#f987af" }}
             >
-              Post
+              Save changes
             </Button>
           </div>
         </AnimatedNext>
@@ -650,4 +694,4 @@ const Create = () => {
   );
 };
 
-export default Create;
+export default EditPost;

@@ -21,6 +21,7 @@ import {
   FlashcardSet,
 } from "../interfaces";
 
+
 export async function createUserCollection(user: User, username: string) {
   const docRef = doc(db, "users", user.uid);
   const data = {
@@ -221,4 +222,9 @@ export async function deleteFlashcardSet(setId: string, uid: string) {
       favorites: arrayRemove(setId),
     });
   });
+}
+
+export async function updateFlashcardSet(setId: string, data: any) {
+  const docRef = doc(db, "flashcardSets", setId);
+  await updateDoc(docRef, data);
 }

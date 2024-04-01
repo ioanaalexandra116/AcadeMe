@@ -3,11 +3,10 @@ import { AuthContext } from "@/context";
 import Loading from "@/components/Loading";
 import { Button } from "@/components/ui/button";
 import { getFlashcardSet } from "@/firebase/firestore";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { FlashcardSet } from "@/interfaces/interfaces";
 import { useNavigate } from "react-router-dom";
-import styled, { keyframes } from "styled-components";
+import styled, { keyframes, css } from "styled-components";
 import { useLocation } from "react-router-dom";
 import Education from "@/assets/education.jpg";
 
@@ -43,10 +42,20 @@ const AnimatedFirst = styled.div`
   animation: ${myAnimLeft} 0.8s ease 0s 1 normal forwards;
 `;
 
-const StyledCard = styled.div`
+interface StyledCardProps {
+  animate?: boolean;
+}
+
+const StyledCard = styled.div<StyledCardProps>`
   width: 500px;
   height: 292px;
   perspective: 1000px;
+
+  ${(props) =>
+    props.animate &&
+    css`
+      animation: ${myAnim} 0.8s ease 0s 1 normal forwards;
+    `}
 `;
 
 const CardInner = styled.div<{ isPressed: boolean }>`
@@ -94,7 +103,7 @@ const CardBack = styled.div`
 
 const Play = () => {
   const { user, userLoading } = useContext(AuthContext);
-  const [next, setNext] = useState(false);
+  const [next, setNext] = useState(true);
   const [score, setScore] = useState(0);
   const [questionIndex, setQuestionIndex] = useState(0);
   const [answer, setAnswer] = useState("");
@@ -138,8 +147,8 @@ const Play = () => {
 
   const handleAnswer = () => {
     if (answerChecked) {
-        setShowAnswer(!showAnswer);
-        return;
+      setShowAnswer(!showAnswer);
+      return;
     }
     if (showAnswer) {
       setShowAnswer(false);
@@ -157,22 +166,35 @@ const Play = () => {
     }
     setAnswerChecked(true);
     setShowAnswer(true);
+    setNext(false);
   };
 
   return flashcardSet === null ? (
     <Loading />
   ) : (
     <div
-      className="bg-cover bg-center h-screen w-screen flex items-center justify-center"
+      className="bg-cover bg-center h-screen w-screen flex flex-col items-center justify-center"
       style={{ backgroundImage: `url(${Education})` }}
     >
+      <h1
+          className="text-4xl font-bold text-black mb-5 contoured-text"
+          style={{
+            color: "#A4DEF7",
+            textShadow: `-0.5px -0.5px 0 #000, 2px -0.5px 0 #000, -0.5px 1px 0 #000, 2px 1px 0 #000`,
+          }}
+        >
+          {flashcardSet?.title}
+        </h1>
       <AnimatedFirst className="flex flex-col items-center justify-center space-y-5">
         <p>Score : {score}</p>
         <p>
           Progress: {questionIndex + 1}/
           {Object.keys(flashcardSet?.flashcards).length}
         </p>
-        <StyledCard>
+        <StyledCard
+          animate={next}
+          className="flex flex-col items-center justify-center space-y-5"
+        >
           {loading ? (
             <Loading />
           ) : (
@@ -181,10 +203,11 @@ const Play = () => {
                 {Object.keys(flashcardSet?.flashcards)[questionIndex]}
               </CardFront>
               <CardBack>
-                {showAnswer &&
+                {
                   flashcardSet?.flashcards[
                     Object.keys(flashcardSet?.flashcards)[questionIndex]
-                  ]}
+                  ]
+                }
               </CardBack>
             </CardInner>
           )}
@@ -195,26 +218,45 @@ const Play = () => {
           onChange={(e) => setAnswer(e.target.value)}
           className="w-1/2"
           style={{
+            width: "50%", // Adjust width as needed
             border: "1px solid #000",
-            backgroundColor: "#fff",
+            backgroundColor: answerChecked
+              ? correct
+                ? "#18B42D"
+                : "#EB0002"
+              : "#fff",
+            pointerEvents: answerChecked ? "none" : "auto",
+            textAlign: "center",
           }}
         />
 
         <div className="flex flex-row items-center justify-center space-x-5 mt-4">
-          <Button style={{ width: "150px" }} onClick={handleAnswer}>
-            {showAnswer ? "Back to front side" : "Check Answer"}
-          </Button>
-          <Button
-            onClick={() => {
-              setQuestionIndex((prev) => prev + 1);
-              setShowAnswer(false);
-              setNext(false);
-              setAnswer("");
-              setAnswerChecked(false);
-            }}
-          >
-            Next
-          </Button>
+          {!answerChecked ? (
+            <Button style={{ width: "150px", backgroundColor: "#A4DEF7", color: "#000" }} onClick={handleAnswer}>
+              Check Answer
+            </Button>
+          ) : (
+            <Button
+              style={{ width: "80px", backgroundColor: "#A4DEF7", color: "#000" }}
+              onClick={() => setShowAnswer(!showAnswer)}
+            >
+              Flip
+            </Button>
+          )}
+          {!next && (
+            <Button
+              onClick={() => {
+                setQuestionIndex((prev) => prev + 1);
+                setShowAnswer(false);
+                setNext(true); // Set next to true to trigger animation
+                setAnswer("");
+                setAnswerChecked(false);
+              }}
+              style={{width: "80px", backgroundColor: "#A4DEF7", color: "#000"}}
+            >
+              Next
+            </Button>
+          )}
         </div>
       </AnimatedFirst>
     </div>

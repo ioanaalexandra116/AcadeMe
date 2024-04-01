@@ -124,7 +124,7 @@ const CreateFlashcard = ({
         />
         <img src={RightArrow} alt="right arrow" className="w-10 h-10" />
       </div>
-      <StyledCard className="flex flex-row items-center justify-center w-300 h-175">
+      <StyledCard className="flex flex-row items-center justify-center w-300 h-175 cursor-pointer">
         <CardInner
           isPressed={isPressed}
           onClick={() => setIsPressed(!isPressed)}

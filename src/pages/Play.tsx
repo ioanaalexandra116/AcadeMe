@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext, useRef } from "react";
 import { AuthContext } from "@/context";
 import Loading from "@/components/Loading";
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,9 @@ import { useNavigate } from "react-router-dom";
 import styled, { keyframes, css } from "styled-components";
 import { useLocation } from "react-router-dom";
 import Education from "@/assets/education.jpg";
+import SadHamster from "@/assets/sad-hamster.png";
+import HappyHamster from "@/assets/happy-hamster.png";
+import PreviewCreate from "@/assets/preview-create.svg";
 
 const myAnim = keyframes`
   0% {
@@ -116,6 +119,30 @@ const Play = () => {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const postId = queryParams.get("flashcardSetId");
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [inputDisabled, setInputDisabled] = useState(false);
+
+  useEffect(() => {
+    const handleKeyPress = (event: KeyboardEvent) => {
+      if (event.key === "Enter") {
+        if (!buttonRef.current) return;
+        buttonRef.current.click();
+      }
+    };
+
+    document.addEventListener("keypress", handleKeyPress);
+
+    return () => {
+      document.removeEventListener("keypress", handleKeyPress);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [questionIndex]);
 
   useEffect(() => {
     const fetchFlashcardSet = async () => {
@@ -146,6 +173,7 @@ const Play = () => {
   }, [questionIndex, flashcardSet]);
 
   const handleAnswer = () => {
+    setInputDisabled(true);
     if (answerChecked) {
       setShowAnswer(!showAnswer);
       return;
@@ -173,24 +201,43 @@ const Play = () => {
     <Loading />
   ) : (
     <div
-      className="bg-cover bg-center h-screen w-screen flex flex-col items-center justify-center"
-      style={{ backgroundImage: `url(${Education})` }}
+      className="bg-cover bg-center h-screen w-screen flex flex-col space-y-10 pt-16 relative "
+      style={{ backgroundImage: `url(${PreviewCreate})` }}
     >
-      <h1
-          className="text-4xl font-bold text-black mb-5 contoured-text"
+      <div className="flex flex-row justify-between">
+        <h1
+          className="text-4xl font-bold text-black contoured-text flex justify-start ml-6"
           style={{
-            color: "#A4DEF7",
+            color: "#F987AF",
             textShadow: `-0.5px -0.5px 0 #000, 2px -0.5px 0 #000, -0.5px 1px 0 #000, 2px 1px 0 #000`,
           }}
         >
-          {flashcardSet?.title}
+          {score} exp
         </h1>
-      <AnimatedFirst className="flex flex-col items-center justify-center space-y-5">
-        <p>Score : {score}</p>
-        <p>
-          Progress: {questionIndex + 1}/
+        <h1
+          className="text-4xl font-bold text-black contoured-text flex justify-end mr-6"
+          style={{
+            color: "#F987AF",
+            textShadow: `-0.5px -0.5px 0 #000, 2px -0.5px 0 #000, -0.5px 1px 0 #000, 2px 1px 0 #000`,
+          }}
+        >
+          {" "}
+          flashcard {questionIndex + 1} /{" "}
           {Object.keys(flashcardSet?.flashcards).length}
-        </p>
+        </h1>
+      </div>
+      <h1
+        className="text-4xl font-bold text-black mb-5 contoured-text flex justify-center"
+        style={{
+          color: "#F987AF",
+          textShadow: `-0.5px -0.5px 0 #000, 2px -0.5px 0 #000, -0.5px 1px 0 #000, 2px 1px 0 #000`,
+        }}
+      >
+        {flashcardSet?.title}
+      </h1>
+      <AnimatedFirst className="flex flex-col items-center justify-center space-y-5 relative z-10">
+        {" "}
+        {/* Adjusted z-index */}
         <StyledCard
           animate={next}
           className="flex flex-col items-center justify-center space-y-5"
@@ -213,31 +260,45 @@ const Play = () => {
           )}
         </StyledCard>
         <Input
+          ref={inputRef}
           placeholder="Type the answer"
           value={answer}
+          disabled={inputDisabled}
           onChange={(e) => setAnswer(e.target.value)}
           className="w-1/2"
           style={{
-            width: "50%", // Adjust width as needed
+            width: "250px",
             border: "1px solid #000",
             backgroundColor: answerChecked
               ? correct
-                ? "#18B42D"
-                : "#EB0002"
+                ? "#BBF6D0"
+                : "#EE7579"
               : "#fff",
             pointerEvents: answerChecked ? "none" : "auto",
             textAlign: "center",
           }}
+          autoFocus
         />
-
-        <div className="flex flex-row items-center justify-center space-x-5 mt-4">
+        <div className="relative flex flex-row items-center justify-center space-x-5 mt-4">
           {!answerChecked ? (
-            <Button style={{ width: "150px", backgroundColor: "#A4DEF7", color: "#000" }} onClick={handleAnswer}>
+            <Button
+              style={{
+                width: "150px",
+                backgroundColor: "#F987AF",
+                color: "#000",
+              }}
+              onClick={handleAnswer}
+              ref={buttonRef}
+            >
               Check Answer
             </Button>
           ) : (
             <Button
-              style={{ width: "80px", backgroundColor: "#A4DEF7", color: "#000" }}
+              style={{
+                width: "80px",
+                backgroundColor: "#F987AF",
+                color: "#000",
+              }}
               onClick={() => setShowAnswer(!showAnswer)}
             >
               Flip
@@ -247,18 +308,33 @@ const Play = () => {
             <Button
               onClick={() => {
                 setQuestionIndex((prev) => prev + 1);
+                setInputDisabled(false);
                 setShowAnswer(false);
-                setNext(true); // Set next to true to trigger animation
+                setNext(true);
                 setAnswer("");
                 setAnswerChecked(false);
               }}
-              style={{width: "80px", backgroundColor: "#A4DEF7", color: "#000"}}
+              style={{
+                width: "80px",
+                backgroundColor: "#F987AF",
+                color: "#000",
+              }}
             >
               Next
             </Button>
           )}
         </div>
       </AnimatedFirst>
+      <div className="relative flex flex-start bottom-64 ml-4 z-0">
+        {!correct && answerChecked && (
+          <img src={SadHamster} alt="Sad Hamster" className="w-[334px]" />
+        )}
+      </div>
+      <div className="relative flex flex-start bottom-[315px] ml-4 z-0">
+        {correct && answerChecked && (
+          <img src={HappyHamster} alt="Happy Hamster" className="w-[350px]" />
+        )}
+      </div>
     </div>
   );
 };

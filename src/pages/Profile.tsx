@@ -59,7 +59,7 @@ const Profile = () => {
     fetchFlashcardSets();
   }, [user]);
 
-  const columnWidth = `${100 / numColumns}%`;
+  // const columnWidth = `${100 / numColumns}%`;
 
   return (
     <div className="flex flex-col relative items-center justify-center">
@@ -68,7 +68,7 @@ const Profile = () => {
       </div>
       <div className={`flex flex-wrap justify-center items-center pt-16 `}>
         {flashcardSets.map((flashcardSetId) => (
-          <div key={flashcardSetId} style={{ width: columnWidth }} className="p-8 flex justify-center">
+          <div key={flashcardSetId} className="p-8 flex justify-center">
             <Post flashcardSetId={flashcardSetId} />
           </div>
         ))}

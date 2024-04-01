@@ -8,7 +8,6 @@ import { FlashcardSet } from "@/interfaces/interfaces";
 import { useNavigate } from "react-router-dom";
 import styled, { keyframes, css } from "styled-components";
 import { useLocation } from "react-router-dom";
-import Education from "@/assets/education.jpg";
 import SadHamster from "@/assets/sad-hamster.png";
 import HappyHamster from "@/assets/happy-hamster.png";
 import PreviewCreate from "@/assets/preview-create.svg";
@@ -35,10 +34,6 @@ const myAnimLeft = keyframes`
     opacity: 1;
     transform: translateX(0);
   }
-`;
-
-const AnimatedNext = styled.div`
-  animation: ${myAnim} 0.8s ease 0s 1 normal forwards;
 `;
 
 const AnimatedFirst = styled.div`

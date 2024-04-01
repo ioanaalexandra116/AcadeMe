@@ -34,7 +34,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useContext } from "react";
 import { AuthContext } from "@/context";
-import Tag from "../assets/tag.svg";
 import AdvanceCateg from "../assets/advance-categ.svg";
 
 const Post = ({ flashcardSetId }: { flashcardSetId: string }) => {

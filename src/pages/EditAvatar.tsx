@@ -9,6 +9,7 @@ import { AuthContext } from "@/context";
 import { addAvatarProps, getAvatarProps } from "@/firebase/firestore";
 import Loading from "@/components/Loading";
 import { useNavigate } from "react-router-dom";
+import Education from "@/assets/education.jpg";
 
 const EditAvatar = () => {
   const { user, userLoading } = useContext(AuthContext);
@@ -106,7 +107,7 @@ const EditAvatar = () => {
   return fullWidth ? (
     <div
       className="bg-cover bg-center h-screen w-screen flex items-center justify-center"
-      style={{ backgroundImage: `url(${Background})` }}
+      style={{ backgroundImage: `url(${Education})` }}
     >
       <div
         style={cardStyles}

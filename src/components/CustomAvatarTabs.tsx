@@ -143,7 +143,7 @@ export function CustomAvatarTabs({
       style={{
         border: "0px solid rgba(255, 255, 255, 0)",
         boxShadow: "none",
-        backgroundColor: "#FCCEDB",
+        backgroundColor: "#F987AF",
       }}
     >
       <Tabs

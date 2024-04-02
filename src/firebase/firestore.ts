@@ -21,7 +21,6 @@ import {
   FlashcardSet,
 } from "../interfaces";
 
-
 export async function createUserCollection(user: User, username: string) {
   const docRef = doc(db, "users", user.uid);
   const data = {
@@ -170,7 +169,6 @@ export async function getFlashcardSet(setId: string) {
   }
 }
 
-
 export async function getFlashcardSetsOfUser(uid: string) {
   const docRef = doc(db, "users", uid);
   const docSnap = await getDoc(docRef);
@@ -226,7 +224,11 @@ export async function updateFlashcardSet(setId: string, data: any) {
   await updateDoc(docRef, data);
 }
 
-export async function updateActivity(uid: string, flashcardSetId: string, score: number) {
+export async function updateActivity(
+  uid: string,
+  flashcardSetId: string,
+  score: number
+) {
   const docRef = doc(db, "users", uid);
 
   const docSnap = await getDoc(docRef);
@@ -239,4 +241,23 @@ export async function updateActivity(uid: string, flashcardSetId: string, score:
   });
 
   return activityData;
+}
+
+export async function getActivities(uid: string, flashcardSetId: string) {
+  const docRef = doc(db, "users", uid);
+  const docSnap = await getDoc(docRef);
+  const activityData = docSnap.data()?.activity || {};
+  return activityData[flashcardSetId] || [];
+}
+
+export async function updatePlayCount(flashcardSetId: string) {
+  const docRef = doc(db, "flashcardSets", flashcardSetId);
+  const docSnap = await getDoc(docRef);
+  const data = docSnap.data();
+  if (!data) {
+    return;
+  }
+  await updateDoc(docRef, {
+    playCount: data.playCount + 1,
+  });
 }

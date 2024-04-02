@@ -92,7 +92,7 @@ const CardFront = styled.div`
   width: 100%;
   height: 100%;
   backface-visibility: hidden;
-  background-color: #fff;
+  background-color: #fccede;
   color: #000;
   display: flex;
   align-items: center;
@@ -108,8 +108,8 @@ const CardBack = styled.div`
   width: 100%;
   height: 100%;
   backface-visibility: hidden;
-  background-color: rgb(187 247 208);
-  color: rgb(21 128 61);
+  background-color: #fff;
+  color: #000;
   display: flex;
   align-items: center;
   border: 1px solid #000;
@@ -139,6 +139,7 @@ const Play = () => {
   const [inputDisabled, setInputDisabled] = useState(false);
   const [showSadHamster, setShowSadHamster] = useState(false);
   const [showHappyHamster, setShowHappyHamster] = useState(false);
+  const [hamsterTimeout, setHamsterTimeout] = useState<NodeJS.Timeout>();
 
   useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {
@@ -211,15 +212,15 @@ const Play = () => {
       setScore((prev) => prev + 10);
       setCorrect(true);
       setShowHappyHamster(true);
-      setTimeout(() => {
+      setHamsterTimeout(setTimeout(() => {
         setShowHappyHamster(false);
-      }, 3000);
+      }, 3000));
     } else {
       setCorrect(false);
       setShowSadHamster(true);
-      setTimeout(() => {
+      setHamsterTimeout(setTimeout(() => {
         setShowSadHamster(false);
-      }, 3000);
+      }, 3000));
     }
     setAnswerChecked(true);
     setShowAnswer(true);
@@ -344,6 +345,7 @@ const Play = () => {
                 setAnswerChecked(false);
                 setShowHappyHamster(false);
                 setShowSadHamster(false);
+                clearTimeout(hamsterTimeout);
               }}
               style={{
                 width: "80px",
@@ -351,7 +353,10 @@ const Play = () => {
                 color: "#000",
               }}
             >
-              Next
+              {questionIndex + 1 ===
+              Object.keys(flashcardSet?.flashcards).length
+                ? "Results"
+                : "Next"}
             </Button>
           )}
         </div>

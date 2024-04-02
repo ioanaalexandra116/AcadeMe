@@ -18,7 +18,6 @@ export type fromRegisterContextType = {
 
 export type UserData = {
   username: string;
-  photoURL: string;
 };
 
 export type AvatarProperties = {

@@ -27,15 +27,12 @@ export async function createUserCollection(user: User, username: string) {
   const data = {
     id: user.uid,
     username: username,
-    photoURL: "",
     desription: "",
     level: 1,
     following: [],
-    followers: [],
-    followNotif: [],
     posts: [],
     favorites: [],
-    feed: [],
+    activity: {},
   };
   setDoc(docRef, data)
     .then()
@@ -227,4 +224,19 @@ export async function deleteFlashcardSet(setId: string, uid: string) {
 export async function updateFlashcardSet(setId: string, data: any) {
   const docRef = doc(db, "flashcardSets", setId);
   await updateDoc(docRef, data);
+}
+
+export async function updateActivity(uid: string, flashcardSetId: string, score: number) {
+  const docRef = doc(db, "users", uid);
+
+  const docSnap = await getDoc(docRef);
+  const activityData = docSnap.data()?.activity || {};
+  activityData[flashcardSetId] = activityData[flashcardSetId] || [];
+  activityData[flashcardSetId].push(score);
+
+  await updateDoc(docRef, {
+    activity: activityData,
+  });
+
+  return activityData;
 }

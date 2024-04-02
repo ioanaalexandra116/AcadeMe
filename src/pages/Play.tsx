@@ -2,7 +2,7 @@ import { useState, useEffect, useContext, useRef } from "react";
 import { AuthContext } from "@/context";
 import Loading from "@/components/Loading";
 import { Button } from "@/components/ui/button";
-import { getFlashcardSet } from "@/firebase/firestore";
+import { getFlashcardSet, updateActivity } from "@/firebase/firestore";
 import { Input } from "@/components/ui/input";
 import { FlashcardSet } from "@/interfaces/interfaces";
 import { useNavigate } from "react-router-dom";
@@ -34,6 +34,26 @@ const myAnimLeft = keyframes`
     opacity: 1;
     transform: translateX(0);
   }
+`;
+
+const SlideIn = keyframes`
+  0% {
+    opacity: 0;
+    transform: translateY(250px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+`;
+
+interface StyledImageProps {
+  animate?: boolean;
+}
+
+const StyledImage = styled.img<StyledImageProps>`
+  animation: ${SlideIn} 1s ease 0s 1 normal forwards;
 `;
 
 const AnimatedFirst = styled.div`
@@ -117,6 +137,8 @@ const Play = () => {
   const buttonRef = useRef<HTMLButtonElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const [inputDisabled, setInputDisabled] = useState(false);
+  const [showSadHamster, setShowSadHamster] = useState(false);
+  const [showHappyHamster, setShowHappyHamster] = useState(false);
 
   useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {
@@ -163,7 +185,11 @@ const Play = () => {
       return;
     }
     if (questionIndex >= Object.keys(flashcardSet?.flashcards).length) {
-      navigate(`/play/result?score=${score}`);
+      if (!postId) {
+        return;
+      }
+      updateActivity(user.uid, postId, score);
+      navigate(`/play/results?flashcardSetId=${postId}`);
     }
   }, [questionIndex, flashcardSet]);
 
@@ -184,8 +210,16 @@ const Play = () => {
     ) {
       setScore((prev) => prev + 10);
       setCorrect(true);
+      setShowHappyHamster(true);
+      setTimeout(() => {
+        setShowHappyHamster(false);
+      }, 3000);
     } else {
       setCorrect(false);
+      setShowSadHamster(true);
+      setTimeout(() => {
+        setShowSadHamster(false);
+      }, 3000);
     }
     setAnswerChecked(true);
     setShowAnswer(true);
@@ -308,6 +342,8 @@ const Play = () => {
                 setNext(true);
                 setAnswer("");
                 setAnswerChecked(false);
+                setShowHappyHamster(false);
+                setShowSadHamster(false);
               }}
               style={{
                 width: "80px",
@@ -321,13 +357,25 @@ const Play = () => {
         </div>
       </AnimatedFirst>
       <div className="relative flex flex-start bottom-64 ml-4 z-0">
-        {!correct && answerChecked && (
-          <img src={SadHamster} alt="Sad Hamster" className="w-[334px]" />
+        {showSadHamster && (
+          <div className="overflow-hidden">
+            <StyledImage
+              src={SadHamster}
+              alt="Sad Hamster"
+              className="w-[334px]"
+            />
+          </div>
         )}
       </div>
       <div className="relative flex flex-start bottom-[315px] ml-4 z-0">
-        {correct && answerChecked && (
-          <img src={HappyHamster} alt="Happy Hamster" className="w-[350px]" />
+        {showHappyHamster && (
+          <div className="overflow-hidden">
+            <StyledImage
+              src={HappyHamster}
+              alt="Happy Hamster"
+              className="w-[350px]"
+            />
+          </div>
         )}
       </div>
     </div>

@@ -2,7 +2,11 @@ import { useState, useEffect, useContext, useRef } from "react";
 import { AuthContext } from "@/context";
 import Loading from "@/components/Loading";
 import { Button } from "@/components/ui/button";
-import { getFlashcardSet, updateActivity } from "@/firebase/firestore";
+import {
+  getFlashcardSet,
+  updateActivity,
+  updatePlayCount,
+} from "@/firebase/firestore";
 import { Input } from "@/components/ui/input";
 import { FlashcardSet } from "@/interfaces/interfaces";
 import { useNavigate } from "react-router-dom";
@@ -48,12 +52,25 @@ const SlideIn = keyframes`
   }
 `;
 
+const SlideOut = keyframes`
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(250px);
+  }
+`;
+
 interface StyledImageProps {
   animate?: boolean;
 }
 
 const StyledImage = styled.img<StyledImageProps>`
-  animation: ${SlideIn} 1s ease 0s 1 normal forwards;
+  animation: ${({ animate }) => (animate ? SlideIn : SlideOut)} 1s ease 0s 1
+    normal forwards;
 `;
 
 const AnimatedFirst = styled.div`
@@ -62,12 +79,21 @@ const AnimatedFirst = styled.div`
 
 interface StyledCardProps {
   animate?: boolean;
+  windowWidth?: number;
 }
 
 const StyledCard = styled.div<StyledCardProps>`
   width: 500px;
   height: 292px;
   perspective: 1000px;
+
+  ${({ windowWidth }) =>
+    windowWidth &&
+    windowWidth < 786 &&
+    css`
+      width: 350px;
+      height: 204px;
+    `}
 
   ${(props) =>
     props.animate &&
@@ -126,7 +152,7 @@ const Play = () => {
   const [questionIndex, setQuestionIndex] = useState(0);
   const [answer, setAnswer] = useState("");
   const [showAnswer, setShowAnswer] = useState(false);
-  const [correct, setCorrect] = useState(false);
+  const [correct, setCorrect] = useState<boolean | null>(null);
   const [answerChecked, setAnswerChecked] = useState(false);
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
@@ -136,23 +162,32 @@ const Play = () => {
   const postId = queryParams.get("flashcardSetId");
   const buttonRef = useRef<HTMLButtonElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const nextRef = useRef<HTMLButtonElement>(null);
+  const flipRef = useRef<HTMLButtonElement>(null);
   const [inputDisabled, setInputDisabled] = useState(false);
   const [showSadHamster, setShowSadHamster] = useState(false);
   const [showHappyHamster, setShowHappyHamster] = useState(false);
   const [hamsterTimeout, setHamsterTimeout] = useState<NodeJS.Timeout>();
+  const [result, setResult] = useState<number | null>(null);
+  const [timeEnd, setTimeEnd] = useState(Date.now());
 
   useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {
       if (event.key === "Enter") {
-        if (!buttonRef.current) return;
-        buttonRef.current.click();
+        if (buttonRef.current) buttonRef.current.click();
+      }
+      if (event.key === "ArrowRight") {
+        if (nextRef.current) nextRef.current.click();
+      }
+      if (event.key === " ") {
+        if (flipRef.current) flipRef.current.click();
       }
     };
 
-    document.addEventListener("keypress", handleKeyPress);
+    document.addEventListener("keydown", handleKeyPress);
 
     return () => {
-      document.removeEventListener("keypress", handleKeyPress);
+      document.removeEventListener("keydown", handleKeyPress);
     };
   }, []);
 
@@ -189,10 +224,18 @@ const Play = () => {
       if (!postId) {
         return;
       }
-      updateActivity(user.uid, postId, score);
-      navigate(`/play/results?flashcardSetId=${postId}`);
+      updateActivity(user.uid, postId, score)
+        .then((result: number) => setResult(result))
+        .catch((error) => console.error("Error updating activity:", error));
+      updatePlayCount(postId);
     }
   }, [questionIndex, flashcardSet]);
+
+  useEffect(() => {
+    if (result !== null) {
+      navigate(`/play/results?flashcardSetId=${postId}`);
+    }
+  }, [result, postId]);
 
   const handleAnswer = () => {
     setInputDisabled(true);
@@ -212,15 +255,21 @@ const Play = () => {
       setScore((prev) => prev + 10);
       setCorrect(true);
       setShowHappyHamster(true);
-      setHamsterTimeout(setTimeout(() => {
-        setShowHappyHamster(false);
-      }, 3000));
+      setHamsterTimeout(
+        setTimeout(() => {
+          setShowHappyHamster(false);
+        }, 3000)
+      );
+      setTimeEnd(Date.now());
     } else {
       setCorrect(false);
       setShowSadHamster(true);
-      setHamsterTimeout(setTimeout(() => {
-        setShowSadHamster(false);
-      }, 3000));
+      setHamsterTimeout(
+        setTimeout(() => {
+          setShowSadHamster(false);
+        }, 3000)
+      );
+      setTimeEnd(Date.now());
     }
     setAnswerChecked(true);
     setShowAnswer(true);
@@ -231,44 +280,83 @@ const Play = () => {
     <Loading />
   ) : (
     <div
-      className="bg-cover bg-center h-screen w-screen flex flex-col space-y-10 pt-16 relative "
+      className="bg-cover bg-center h-screen w-screen flex flex-col space-y-10 pt-16 relative"
       style={{ backgroundImage: `url(${PreviewCreate})` }}
     >
       <div className="flex flex-row justify-between">
-        <h1
-          className="text-4xl font-bold text-black contoured-text flex justify-start ml-6"
-          style={{
-            color: "#F987AF",
-            textShadow: `-0.5px -0.5px 0 #000, 2px -0.5px 0 #000, -0.5px 1px 0 #000, 2px 1px 0 #000`,
-          }}
-        >
-          {score} exp
-        </h1>
-        <h1
-          className="text-4xl font-bold text-black contoured-text flex justify-end mr-6"
-          style={{
-            color: "#F987AF",
-            textShadow: `-0.5px -0.5px 0 #000, 2px -0.5px 0 #000, -0.5px 1px 0 #000, 2px 1px 0 #000`,
-          }}
-        >
-          {" "}
-          flashcard {questionIndex + 1} /{" "}
-          {Object.keys(flashcardSet?.flashcards).length}
-        </h1>
+        {window.innerWidth > 786 ? (
+          <h1
+            className="text-4xl font-bold text-black contoured-text flex justify-start ml-6"
+            style={{
+              color: "#F987AF",
+              textShadow: `-0.5px -0.5px 0 #000, 2px -0.5px 0 #000, -0.5px 1px 0 #000, 2px 1px 0 #000`,
+            }}
+          >
+            {score} exp
+          </h1>
+        ) : (
+          <h1
+            className="text-xl font-bold text-black contoured-text flex justify-start ml-6"
+            style={{
+              color: "#F987AF",
+              textShadow: `-0.5px -0.5px 0 #000, 2px -0.5px 0 #000, -0.5px 1px 0 #000, 2px 1px 0 #000`,
+            }}
+          >
+            {score} exp
+          </h1>
+        )}
+        {window.innerWidth > 786 ? (
+          <h1
+            className="text-4xl font-bold text-black contoured-text flex justify-end mr-6"
+            style={{
+              color: "#F987AF",
+              textShadow: `-0.5px -0.5px 0 #000, 2px -0.5px 0 #000, -0.5px 1px 0 #000, 2px 1px 0 #000`,
+            }}
+          >
+            {" "}
+            flashcard {questionIndex + 1} /{" "}
+            {Object.keys(flashcardSet?.flashcards).length}
+          </h1>
+        ) : (
+          <h1
+            className="text-xl font-bold text-black contoured-text flex justify-end mr-6"
+            style={{
+              color: "#F987AF",
+              textShadow: `-0.5px -0.5px 0 #000, 2px -0.5px 0 #000, -0.5px 1px 0 #000, 2px 1px 0 #000`,
+            }}
+          >
+            {" "}
+            flashcard {questionIndex + 1} /{" "}
+            {Object.keys(flashcardSet?.flashcards).length}
+          </h1>
+        )}
       </div>
-      <h1
-        className="text-4xl font-bold text-black mb-5 contoured-text flex justify-center"
-        style={{
-          color: "#F987AF",
-          textShadow: `-0.5px -0.5px 0 #000, 2px -0.5px 0 #000, -0.5px 1px 0 #000, 2px 1px 0 #000`,
-        }}
-      >
-        {flashcardSet?.title}
-      </h1>
+      {window.innerWidth > 786 ? (
+        <h1
+          className="text-4xl font-bold text-black mb-5 contoured-text flex justify-center"
+          style={{
+            color: "#F987AF",
+            textShadow: `-0.5px -0.5px 0 #000, 2px -0.5px 0 #000, -0.5px 1px 0 #000, 2px 1px 0 #000`,
+          }}
+        >
+          {flashcardSet?.title}
+        </h1>
+      ) : (
+        <h1
+          className="text-3xl font-bold text-black mb-5 contoured-text flex justify-center"
+          style={{
+            color: "#F987AF",
+            textShadow: `-0.5px -0.5px 0 #000, 2px -0.5px 0 #000, -0.5px 1px 0 #000, 2px 1px 0 #000`,
+          }}
+        >
+          {flashcardSet?.title}
+        </h1>
+      )}
       <AnimatedFirst className="flex flex-col items-center justify-center space-y-5 relative z-10">
         {" "}
         {/* Adjusted z-index */}
         <StyledCard
+          windowWidth={window.innerWidth}
           animate={next}
           className="flex flex-col items-center justify-center space-y-5"
         >
@@ -297,7 +385,7 @@ const Play = () => {
           onChange={(e) => setAnswer(e.target.value)}
           className="w-1/2"
           style={{
-            width: "250px",
+            width: window.innerWidth > 786 ? "250px" : "200px",
             border: "1px solid #000",
             backgroundColor: answerChecked
               ? correct
@@ -310,7 +398,7 @@ const Play = () => {
           autoFocus
         />
         <div className="relative flex flex-row items-center justify-center space-x-5 mt-4">
-          {!answerChecked ? (
+          {!answerChecked && (
             <Button
               style={{
                 width: "150px",
@@ -322,7 +410,8 @@ const Play = () => {
             >
               Check Answer
             </Button>
-          ) : (
+          )}
+          {answerChecked && (
             <Button
               style={{
                 width: "80px",
@@ -330,12 +419,14 @@ const Play = () => {
                 color: "#000",
               }}
               onClick={() => setShowAnswer(!showAnswer)}
+              ref={flipRef}
             >
               Flip
             </Button>
           )}
           {!next && (
             <Button
+              ref={nextRef}
               onClick={() => {
                 setQuestionIndex((prev) => prev + 1);
                 setInputDisabled(false);
@@ -361,28 +452,33 @@ const Play = () => {
           )}
         </div>
       </AnimatedFirst>
-      <div className="relative flex flex-start bottom-64 ml-4 z-0">
-        {showSadHamster && (
-          <div className="overflow-hidden">
-            <StyledImage
-              src={SadHamster}
-              alt="Sad Hamster"
-              className="w-[334px]"
-            />
-          </div>
-        )}
-      </div>
-      <div className="relative flex flex-start bottom-[315px] ml-4 z-0">
-        {showHappyHamster && (
-          <div className="overflow-hidden">
-            <StyledImage
-              src={HappyHamster}
-              alt="Happy Hamster"
-              className="w-[350px]"
-            />
-          </div>
-        )}
-      </div>
+      {window.innerWidth > 786 ? (
+        <div className="absolute bottom-0 w-full flex">
+          {correct !== null && (
+            <div className="overflow-hidden">
+              <StyledImage
+                src={correct ? HappyHamster : SadHamster}
+                alt="Hamster"
+                className={correct ? "w-[330px]" : "w-[330px] ml-4"}
+                animate={Date.now() - timeEnd > 2000 || next ? false : true}
+              />
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className="absolute bottom-0 w-full flex items-center justify-center">
+          {correct !== null && (
+            <div className="overflow-hidden flex items-center justify-center">
+              <StyledImage
+                src={correct ? HappyHamster : SadHamster}
+                alt="Hamster"
+                className="w-[250px]"
+                animate={Date.now() - timeEnd > 2000 || next ? false : true}
+              />
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };

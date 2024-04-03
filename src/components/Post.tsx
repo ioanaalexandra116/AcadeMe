@@ -158,10 +158,11 @@ const Post = ({ flashcardSetId }: { flashcardSetId: string }) => {
       style={{ width: "370px", height: "470px", backgroundColor: "#fff" }}
     >
       <CardHeader>
-        <div
-          className="flex justify-between items-center"
-        >
-          <div className="flex items-center justify-start cursor-pointer" onClick={() => navigate(`/profile?userId=${flashcardSet.creator}`)}>
+        <div className="flex justify-between items-center">
+          <div
+            className="flex items-center justify-start cursor-pointer"
+            onClick={() => navigate(`/profile?userId=${flashcardSet.creator}`)}
+          >
             {loadingAvatar ? <Loader /> : <Avatar {...characterProperties} />}
             &nbsp;
             <span className="relative">{username}</span>
@@ -180,13 +181,11 @@ const Post = ({ flashcardSetId }: { flashcardSetId: string }) => {
                   <DropdownMenuGroup className="h-24 flex flex-col justify-center items-center">
                     <DropdownMenuItem
                       className="w-28 h-10 flex justify-center items-center cursor-pointer"
-                      onClick={() => navigate(`/edit-post?postId=${flashcardSetId}`)}
+                      onClick={() =>
+                        navigate(`/edit-post?postId=${flashcardSetId}`)
+                      }
                     >
-                      <img
-                        src={EditPost}
-                        alt="edit post"
-                        className="w-4 h-4"
-                      />
+                      <img src={EditPost} alt="edit post" className="w-4 h-4" />
                       &nbsp; Edit
                     </DropdownMenuItem>
                     <DropdownMenuItem
@@ -303,7 +302,11 @@ const Post = ({ flashcardSetId }: { flashcardSetId: string }) => {
               }}
             ></Card>
           </div>
-          <div>played {flashcardSet.playCount} times</div>
+          {flashcardSet.playCount === 1 ? (
+            <div>played 1 time</div>
+          ) : (
+            <div>played {flashcardSet.playCount} times</div>
+          )}
           <div className="flex items-end">
             {!isSaved ? (
               <img

@@ -170,6 +170,8 @@ const Play = () => {
   const [hamsterTimeout, setHamsterTimeout] = useState<NodeJS.Timeout>();
   const [result, setResult] = useState<number | null>(null);
   const [timeEnd, setTimeEnd] = useState(Date.now());
+  const [updated, setUpdated] = useState(false);
+  const [resultsPressed, setResultsPressed] = useState(false);
 
   useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {
@@ -224,10 +226,13 @@ const Play = () => {
       if (!postId) {
         return;
       }
-      updateActivity(user.uid, postId, score)
-        .then((result: number) => setResult(result))
-        .catch((error) => console.error("Error updating activity:", error));
       updatePlayCount(postId);
+      updateActivity(user.uid, postId, score)
+        .then((result: number) => {
+          setUpdated(true);
+          setResult(result);
+        })
+        .catch((error) => console.error("Error updating activity:", error));
     }
   }, [questionIndex, flashcardSet]);
 
@@ -276,7 +281,7 @@ const Play = () => {
     setNext(false);
   };
 
-  return flashcardSet === null ? (
+  return flashcardSet === null || (resultsPressed && !updated) ? (
     <Loading />
   ) : (
     <div
@@ -437,6 +442,12 @@ const Play = () => {
                 setShowHappyHamster(false);
                 setShowSadHamster(false);
                 clearTimeout(hamsterTimeout);
+                if (
+                  questionIndex + 1 ===
+                  Object.keys(flashcardSet?.flashcards).length
+                ) {
+                  setResultsPressed(true);
+                }
               }}
               style={{
                 width: "80px",

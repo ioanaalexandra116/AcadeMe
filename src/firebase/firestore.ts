@@ -234,6 +234,9 @@ export async function updateActivity(
   const docSnap = await getDoc(docRef);
   const activityData = docSnap.data()?.activity || {};
   activityData[flashcardSetId] = activityData[flashcardSetId] || [];
+  if (activityData[flashcardSetId].length == 10) {
+    activityData[flashcardSetId].shift();
+  }
   activityData[flashcardSetId].push(score);
 
   await updateDoc(docRef, {

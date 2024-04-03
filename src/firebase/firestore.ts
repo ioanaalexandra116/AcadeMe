@@ -27,7 +27,7 @@ export async function createUserCollection(user: User, username: string) {
     id: user.uid,
     username: username,
     desription: "",
-    level: 1,
+    exp: 0,
     following: [],
     posts: [],
     favorites: [],
@@ -241,6 +241,11 @@ export async function updateActivity(
 
   await updateDoc(docRef, {
     activity: activityData,
+  });
+
+  const exp = docSnap.data()?.exp || 0;
+  await updateDoc(docRef, {
+    exp: exp + score,
   });
 
   return activityData;

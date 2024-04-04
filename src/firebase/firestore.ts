@@ -269,3 +269,9 @@ export async function updatePlayCount(flashcardSetId: string) {
     playCount: data.playCount + 1,
   });
 }
+
+export async function getExp(uid: string) {
+  const docRef = doc(db, "users", uid);
+  const docSnap = await getDoc(docRef);
+  return docSnap.data()?.exp || 0;
+}

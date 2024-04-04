@@ -16,10 +16,8 @@ import {
 } from "@/components/ui/navigation-menu";
 
 import { AuthContext } from "@/context";
-
-import { AvatarUI, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Avatar from "@/components/Avatar";
-import { getAvatarProps, getUsername } from "@/firebase/firestore";
+import { getAvatarProps, getUsername, getExp } from "@/firebase/firestore";
 import { AvatarProperties } from "@/interfaces/interfaces";
 import { useState, useContext, useEffect } from "react";
 import Loading from "@/components/Loading";
@@ -32,7 +30,9 @@ import Create from "../assets/create.svg";
 import Discover from "../assets/discover.svg";
 import Search from "../assets/search.svg";
 import { auth } from "@/firebase/config";
-import {Link} from "react-router-dom";
+import { Link } from "react-router-dom";
+import { Card } from "./ui/card";
+import Crown from "../assets/crown.svg";
 
 const components: { title: string; href: string; description: string }[] = [
   {
@@ -68,7 +68,10 @@ export default function Navbar() {
   const [characterProperties, setCharacterProperties] =
     useState<AvatarProperties>(defaultCharacterProperties);
   const [username, setUsername] = useState("");
+  const [exp, setExp] = useState(0);
   const smallScreen = window.innerWidth < 700;
+  const [lower, setLower] = useState(0);
+  const [levelHovered, setLevelHovered] = useState(false);
 
   const handleLogOut = async () => {
     try {
@@ -126,8 +129,21 @@ export default function Navbar() {
       }
     };
 
+    const fetchExp = async () => {
+      try {
+        const exp = await getExp(user.uid);
+        setExp(exp);
+        setLower(Math.floor(exp / 1000) * 1000);
+      } catch (error) {
+        console.error("Error fetching exp:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchAvatarProps();
     fetchUsername();
+    fetchExp();
   }, [user, location.pathname]);
 
   if (loading) {
@@ -139,13 +155,20 @@ export default function Navbar() {
       <NavigationMenuItem className="flex justify-start items-left absolute left-0">
         <Link to="/">
           {!smallScreen ? (
-          <img src={Logo} alt="logo" className="h-8 w-24"
-          style={{marginLeft: "1.5rem"}} />)
-          :
-          <img src={SimpleGirl} alt="logo" className="h-10 w-10"
-          style={{marginLeft: "1.5rem"}} />
-          }
-          
+            <img
+              src={Logo}
+              alt="logo"
+              className="h-8 w-24"
+              style={{ marginLeft: "1.5rem" }}
+            />
+          ) : (
+            <img
+              src={SimpleGirl}
+              alt="logo"
+              className="h-10 w-10"
+              style={{ marginLeft: "1.5rem" }}
+            />
+          )}
         </Link>
       </NavigationMenuItem>
       <NavigationMenuList className="mb-1.5 mt-1 flex justify-center items-center">
@@ -155,13 +178,18 @@ export default function Navbar() {
               <img src={Discover} alt="discover" className="h-5 w-6" />
               {smallScreen ? "" : "Discover"}
             </div>
-          </NavigationMenuTrigger >
+          </NavigationMenuTrigger>
           <NavigationMenuContent className="flex justify-center items-center">
             <ul className="grid gap-2 p-4 md:w-[200px] lg:w-[500px] lg:grid-cols-[.80fr_1fr] flex items-center justify-center">
               <li className="row-span-2 flex justify-center items-center">
                 <NavigationMenuLink asChild className="bg-blue-400">
                   <div className="flex items-center justify-center select-none flex-col justify-end rounded-xl bg-gradient-to-b from-muted/50 to-muted p-4 no-underline outline-none focus:shadow-md">
-                    <img src={Girl} alt="girl" sizes="400vw" className="h-48 w-80" />
+                    <img
+                      src={Girl}
+                      alt="girl"
+                      sizes="400vw"
+                      className="h-48 w-80"
+                    />
                   </div>
                 </NavigationMenuLink>
               </li>
@@ -207,14 +235,63 @@ export default function Navbar() {
           </NavigationMenuLink>
         </NavigationMenuItem>
       </NavigationMenuList>
-      {/* <AvatarUI className="flex items-right justify-end absolute right-4">
-            <AvatarImage Avatar fallback={<AvatarFallback>SH</AvatarFallback>} />
-            <AvatarFallback>CN</AvatarFallback>
-          </AvatarUI> */}
-      {/* <NavigationMenuItem className="flex justify-end items-end"> */}
-      <NavigationMenuItem className="flex items-right justify-end absolute"
-      style={{right: "1rem"}}
+      <NavigationMenuItem
+        className="flex items-right justify-end absolute"
+        style={{ right: "1rem" }}
       >
+         <div className="flex flex-col z-10"> {/* Ensure a higher stacking context for the crown */}
+        {window.innerWidth > 700 && (
+            <div className="flex flex-row justify-center items-center z-10"> {/* Ensure a higher stacking context for the crown */}
+                <div className="relative top-1 left-3 z-20"> {/* Higher z-index for the crown */}
+                    <img src={Crown} className="h-5 w-5 z-20" /> {/* Higher z-index for the crown */}
+                </div>
+                <div className="flex flex-col">
+                    <Card
+                        onMouseEnter={() => setLevelHovered(true)}
+                        onMouseLeave={() => setLevelHovered(false)}
+                        style={{
+                            width: "150px",
+                            height: "10px",
+                            backgroundColor: "#fff",
+                            zIndex: 10,
+                            borderRight: "1px solid black",
+                            borderTop: "1px solid black",
+                            borderBottom: "1px solid black",
+                            cursor: "pointer",
+                        }}
+                        className="flex items-center justify-start mt-4 z-10"
+                    >
+                        {exp && (
+                            <Card
+                                style={{
+                                    width: (exp / 1000) * 150 + "px",
+                                    height: "10px",
+                                    backgroundColor: "#D09FDE",
+                                    zIndex: 10,
+                                }}
+                                className="flex justify-center items-center border border-black z-10"
+                            ></Card>
+                        )}
+                    </Card>
+                </div>
+            </div>
+        )}
+        {levelHovered && (
+            <p
+                style={{
+                    zIndex: 10,
+                    height: "1px",
+                }}
+                className="text-xs flex relative justify-center items-center mt-2 mb-1 ml-3"
+            >
+                <div className="flex justify-center items-center">
+                    <p className="text-xs text-center">
+                        {1000 - exp} EXP to Level 2
+                    </p>
+                </div>
+            </p>
+        )}
+    </div>
         <NavigationMenuTrigger onMouseEnter={() => setAvatarHover(true)}>
           <Avatar {...characterProperties} />
         </NavigationMenuTrigger>
@@ -251,10 +328,9 @@ export default function Navbar() {
 }
 
 const ListItem = React.forwardRef<
-  React.ElementRef<"a"> & { img?: string }, // Add the img field to the props
-  React.ComponentPropsWithoutRef<"a"> & { img?: string } // Also include img in the type definition
+  React.ElementRef<"a"> & { img?: string },
+  React.ComponentPropsWithoutRef<"a"> & { img?: string }
 >(({ className, title, children, img, ...props }, ref) => {
-  // Destructure img from props
   return (
     <li>
       <NavigationMenuLink asChild>

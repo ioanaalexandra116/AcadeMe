@@ -19,6 +19,7 @@ import {
   ErrorMessasge,
   AvatarProperties,
   FlashcardSet,
+  UserData,
 } from "../interfaces";
 
 export async function createUserCollection(user: User, username: string) {
@@ -26,7 +27,7 @@ export async function createUserCollection(user: User, username: string) {
   const data = {
     id: user.uid,
     username: username,
-    desription: "",
+    description: "",
     exp: 0,
     following: [],
     posts: [],
@@ -81,7 +82,7 @@ export async function getUserData(uid: string) {
   const docRef = doc(db, "users", uid);
   const docSnap = await getDoc(docRef);
   if (docSnap.exists()) {
-    return docSnap.data();
+    return docSnap.data() as UserData;
   } else {
     console.log("No such document!");
   }

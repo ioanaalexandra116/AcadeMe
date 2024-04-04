@@ -16,10 +16,6 @@ export type fromRegisterContextType = {
   setFromRegister: (value: boolean) => void;
 };
 
-export type UserData = {
-  username: string;
-};
-
 export type AvatarProperties = {
   gender: string;
   backgroundColor: string;
@@ -32,6 +28,19 @@ export type AvatarProperties = {
   bowColor?: string;
   dimensions: string;
 }
+
+export type UserData = {
+  id: string;
+  avatarProps: AvatarProperties;
+  username: string;
+  description: string;
+  exp: number;
+  following: string[];
+  posts: string[];
+  favorites: string[];
+  activity: { [key: string]: number[] };
+};
+
 
 export type FlashcardSet = {
   creator: string;

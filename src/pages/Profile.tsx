@@ -101,7 +101,7 @@ const Profile = () => {
                   alt="description"
                   className="w-5 h-5 mt-1"
                 />
-                <p style={{ fontStyle: "italic", textAlign: "left" }}>
+                <p style={{ fontStyle: "italic", textAlign: "left", maxWidth: "200px" }}>
                   {description}
                 </p>
               </div>

@@ -4,18 +4,31 @@ import Loading from "@/components/Loading";
 import { getUserData } from "@/firebase/firestore";
 import Post from "@/components/Post";
 import DotsBackground from "@/components/DotsBackground";
-import { useLocation } from "react-router-dom";
+import { useLocation, Link, useNavigate } from "react-router-dom";
 import Avatar from "@/components/Avatar";
 import { AvatarProperties } from "@/interfaces";
 import Loader from "@/components/Loader";
-import LevelRibbon from "@/assets/level-ribbon.svg";
+import { Card } from "@/components/ui/card";
+import Description from "@/assets/description.svg";
+import FileCabinet from "@/assets/file-cabinet.svg";
+import User from "@/assets/username.svg";
+import WhiteCrown from "@/assets/white-crown.svg";
+import SaveIcon from "@/assets/favorite-posts.svg";
+import EditProfile from "@/assets/edit-profile.svg";
+import Posts from "@/assets/posts.svg";
+import { Button } from "@/components/ui/button";
+// import LevelRibbon from "@/assets/level-ribbon.svg";
+// import RibbonHeading from "@/components/RibbonHeading";
 
 const Profile = () => {
   const { user, userLoading } = useContext(AuthContext);
+  const navigate = useNavigate();
   const [flashcardSets, setFlashcardSets] = useState<string[]>([]);
   const [username, setUsername] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [level, setLevel] = useState<number>(1);
+  const [showPosts, setShowPosts] = useState<boolean>(true);
+  const [favorites, setFavorites] = useState<string[]>([]);
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const userId = queryParams.get("userId");
@@ -51,6 +64,7 @@ const Profile = () => {
           userData.avatarProps.dimensions = "175px";
           setCharacterProperties(userData.avatarProps);
           setFlashcardSets(userData.posts);
+          setFavorites(userData.favorites);
           setUsername(userData.username);
           setDescription(userData.description);
           setLevel(Math.floor(userData.exp / 1000) * 1000);
@@ -64,28 +78,118 @@ const Profile = () => {
   }, [user]);
 
   return (
-    <div className="flex flex-col relative items-center justify-center pt-16">
-      {loadingAvatar ? <Loader /> : <Avatar {...characterProperties} />}
-      <div className="relative flex flex-col items-center justify-center bottom-6">
-        <img src={LevelRibbon} alt="Level Ribbon" className="w-32 h-32" />
-        <div className="absolute top-2 left-0 right-0 text-center text-lg font-bold">
-          {level + 1}
-        </div>
-      </div>
-      <div className="relative bottom-24">
-      <div className="text-2xl text-center font-bold">{username}</div>
-      <div className="text-lg text-center">{description}</div>
+    <div className="flex flex-col items-center justify-center pt-16">
       <div className="absolute inset-0 z-1">
         <DotsBackground />
       </div>
-      <div className={`flex flex-wrap justify-center items-center`}>
-        {flashcardSets.map((flashcardSetId) => (
-          <div key={flashcardSetId} className="p-8 flex justify-center">
-            <Post flashcardSetId={flashcardSetId} />
+      <Card
+        className="relative flex justify-center items-center border border-black"
+        style={{ backgroundColor: "#fff", width: "460px", height: "240px" }}
+      >
+        <div className="flex flex-row justify-center items-center space-x-20 p-4">
+          {loadingAvatar ? <Loader /> : <Avatar {...characterProperties} />}
+          <div className="flex flex-col items-start justify-center space-y-1">
+            <div className="flex flex-row text-md text-center items-center justify-center space-x-2 font-bold">
+              <img src={User} alt="user" className="w-5 h-5" />
+              <p>{username}</p>
+            </div>
+            {description && (
+              <div className="flex flex-row text-md text-center space-x-2">
+                <img
+                  src={Description}
+                  alt="description"
+                  className="w-5 h-5 mt-1"
+                />
+                <p style={{ fontStyle: "italic", textAlign: "left" }}>
+                  {description}
+                </p>
+              </div>
+            )}
+            <div
+              className="flex flex-row text-md text-center items-center justify-center space-x-2 cursor-pointer"
+              onClick={() => navigate("/leaderboard")}
+            >
+              <img src={WhiteCrown} alt="crown" className="w-5 h-5" />
+              <p>Level {level + 1}</p>
+            </div>
+            <div className="relative flex flex-row text-md text-center items-center justify-center space-x-2 cursor-pointer">
+              <img src={FileCabinet} alt="file-cabinet" className="w-5 h-5" />
+              <Link to="/followed-categories">following</Link>
+            </div>
+            <div className="absolute bottom-2 right-2">
+              {userId === user.uid && (
+                <Button
+                  style={{
+                    backgroundColor: "#fccede",
+                    color: "#fff",
+                    height: "34px",
+                    width: "120px",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = "#f987af";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = "#fccede";
+                  }}
+                  onClick={() => navigate("/edit-profile")}
+                >
+                  <img src={EditProfile} alt="edit" className="w-5 h-5" />
+                  <p className="ml-1">Edit Profile</p>
+                </Button>
+              )}
+            </div>
           </div>
-        ))}
+        </div>
+      </Card>
+      <div className="relative flex flex-row justify-between items-center space-x-2 mt-4 w-1/2">
+        <div
+          style={{
+            borderBottom: showPosts ? "1px solid black" : "none",
+            paddingBottom: "8px", // Adjust spacing if needed
+            width: "50%",
+          }}
+          className="flex flex-row justify-center items-center"
+        >
+          <img
+            src={Posts}
+            alt="posts"
+            className="w-6 h-6 mt-4 ml-2 cursor-pointer"
+            onClick={() => setShowPosts(true)}
+          />
+        </div>
+        <div
+          style={{
+            borderBottom: !showPosts ? "1px solid black" : "none",
+            paddingBottom: "8px", // Adjust spacing if needed
+            width: "50%",
+          }}
+          className="flex flex-row justify-center items-center"
+        >
+          <img
+            src={SaveIcon}
+            alt="save"
+            className="w-6 h-6 mt-4 cursor-pointer"
+            onClick={() => setShowPosts(false)}
+          />
+        </div>
       </div>
-      </div>
+      {showPosts ? (
+        <div className={`flex flex-wrap justify-center items-center`}>
+          {flashcardSets.map((flashcardSetId) => (
+            <div key={flashcardSetId} className="p-8 flex justify-center">
+              <Post flashcardSetId={flashcardSetId} />
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className={`flex flex-wrap justify-center items-center`}>
+          {favorites.map((flashcardSetId) => (
+            <div key={flashcardSetId} className="p-8 flex justify-center">
+              <Post flashcardSetId={flashcardSetId} />
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

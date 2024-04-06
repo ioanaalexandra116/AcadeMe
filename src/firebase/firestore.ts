@@ -276,3 +276,15 @@ export async function getExp(uid: string) {
   const docSnap = await getDoc(docRef);
   return docSnap.data()?.exp || 0;
 }
+
+export async function updateProfile(
+  uid: string,
+  username: string,
+  description: string
+) {
+  const docRef = doc(db, "users", uid);
+  await updateDoc(docRef, {
+    username: username,
+    description: description,
+  });
+}

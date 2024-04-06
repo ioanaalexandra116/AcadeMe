@@ -3,13 +3,12 @@ import { AvatarProperties } from "@/interfaces";
 import Avatar from "@/components/Avatar";
 import React from "react";
 import { useState, useEffect, useContext } from "react";
-import Background from "../assets/aesthetic-background.jpg";
 import { Button } from "@/components/ui/button";
 import { AuthContext } from "@/context";
 import { addAvatarProps, getAvatarProps } from "@/firebase/firestore";
 import Loading from "@/components/Loading";
 import { useNavigate } from "react-router-dom";
-import Education from "@/assets/education.jpg";
+import Background from "@/assets/strawberry-background.svg";
 
 const EditAvatar = () => {
   const { user, userLoading } = useContext(AuthContext);
@@ -17,7 +16,7 @@ const EditAvatar = () => {
     width: "100%",
     padding: "16px",
     margin: "auto",
-    marginTop: "40px"
+    marginTop: "40px",
   });
 
   useEffect(() => {
@@ -26,7 +25,7 @@ const EditAvatar = () => {
         width: window.innerWidth > 480 ? `480px` : "100%",
         padding: "16px",
         margin: "auto",
-        marginTop: "40px"
+        marginTop: "40px",
       };
       setCardStyles(newStyles);
     };
@@ -97,7 +96,7 @@ const EditAvatar = () => {
       properties.dimensions = "300px";
     }
     addAvatarProps(user.uid, properties);
-    navigate(`/profile?userId=${user.uid}`);
+    navigate(`/edit-profile`);
   };
 
   if (loading) {
@@ -107,7 +106,7 @@ const EditAvatar = () => {
   return fullWidth ? (
     <div
       className="bg-cover bg-center h-screen w-screen flex items-center justify-center"
-      style={{ backgroundImage: `url(${Education})` }}
+      style={{ backgroundImage: `url(${Background})`, backgroundColor: "#000" }}
     >
       <div
         style={cardStyles}

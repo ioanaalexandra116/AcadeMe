@@ -357,7 +357,7 @@ const Create = () => {
             textShadow: `-0.5px -0.5px 0 #000, 2px -0.5px 0 #000, -0.5px 1px 0 #000, 2px 1px 0 #000`,
           }}
         >
-          Create flashcard set
+          Create Flashcard Set
         </h1>
         {!next ? (
           <AnimatedFirst className="flex flex-col items-center justify-center space-y-5">

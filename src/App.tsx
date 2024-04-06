@@ -10,6 +10,7 @@ import Create from "./pages/Create";
 import EditPost from "./pages/EditPost";
 import Play from "./pages/Play";
 import Results from "./pages/Results";
+import EditProfile from "./pages/EditProfile";
 
 const router = createBrowserRouter([
   {
@@ -53,7 +54,11 @@ const router = createBrowserRouter([
           {
             path: "/play/results",
             element: <Results />,
-          }
+          },
+          {
+            path: "/edit-profile",
+            element: <EditProfile />,
+          },
         ],
       },
     ],

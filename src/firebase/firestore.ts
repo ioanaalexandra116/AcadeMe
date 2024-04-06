@@ -280,11 +280,13 @@ export async function getExp(uid: string) {
 export async function updateProfile(
   uid: string,
   username: string,
-  description: string
+  description: string,
+  avatarProps: AvatarProperties
 ) {
   const docRef = doc(db, "users", uid);
   await updateDoc(docRef, {
     username: username,
     description: description,
+    avatarProps: avatarProps,
   });
 }

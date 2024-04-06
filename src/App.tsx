@@ -5,7 +5,6 @@ import PrivateRoute from "./route/PrivateRoute";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Profile from "./pages/Profile";
-import EditAvatar from "./pages/EditAvatar";
 import Create from "./pages/Create";
 import EditPost from "./pages/EditPost";
 import Play from "./pages/Play";
@@ -34,10 +33,6 @@ const router = createBrowserRouter([
           {
             path: "/profile",
             element: <Profile />,
-          },
-          {
-            path: "/edit-avatar",
-            element: <EditAvatar/>,
           },
           {
             path: "/create",

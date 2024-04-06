@@ -84,7 +84,8 @@ const Profile = () => {
       </div>
       <Card
         className="relative flex justify-center items-center border border-black"
-        style={{ backgroundColor: "#fff", width: "460px", height: "240px" }}
+        style={{ backgroundColor: "#fff", height: "240px", maxWidth: "480px" }}
+        cardWidth={460}
       >
         <div className="flex flex-row justify-center items-center space-x-20 p-4">
           {loadingAvatar ? <Loader /> : <Avatar {...characterProperties} />}
@@ -141,7 +142,9 @@ const Profile = () => {
           </div>
         </div>
       </Card>
-      <div className="relative flex flex-row justify-between items-center space-x-2 mt-4 w-1/2">
+      <div className="relative flex flex-row justify-between items-center space-x-2 mt-4 w-1/2"
+      style={{ width: window.innerWidth < 768 ? "100%" : "50%" }}
+      >
         <div
           style={{
             borderBottom: showPosts ? "1px solid black" : "none",

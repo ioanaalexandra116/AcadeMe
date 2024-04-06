@@ -3,7 +3,7 @@ import { AuthContext } from "@/context";
 import Loading from "@/components/Loading";
 import { getUserData, updateProfile } from "@/firebase/firestore";
 import Background from "@/assets/strawberry-background.svg";
-import { useLocation, Link, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import Avatar from "@/components/Avatar";
 import { AvatarProperties } from "@/interfaces";
 import Loader from "@/components/Loader";
@@ -11,6 +11,7 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import EditAvatar from "@/assets/edit-avatar.svg";
+import { CustomAvatarTabs } from "@/components/CustomAvatarTabs";
 import { Button } from "@/components/ui/button";
 
 const EditProfile = () => {
@@ -36,6 +37,8 @@ const EditProfile = () => {
   const [characterProperties, setCharacterProperties] =
     useState<AvatarProperties>(defaultCharacterProperties);
   const [loadingAvatar, setLoadingAvatar] = useState(true);
+  const [editAvatarComp, setEditAvatarComp] = useState<boolean>(false);
+  const [imageLoaded, setImageLoaded] = useState<boolean>(false);
 
   if (!user || userLoading) {
     return <Loading />;
@@ -64,20 +67,65 @@ const EditProfile = () => {
   }, [user]);
 
   const handleSaveChanges = () => {
-    updateProfile(user.uid,
-      username,
-      description,
-    );
+    updateProfile(user.uid, username, description, characterProperties);
     navigate(`/profile?userId=${user.uid}`);
-  }
+  };
 
-  return (
-    <div className="flex flex-col items-center justify-center h-screen" style={{ backgroundColor: "#000" }}>
-        <div className="absolute inset-0 z-0">
-        <img src={Background} alt="Background" className="w-full h-full object-cover" />
+  const handleBack = () => {
+    setEditAvatarComp(false);
+    characterProperties.dimensions = "175px";
+  };
+
+  const [cardStyles, setCardStyles] = useState({
+    width: "100%",
+    padding: "16px",
+    margin: "auto",
+    marginTop: "40px",
+  });
+
+  //---------edit-avatar-------
+
+  useEffect(() => {
+    const handleResize = () => {
+      const newStyles = {
+        width: window.innerWidth > 480 ? `480px` : "100%",
+        padding: "16px",
+        margin: "auto",
+        marginTop: "40px",
+      };
+      setCardStyles(newStyles);
+    };
+
+    handleResize(); // Initial call
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []); // Empty dependency array means this effect runs once after the initial render
+
+  const fullWidth = window.innerWidth > 700;
+
+  const handleCharacterProperties = (properties: AvatarProperties) => {
+    setCharacterProperties(properties);
+  };
+
+  return !editAvatarComp ? (
+    <div
+      className="flex flex-col items-center justify-center h-screen pt-16"
+    >
+      <div className="absolute inset-0 z-0">
+        <img
+          src={Background}
+          alt="Background"
+          className="w-full h-full object-cover"
+          style={{ backgroundColor: imageLoaded ? "#000" : "#transparent" }}
+          onLoad={() => setImageLoaded(true)}
+        />
       </div>
       <h1
-        className="text-4xl font-bold text-black mt-20 contoured-text z-10"
+        className="text-4xl font-bold text-black contoured-text z-10 mt-10"
         style={{
           color: "#f987af",
           textShadow: `-0.5px -0.5px 0 #000, 2px -0.5px 0 #000, -0.5px 1px 0 #000, 2px 1px 0 #000`,
@@ -87,13 +135,16 @@ const EditProfile = () => {
       </h1>
       <Card className="relative flex flex-col justify-center items-center border border-black space-y-4 p-4">
         {loadingAvatar ? <Loader /> : <Avatar {...characterProperties} />}
-        <Link
-          to="/edit-avatar"
-          className="relative bottom-14 left-11 p-2 bg-white rounded-full shadow-md"
+        <div
+          className="relative bottom-14 left-11 p-2 bg-white rounded-full shadow-md cursor-pointer"
           style={{ zIndex: 10 }}
+          onClick={() => {
+            setEditAvatarComp(true);
+            characterProperties.dimensions = "300px";
+          }}
         >
           <img src={EditAvatar} alt="Edit Profile" className="w-6 h-6" />
-        </Link>
+        </div>
 
         <div className="flex flex-col space-y-1 relative bottom-10">
           <h1 className="text-muted-foreground">Username</h1>
@@ -123,17 +174,88 @@ const EditProfile = () => {
             onChange={(e) => setDescription(e.target.value)}
           />
         </div>
+        <div className="flex flex-row space-x-5 relative">
+          <Button
+            style={{
+              backgroundColor: "#f987af",
+              width: "100px",
+            }}
+            className="relative bottom-4"
+            onClick={() => navigate("/profile?userId=" + user.uid)}
+          >
+            <p className="ml-1">Cancel</p>
+          </Button>
+          <Button
+            style={{
+              backgroundColor: "#f987af",
+              width: "100px",
+            }}
+            className="relative bottom-4"
+            onClick={handleSaveChanges}
+          >
+            <p className="ml-1">Save</p>
+          </Button>
+        </div>
+      </Card>
+    </div>
+  ) : fullWidth ? (
+    //-----------------------------edit-avatar-desktop--------------------------
+    <div
+      className="bg-cover bg-center h-screen w-screen flex items-center justify-center"
+      style={{ backgroundImage: `url(${Background})`, backgroundColor: imageLoaded ? "#000" : "#transparent" }}
+    >
+      <div
+        style={cardStyles}
+        className="flex flex-row items-center justify-center space-x-40"
+      >
+        <div className="flex flex-col items-center justify-center space-y-20">
+          <div className="bg-transparent rounded-full shadow-2xl flex flex-col items-center justify-center border-0">
+            <Avatar {...characterProperties} />
+          </div>
+          <Button
+            style={{
+              backgroundColor: "#F987AF",
+              boxShadow: "0px 8px 14px rgba(0, 0, 0, 0.2)",
+              height: "48px",
+            }}
+            onClick={handleBack}
+          >
+            Back to Edit Profile
+          </Button>
+        </div>
+        <CustomAvatarTabs
+          onCharacterPropertiesChange={handleCharacterProperties}
+          recievedCharacterProperties={characterProperties}
+        />
+      </div>
+    </div>
+  ) : (
+    //-----------------------------edit-avatar-phone--------------------------
+    <div
+      className="bg-cover bg-center h-screen w-screen flex items-center justify-center"
+      style={{ backgroundImage: `url(${Background})`, backgroundColor: imageLoaded ? "#000" : "#transparent" }}
+    >
+      <div
+        style={cardStyles}
+        className="flex flex-col items-center justify-center space-y-8"
+      >
+        <div className="bg-transparent rounded-full shadow-2xl">
+          <Avatar {...characterProperties} />
+        </div>
+        <CustomAvatarTabs
+          onCharacterPropertiesChange={handleCharacterProperties}
+          recievedCharacterProperties={characterProperties}
+        />
         <Button
           style={{
-            backgroundColor: "#f987af",
-            width: "100px",
+            backgroundColor: "#F987AF",
+            boxShadow: "0px 8px 14px rgba(0, 0, 0, 0.2)",
           }}
-        className="relative bottom-4"
-          onClick={handleSaveChanges}
+          onClick={handleBack}
         >
-            <p className="ml-1">Save</p>
+          Back to Edit Profile
         </Button>
-      </Card>
+      </div>
     </div>
   );
 };

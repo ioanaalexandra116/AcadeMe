@@ -77,8 +77,10 @@ const Avatar = ({
   const bigAvatarTop: string = dimensions === "300px" ? "30" : "17.54";
   const bigAvatarLeft: string = dimensions === "300px" ? "42" : "24.56";
 
-  const bowTop: string = window.innerWidth > 700 ? bigAvatarTop : "28.5";
-  const bowLeft: string = window.innerWidth > 700 ? bigAvatarLeft : "40.5";
+  const bowTop: string = window.innerWidth > 700 ? bigAvatarTop : 
+  dimensions === "300px" ? "28.5" : "17.54";
+  const bowLeft: string = window.innerWidth > 700 ? bigAvatarLeft : 
+  dimensions === "300px" ? "40.5" : "24.56";
 
   const smallBowTop: string = parseInt(dimensions) < 100 ? "4" : bowTop;
   const smallBowLeft: string = parseInt(dimensions) < 100 ? "6" : bowLeft;

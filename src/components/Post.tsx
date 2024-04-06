@@ -161,7 +161,7 @@ const Post = ({ flashcardSetId }: { flashcardSetId: string }) => {
         <div className="flex justify-between items-center">
           <div
             className="flex items-center justify-start cursor-pointer"
-            onClick={() => navigate(`/profile?userId=${flashcardSet.creator}`)}
+            onClick={() => window.location.replace(`/profile?userId=${flashcardSet.creator}`)}
           >
             {loadingAvatar ? <Loader /> : <Avatar {...characterProperties} />}
             &nbsp;

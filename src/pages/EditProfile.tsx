@@ -130,14 +130,14 @@ const EditProfile = () => {
       setCardStyles(newStyles);
     };
 
-    handleResize(); // Initial call
+    handleResize();
 
     window.addEventListener("resize", handleResize);
 
     return () => {
       window.removeEventListener("resize", handleResize);
     };
-  }, []); // Empty dependency array means this effect runs once after the initial render
+  }, []);
 
   const handleCharacterProperties = (properties: AvatarProperties) => {
     setCharacterProperties(properties);

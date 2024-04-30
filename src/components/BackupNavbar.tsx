@@ -17,7 +17,13 @@ import {
 
 import { AuthContext } from "@/context";
 import Avatar from "@/components/Avatar";
-import { getAvatarProps, getUsername, getExp } from "@/firebase/firestore";
+import {
+  getAvatarProps,
+  getUsername,
+  getExp,
+  getCategories,
+  getSecondCategories,
+} from "@/firebase/firestore";
 import { AvatarProperties } from "@/interfaces/interfaces";
 import { useState, useContext, useEffect } from "react";
 import Loading from "@/components/Loading";
@@ -27,25 +33,12 @@ import SimpleGirl from "../assets/girl.svg";
 import User from "../assets/user.svg";
 import Logout from "../assets/logout.svg";
 import Create from "../assets/create.svg";
-import Discover from "../assets/discover.svg";
+import Categs from "../assets/hierarchy.svg";
 import Search from "../assets/search.svg";
 import { auth } from "@/firebase/config";
 import { Link } from "react-router-dom";
 import { Card } from "./ui/card";
 import Crown from "../assets/crown.svg";
-
-const components: { title: string; href: string; description: string }[] = [
-  {
-    title: "People",
-    href: "/search/people",
-    description: "Search for other users on the platform",
-  },
-  {
-    title: "Flashcard Sets",
-    href: "/search/flashcards",
-    description: "Search for flashcard sets created by other users",
-  },
-];
 
 export default function Navbar() {
   const defaultCharacterProperties: AvatarProperties = {
@@ -72,6 +65,91 @@ export default function Navbar() {
   const smallScreen = window.innerWidth < 700;
   const [lower, setLower] = useState(0);
   const [levelHovered, setLevelHovered] = useState(false);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [subcategories, setSubcategories] = useState<string[][]>([]) || [];
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [secondSelectedCategory, setSecondSelectedCategory] = useState<
+    string | null
+  >(null);
+  const [components, setComponents] = useState<
+    { title: string; href: string; subcategories: string[][] }[] | []
+  >([]);
+  const [currentComponent, setCurrentComponent] = useState<{
+    title: string;
+    href: string;
+    subcategories: string[][];
+  } | null>(null);
+  const [showSubcategs, setShowSubcategs] = useState<boolean>(false);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const categories = await getCategories();
+        setCategories(categories);
+        console.log(categories);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
+  useEffect(() => {
+    const fetchSubcategories = async () => {
+      try {
+        await Promise.all(
+          categories.map(async (category) => {
+            const secondCategories = await getSecondCategories(category);
+
+            // Update state for subcategories
+            setSubcategories(secondCategories || []);
+            console.log(secondCategories);
+
+            // Find or create the component
+            const existingComponent = components.find(
+              (component) => component.title === category
+            );
+
+            if (existingComponent) {
+              // Update the existing component
+              existingComponent.subcategories = secondCategories || [];
+            }
+
+            if (!existingComponent) {
+              // Create a new component
+              const newComponent = {
+                title: category,
+                href: `/search/${category}`,
+                subcategories: secondCategories || [],
+              };
+
+              // Update state with the new component
+              setComponents((prev) => [...prev, newComponent]);
+            }
+          })
+        );
+      } catch (error) {
+        console.error("Error fetching subcategories:", error);
+      }
+    };
+
+    fetchSubcategories();
+  }, [categories]);
+
+  useEffect(() => {
+    const printBiology = () => {
+      console.log(components);
+    };
+
+    printBiology();
+  }, [components]);
+
+  // const components: { title: string; href: string, subcategories?: string[] }[] = [
+  //   categories.map((category) => {
+  //     return { title: category, href: `/search/${category}`, subcategories: subcategories[0] };
+  //   }),
+  // ].flat();
 
   const handleLogOut = async () => {
     try {
@@ -175,8 +253,8 @@ export default function Navbar() {
         <NavigationMenuItem>
           <NavigationMenuTrigger onMouseEnter={() => setAvatarHover(false)}>
             <div className="flex items-center">
-              <img src={Discover} alt="discover" className="h-5 w-6" />
-              {smallScreen ? "" : "Discover"}
+              <img src={Search} alt="search" className="h-5 w-5" />
+              {smallScreen ? "" : "Search"}
             </div>
           </NavigationMenuTrigger>
           <NavigationMenuContent className="flex justify-center items-center">
@@ -188,17 +266,16 @@ export default function Navbar() {
                       src={Girl}
                       alt="girl"
                       sizes="400vw"
-                      className="h-48 w-80"
+                      className="h-44 w-80"
                     />
                   </div>
                 </NavigationMenuLink>
               </li>
-              <ListItem href="/discover/friends" title="New Friends">
-                Connect with other study enthusiasts sharing similar interests
+              <ListItem href="/search/users" title="People">
+                Connect with other study enthusiasts on the platform
               </ListItem>
-              <ListItem href="/discover/flascards" title="New Flashcard Sets">
-                Find flashcard sets recommended for you based on your favorite
-                ones
+              <ListItem href="/search/flascards" title="Flashcard sets">
+                Search for flashcard sets created by other users
               </ListItem>
             </ul>
           </NavigationMenuContent>
@@ -206,29 +283,61 @@ export default function Navbar() {
         <NavigationMenuItem>
           <NavigationMenuTrigger onMouseEnter={() => setAvatarHover(false)}>
             <div className="flex items-center">
-              <img src={Search} alt="create" className="h-5 w-5" />
-              {smallScreen ? "" : "Search"}
+              <img src={Categs} alt="categories" className="h-5 w-7" />
+              {smallScreen ? "" : "Categories"}
             </div>
           </NavigationMenuTrigger>
-          <NavigationMenuContent>
+          <div className="flex justify-space-between items-center">
+          <NavigationMenuContent className="flex justify-center items-center">
             <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-1 lg:w-[280px]">
               {components.map((component) => (
                 <ListItem
                   key={component.title}
                   title={component.title}
                   href={component.href}
-                >
-                  {component.description}
-                </ListItem>
+                  onMouseEnter={() => {
+                    setSelectedCategory(component.title);
+                    setCurrentComponent(component);
+                    setShowSubcategs(true);
+                  }}
+                ></ListItem>
               ))}
             </ul>
+            {currentComponent && (
+              <ul className="grid gap-3 p-4 md:w-[500px] md:grid-cols-1 lg:w-[280px] top-0">
+                {Object.entries(currentComponent.subcategories).map(
+                  ([key, value]) => (
+                    <ListItem
+                      key={key}
+                      title={key}
+                      href={`/search/${currentComponent.title}/${key}`}
+                      onMouseEnter={() => setSecondSelectedCategory(key)}
+                    >
+                      {secondSelectedCategory === key && (
+                        <ul className="grid gap-3 p-4 md:w-[500px] md:grid-cols-1 lg:w-[280px]">
+                          {value.map((subcat) => (
+                            <ListItem
+                              key={subcat}
+                              title={subcat}
+                              href={`/search/${currentComponent.title}/${key}/${subcat}`}
+                            ></ListItem>
+                          ))}
+                        </ul>
+                      )}
+                    </ListItem>
+                  )
+                )}
+              </ul>
+            )}
           </NavigationMenuContent>
+          </div>
         </NavigationMenuItem>
+
         <NavigationMenuItem>
           <NavigationMenuLink className={navigationMenuTriggerStyle()}>
             <Link to="/create">
               <div className="flex items-center">
-                <img src={Create} alt="create" className="h-5 w-5 rotate-90" />
+                <img src={Create} alt="create" className="h-5 w-6 rotate-90" />
                 {smallScreen ? "" : "Create"}
               </div>
             </Link>
@@ -239,59 +348,66 @@ export default function Navbar() {
         className="flex items-right justify-end absolute"
         style={{ right: "1rem" }}
       >
-         <div className="flex flex-col z-10"> {/* Ensure a higher stacking context for the crown */}
-        {window.innerWidth > 700 && (
-            <div className="flex flex-row justify-center items-center z-10"> {/* Ensure a higher stacking context for the crown */}
-                <div className="relative top-1 left-3 z-20"> {/* Higher z-index for the crown */}
-                    <img src={Crown} className="h-5 w-5 z-20" /> {/* Higher z-index for the crown */}
-                </div>
-                <div className="flex flex-col">
-                    <Card
-                        onMouseEnter={() => setLevelHovered(true)}
-                        onMouseLeave={() => setLevelHovered(false)}
-                        style={{
-                            width: "150px",
-                            height: "10px",
-                            backgroundColor: "#fff",
-                            zIndex: 10,
-                            borderRight: "1px solid black",
-                            borderTop: "1px solid black",
-                            borderBottom: "1px solid black",
-                            cursor: "pointer",
-                        }}
-                        className="flex items-center justify-start mt-4 z-10"
-                    >
-                        {exp && (
-                            <Card
-                                style={{
-                                    width: (exp / 1000) * 150 + "px",
-                                    height: "10px",
-                                    backgroundColor: "#D09FDE",
-                                    zIndex: 10,
-                                }}
-                                className="flex justify-center items-center border border-black z-10"
-                            ></Card>
-                        )}
-                    </Card>
-                </div>
-            </div>
-        )}
-        {levelHovered && (
-            <p
-                style={{
+        <div className="flex flex-col z-10">
+          {" "}
+          {/* Ensure a higher stacking context for the crown */}
+          {window.innerWidth > 700 && (
+            <div className="flex flex-row justify-center items-center z-10">
+              {" "}
+              {/* Ensure a higher stacking context for the crown */}
+              <div className="relative top-1 left-3 z-20">
+                {" "}
+                {/* Higher z-index for the crown */}
+                <img src={Crown} className="h-5 w-5 z-20" />{" "}
+                {/* Higher z-index for the crown */}
+              </div>
+              <div className="flex flex-col">
+                <Card
+                  onMouseEnter={() => setLevelHovered(true)}
+                  onMouseLeave={() => setLevelHovered(false)}
+                  style={{
+                    width: "150px",
+                    height: "10px",
+                    backgroundColor: "#fff",
                     zIndex: 10,
-                    height: "1px",
-                }}
-                className="text-xs flex relative justify-center items-center mt-2 mb-1 ml-3"
+                    borderRight: "1px solid black",
+                    borderTop: "1px solid black",
+                    borderBottom: "1px solid black",
+                    cursor: "pointer",
+                  }}
+                  className="flex items-center justify-start mt-4 z-10"
+                >
+                  {exp && (
+                    <Card
+                      style={{
+                        width: (exp / 1000) * 150 + "px",
+                        height: "10px",
+                        backgroundColor: "#D09FDE",
+                        zIndex: 10,
+                      }}
+                      className="flex justify-center items-center border border-black z-10"
+                    ></Card>
+                  )}
+                </Card>
+              </div>
+            </div>
+          )}
+          {levelHovered && (
+            <p
+              style={{
+                zIndex: 10,
+                height: "1px",
+              }}
+              className="text-xs flex relative justify-center items-center mt-2 mb-1 ml-3"
             >
-                <div className="flex justify-center items-center">
-                    <p className="text-xs text-center">
-                        {1000 - exp} EXP to Level 2
-                    </p>
-                </div>
+              <div className="flex justify-center items-center">
+                <p className="text-xs text-center">
+                  {1000 - exp} EXP to Level 2
+                </p>
+              </div>
             </p>
-        )}
-    </div>
+          )}
+        </div>
         <NavigationMenuTrigger onMouseEnter={() => setAvatarHover(true)}>
           <Avatar {...characterProperties} />
         </NavigationMenuTrigger>

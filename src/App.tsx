@@ -10,6 +10,7 @@ import EditPost from "./pages/EditPost";
 import Play from "./pages/Play";
 import Results from "./pages/Results";
 import EditProfile from "./pages/EditProfile";
+import SearchFlashcardSets from "./pages/SearchFlashcardSets";
 
 const router = createBrowserRouter([
   {
@@ -53,6 +54,10 @@ const router = createBrowserRouter([
           {
             path: "/edit-profile",
             element: <EditProfile />,
+          },
+          {
+            path: "/search/flashcards",
+            element: <SearchFlashcardSets />,
           },
         ],
       },

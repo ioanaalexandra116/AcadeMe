@@ -290,3 +290,20 @@ export async function updateProfile(
     avatarProps: avatarProps,
   });
 }
+
+export async function addForeignLanguages() {
+  const collectionRef = collection(db, "categories");
+  const docRef = doc(collectionRef, "Foreign Languages");
+  const data = {
+    "Italian": ["Verbs", "Nouns", "Pronouns", "Adjectives", "Adverbs", "Tenses", "Articles", "Prepositions", "Vocabulary", "Other"],
+    "Spanish": ["Verbs", "Nouns", "Pronouns", "Adjectives", "Adverbs", "Tenses", "Articles", "Prepositions", "Vocabulary", "Other"],
+    "French": ["Verbs", "Nouns", "Pronouns", "Adjectives", "Adverbs", "Tenses", "Articles", "Prepositions", "Vocabulary", "Other"],
+    "German": ["Verbs", "Nouns", "Pronouns", "Adjectives", "Adverbs", "Tenses", "Articles", "Prepositions", "Vocabulary", "Other"],
+    "Japanese": ["Verbs", "Nouns", "Pronouns", "Adjectives", "Adverbs", "Tenses", "Articles", "Prepositions", "Vocabulary", "Other"],
+    "Korean": ["Verbs", "Nouns", "Pronouns", "Adjectives", "Adverbs", "Tenses", "Articles", "Prepositions", "Vocabulary", "Other"],
+    "Chinese": ["Verbs", "Nouns", "Pronouns", "Adjectives", "Adverbs", "Tenses", "Articles", "Prepositions", "Vocabulary", "Other"],
+    "Russian": ["Verbs", "Nouns", "Pronouns", "Adjectives", "Adverbs", "Tenses", "Articles", "Prepositions", "Vocabulary", "Other"],
+    "Romanian": ["Verbs", "Nouns", "Pronouns", "Adjectives", "Adverbs", "Tenses", "Articles", "Prepositions", "Vocabulary", "Other"],
+  };
+  await setDoc(docRef, data);
+}

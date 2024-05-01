@@ -1,9 +1,51 @@
-import { Card } from "./ui/card";
 import { getCategories, getSecondCategories } from "@/firebase/firestore";
 import { useEffect, useState } from "react";
 import arrwRight from "@/assets/arrow-right.svg";
 import Menu from "@/assets/menu.svg";
 import { Button } from "./ui/button";
+import styled, { keyframes } from "styled-components";
+
+const SlideIn = keyframes`
+  0% {
+    opacity: 1;
+    transform: translateX(-280px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+`;
+
+const SlideOut = keyframes`
+  0% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateX(-280px);
+  }
+`;
+
+const AnimatedCard = styled.div<{ openMenu: boolean }>`
+  width: 280px;
+  height: calc(100vh - 3.1rem);
+  overflow-y: auto;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  animation: ${({ openMenu }) => (openMenu ? SlideIn : SlideOut)} 0.5s forwards;
+  visibility: visible;
+  transition: visibility 0s linear
+    ${({ openMenu }) => (openMenu ? "0s" : "0.5s")};
+  pointer-events: ${({ openMenu }) => (openMenu ? "auto" : "none")};
+  opacity: ${({ openMenu }) => (openMenu ? "1" : "0")};
+`;
+
+const AnimatedOpenMenu = styled.div<{ openMenu: boolean }>`
+  animation: ${({ openMenu }) => (openMenu ? SlideIn : SlideOut)} 0.5s forwards;
+`;
 
 export const SearchFlashcards = () => {
   const [categories, setCategories] = useState<string[]>([]);
@@ -20,8 +62,16 @@ export const SearchFlashcards = () => {
   >([]);
   const [chosenCategory, setChosenCategory] = useState<string | null>(null);
   const [openMenu, setOpenMenu] = useState(true);
+  const [parentCategory, setParentCategory] = useState<string | null>(null);
+  const [hoveredTitle, setHoveredTitle] = useState<string | null>(null);
+  const [hovredParent, setHoveredParent] = useState<string | null>(null);
+  const [hoveredImg, setHoveredImg] = useState<boolean>(false);
+  const [currentComponentTitle, setCurrentComponentTitle] = useState<
+    string | null
+  >(null);
 
   useEffect(() => {
+    console.log("reading categories");
     const fetchCategories = async () => {
       try {
         const fetchedCategories = await getCategories();
@@ -35,6 +85,7 @@ export const SearchFlashcards = () => {
   }, []);
 
   useEffect(() => {
+    console.log("reading subcategories");
     const fetchSubcategories = async () => {
       try {
         const updatedComponents = await Promise.all(
@@ -133,33 +184,59 @@ export const SearchFlashcards = () => {
     setComponents(updatedComponents);
   };
 
-  return (
-    <div style={{ paddingTop: "3rem" }} className="flex">
-      {openMenu && (
-        <Card
-        style={{
-            width: "250px",
-            height: "calc(100vh - 3rem)",
-            overflowY: "auto",
-            borderRadius: "8px",
-          }}
+  const handleTitleMouseEnter = (title: string) => {
+    setHoveredTitle(title);
+  };
 
-          className="rounded shadow-xl"
-        >
-          <div>
-            {components.map((component) => (
-              <div key={component.title}>
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "row",
-                    alignItems: "center",
-                    cursor: "pointer",
-                    padding: "8px",
-                    borderRadius: "4px",
-                  }}
-                >
-                  {component.title != "Trivia" && (
+  const handleTitleMouseLeave = () => {
+    setHoveredTitle(null);
+  };
+
+  const handleImgMouseEnter = () => {
+    setHoveredImg(true);
+  };
+
+  const handleImgMouseLeave = () => {
+    setHoveredImg(false);
+  };
+
+  return (
+    <div style={{ paddingTop: "3.1rem" }} className="flex">
+      <AnimatedCard openMenu={openMenu}>
+        <div>
+          {components.map((component) => (
+            <div key={component.title}>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  alignItems: "center",
+                  cursor: "pointer",
+                  padding: "4px",
+                  borderRadius: "4px",
+                }}
+                onMouseEnter={() => setCurrentComponentTitle(component.title)}
+              >
+                {component.title != "Trivia" && (
+                  <Button
+                    style={{
+                      width: "30px",
+                      height: "36px",
+                      backgroundColor:
+                        hoveredImg && currentComponentTitle === component.title
+                          ? "#F3F3F3"
+                          : "transparent",
+                      boxShadow: "none",
+                      borderRadius: "10px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      padding: "4px",
+                    }}
+                    onClick={() => toggleArrow(component.title)}
+                    onMouseEnter={handleImgMouseEnter}
+                    onMouseLeave={handleImgMouseLeave}
+                  >
                     <img
                       src={arrwRight}
                       alt="arrow"
@@ -170,34 +247,81 @@ export const SearchFlashcards = () => {
                           ? "rotate(90deg)"
                           : "none",
                       }}
-                      onClick={() => toggleArrow(component.title)}
                     />
-                  )}
-                  <h3
-                    style={{
-                      color:
-                        chosenCategory === component.title
-                          ? "rgb(56 189 248)"
-                          : "black",
-                    }}
-                    onClick={() => setChosenCategory(component.title)}
-                  >
-                    {component.title}
-                  </h3>
-                </div>
-                {component.arrowPressed && (
-                  <ul style={{ paddingLeft: "20px" }}>
-                    {component.subcategories.map((subcat) => (
-                      <li key={subcat.title}>
-                        <div
+                  </Button>
+                )}
+                <h3
+                  style={{
+                    color:
+                      chosenCategory === component.title
+                        ? "rgb(56 189 248)"
+                        : "black",
+                    backgroundColor:
+                      hoveredTitle === component.title &&
+                      chosenCategory !== component.title
+                        ? "#F3F3F3"
+                        : "transparent",
+                    borderRadius: "10px",
+                    paddingRight: "12px",
+                    paddingLeft: "12px",
+                    paddingBottom: "6px",
+                    paddingTop: "6px",
+                    cursor: "pointer",
+                  }}
+                  onClick={() => {
+                    if (component.arrowPressed === false) {
+                      toggleArrow(component.title);
+                    }
+                    setChosenCategory(component.title);
+                  }}
+                  onMouseEnter={() => handleTitleMouseEnter(component.title)}
+                  onMouseLeave={handleTitleMouseLeave}
+                >
+                  {component.title}
+                </h3>
+              </div>
+              {component.arrowPressed && (
+                <ul style={{ paddingLeft: "20px" }}>
+                  {component.subcategories.map((subcat) => (
+                    <li key={subcat.title}>
+                      <div
+                        style={{
+                          display: "flex",
+                          flexDirection: "row",
+                          alignItems: "center",
+                          cursor: "pointer",
+                          padding: "4px",
+                          borderRadius: "4px",
+                        }}
+                        onMouseEnter={() =>
+                          setCurrentComponentTitle(subcat.title)
+                        }
+                        onMouseLeave={() => setCurrentComponentTitle(null)}
+                      >
+                        <Button
                           style={{
+                            width: "30px",
+                            height: "36px",
+                            backgroundColor:
+                              hoveredImg &&
+                              currentComponentTitle === subcat.title
+                                ? "#F3F3F3"
+                                : "transparent",
+                            boxShadow: "none",
+                            borderRadius: "10px",
                             display: "flex",
-                            flexDirection: "row",
                             alignItems: "center",
-                            cursor: "pointer",
-                            padding: "8px",
-                            borderRadius: "4px",
+                            justifyContent: "center",
+                            padding: "4px",
                           }}
+                          onClick={() =>
+                            toggleArrowSubcategory(
+                              component.title,
+                              subcat.title
+                            )
+                          }
+                          onMouseEnter={handleImgMouseEnter}
+                          onMouseLeave={handleImgMouseLeave}
                         >
                           <img
                             src={arrwRight}
@@ -209,71 +333,123 @@ export const SearchFlashcards = () => {
                                 ? "rotate(90deg)"
                                 : "none",
                             }}
-                            onClick={() =>
+                          />
+                        </Button>
+                        <h3
+                          style={{
+                            color:
+                              chosenCategory === subcat.title
+                                ? "rgb(56 189 248)"
+                                : "black",
+                            backgroundColor:
+                              hoveredTitle === subcat.title &&
+                              chosenCategory !== subcat.title
+                                ? "#F3F3F3"
+                                : "transparent",
+                            borderRadius: "10px",
+                            paddingRight: "12px",
+                            paddingLeft: "12px",
+                            paddingBottom: "6px",
+                            paddingTop: "6px",
+                            cursor: "pointer",
+                          }}
+                          onClick={() => {
+                            if (subcat.arrowPressed === false) {
                               toggleArrowSubcategory(
                                 component.title,
                                 subcat.title
-                              )
+                              );
                             }
-                          />
-                          <h3
-                            style={{
-                              color:
-                                chosenCategory === subcat.title
-                                  ? "rgb(56 189 248)"
-                                  : "black",
-                            }}
-                            onClick={() => setChosenCategory(subcat.title)}
-                          >
-                            {subcat.title}
-                          </h3>
-                        </div>
-                        {subcat.arrowPressed && (
-                          <ul style={{ paddingLeft: "40px" }}>
-                            {subcat.subcategories.map((subsubcat) => (
+                            setChosenCategory(subcat.title);
+                            setParentCategory(component.title);
+                          }}
+                          onMouseEnter={() =>
+                            handleTitleMouseEnter(subcat.title)
+                          }
+                          onMouseLeave={handleTitleMouseLeave}
+                        >
+                          {subcat.title}
+                        </h3>
+                      </div>
+                      {subcat.arrowPressed && (
+                        <ul style={{ paddingLeft: "40px" }}>
+                          {subcat.subcategories.map((subsubcat) => (
+                            <div
+                              style={{
+                                display: "flex",
+                                flexDirection: "row",
+                                alignItems: "center",
+                                cursor: "pointer",
+                                padding: "4px",
+                                borderRadius: "4px",
+                              }}
+                            >
                               <li
                                 style={{
                                   display: "flex",
-                                  flexDirection: "row",
-                                  alignItems: "center",
                                   cursor: "pointer",
-                                  padding: "8px",
-                                  borderRadius: "4px",
+                                  paddingRight: "12px",
+                                  paddingLeft: "12px",
+                                  paddingBottom: "6px",
+                                  paddingTop: "6px",
+                                  borderRadius: "10px",
                                   color:
-                                    chosenCategory === subsubcat
+                                    chosenCategory === subsubcat &&
+                                    parentCategory === subcat.title
                                       ? "rgb(56 189 248)"
                                       : "black",
+                                  backgroundColor:
+                                    hoveredTitle === subsubcat &&
+                                    chosenCategory !== subsubcat &&
+                                    hovredParent === subcat.title
+                                      ? "#F3F3F3"
+                                      : "transparent",
                                 }}
                                 key={subsubcat}
-                                onClick={() => setChosenCategory(subsubcat)}
+                                onClick={() => {
+                                  setChosenCategory(subsubcat);
+                                  setParentCategory(subcat.title);
+                                }}
+                                onMouseEnter={() => {
+                                  handleTitleMouseEnter(subsubcat);
+                                  setHoveredParent(subcat.title);
+                                }}
+                                onMouseLeave={handleTitleMouseLeave}
                               >
                                 {subsubcat}
                               </li>
-                            ))}
-                          </ul>
-                        )}
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-            ))}
-          </div>
-        </Card>
-      )}
-      <Button
-        onClick={() => setOpenMenu(!openMenu)}
-        style={{
-          backgroundColor: "transparent",
-          border: "none",
-          borderTopLeftRadius: "5px",
-          borderBottomLeftRadius: "5px",
-          borderTopRightRadius: "5px",
-          borderBottomRightRadius: "5px",
-        }}
-      >
-        <img src={Menu} alt="menu" style={{ width: "20px", height: "20px" }} />
-      </Button>
+                            </div>
+                          ))}
+                        </ul>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          ))}
+        </div>
+      </AnimatedCard>
+      <AnimatedOpenMenu openMenu={openMenu}>
+        <Button
+          onClick={() => setOpenMenu(!openMenu)}
+          style={{
+            backgroundColor: "transparent",
+            border: "none",
+            borderTopLeftRadius: "5px",
+            borderBottomLeftRadius: "5px",
+            borderTopRightRadius: "5px",
+            borderBottomRightRadius: "5px",
+          }}
+          className="shadow-md"
+        >
+          <img
+            src={Menu}
+            alt="menu"
+            style={{ width: "20px", height: "20px" }}
+          />
+        </Button>
+      </AnimatedOpenMenu>
     </div>
   );
 };

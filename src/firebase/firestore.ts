@@ -291,6 +291,27 @@ export async function updateProfile(
   });
 }
 
+export async function getFlashcardSetsIdsByCategory(category: string) {
+  const collectionRef = collection(db, "flashcardSets");
+  const q = query(collectionRef, where("category", "array-contains", category));
+  const querySnapshot = await getDocs(q);
+  const flashcardSetsIds = <string[]>[];
+  querySnapshot.forEach((doc) => {
+    flashcardSetsIds.push(doc.id);
+  });
+  return flashcardSetsIds;
+}
+
+export async function getAllFlashcardSetsIds() {
+  const collectionRef = collection(db, "flashcardSets");
+  const querySnapshot = await getDocs(collectionRef);
+  const flashcardSetsIds = <string[]>[];
+  querySnapshot.forEach((doc) => {
+    flashcardSetsIds.push(doc.id);
+  });
+  return flashcardSetsIds;
+}
+
 export async function addForeignLanguages() {
   const collectionRef = collection(db, "categories");
   const docRef = doc(collectionRef, "Foreign Languages");

@@ -1,8 +1,14 @@
-import { getCategories, getSecondCategories } from "@/firebase/firestore";
+import {
+  getCategories,
+  getSecondCategories,
+  getFlashcardSetsIdsByCategory,
+  getAllFlashcardSetsIds,
+} from "@/firebase/firestore";
 import { useEffect, useState } from "react";
 import arrwRight from "@/assets/arrow-right.svg";
 import Menu from "@/assets/menu.svg";
 import { Button } from "./ui/button";
+import Post from "./Post";
 import styled, { keyframes } from "styled-components";
 
 const SlideIn = keyframes`
@@ -41,10 +47,18 @@ const AnimatedCard = styled.div<{ openMenu: boolean }>`
     ${({ openMenu }) => (openMenu ? "0s" : "0.5s")};
   pointer-events: ${({ openMenu }) => (openMenu ? "auto" : "none")};
   opacity: ${({ openMenu }) => (openMenu ? "1" : "0")};
+  z-index: 100;
+  position: fixed;
 `;
 
 const AnimatedOpenMenu = styled.div<{ openMenu: boolean }>`
   animation: ${({ openMenu }) => (openMenu ? SlideIn : SlideOut)} 0.5s forwards;
+  visibility: visible;
+  transition: visibility 0s linear
+    ${({ openMenu }) => (openMenu ? "0s" : "0.5s")};
+  position: fixed;
+  left: 280px;
+  z-index: 100;
 `;
 
 export const SearchFlashcards = () => {
@@ -69,6 +83,7 @@ export const SearchFlashcards = () => {
   const [currentComponentTitle, setCurrentComponentTitle] = useState<
     string | null
   >(null);
+  const [flashcardSets, setFlashcardSets] = useState<string[]>([]);
 
   useEffect(() => {
     console.log("reading categories");
@@ -165,7 +180,33 @@ export const SearchFlashcards = () => {
   useEffect(() => {
     if (chosenCategory) {
       console.log(chosenCategory);
+    } else {
+      const fetchAllFlashcardSets = async () => {
+        try {
+          const fetchedFlashcardSets = await getAllFlashcardSetsIds();
+          setFlashcardSets(fetchedFlashcardSets);
+          console.log(fetchedFlashcardSets);
+        } catch (error) {
+          console.error("Error fetching flashcard sets:", error);
+        }
+      };
+      fetchAllFlashcardSets();
+      return;
     }
+
+    const fetchFlashcardSets = async () => {
+      try {
+        const fetchedFlashcardSets = await getFlashcardSetsIdsByCategory(
+          chosenCategory
+        );
+        setFlashcardSets(fetchedFlashcardSets);
+        console.log(fetchedFlashcardSets);
+      } catch (error) {
+        console.error("Error fetching flashcard sets:", error);
+      }
+    };
+
+    fetchFlashcardSets();
   }, [chosenCategory]);
 
   const toggleArrowSubcategory = (title: string, subcategory: string) => {
@@ -201,8 +242,12 @@ export const SearchFlashcards = () => {
   };
 
   return (
-    <div style={{ paddingTop: "3.1rem" }} className="flex">
-      <AnimatedCard openMenu={openMenu}>
+    <div style={{ paddingTop: "3.1rem",
+    maxWidth: "100vw",
+    overflowX: "hidden",
+
+     }} className="flex flex-row max-w-full">
+      <AnimatedCard openMenu={openMenu} className="shadow-xl">
         <div>
           {components.map((component) => (
             <div key={component.title}>
@@ -283,7 +328,7 @@ export const SearchFlashcards = () => {
               {component.arrowPressed && (
                 <ul style={{ paddingLeft: "20px" }}>
                   {component.subcategories.map((subcat) => (
-                    <li key={subcat.title}>
+                    <li key={subcat.title + component.title}>
                       <div
                         style={{
                           display: "flex",
@@ -383,6 +428,7 @@ export const SearchFlashcards = () => {
                                 padding: "4px",
                                 borderRadius: "4px",
                               }}
+                              key={subsubcat}
                             >
                               <li
                                 style={{
@@ -405,7 +451,7 @@ export const SearchFlashcards = () => {
                                       ? "#F3F3F3"
                                       : "transparent",
                                 }}
-                                key={subsubcat}
+                                key={subsubcat + subcat.title}
                                 onClick={() => {
                                   setChosenCategory(subsubcat);
                                   setParentCategory(subcat.title);
@@ -440,16 +486,32 @@ export const SearchFlashcards = () => {
             borderBottomLeftRadius: "5px",
             borderTopRightRadius: "5px",
             borderBottomRightRadius: "5px",
+            position: "relative",
+            zIndex: 100,
           }}
           className="shadow-md"
         >
           <img
             src={Menu}
             alt="menu"
-            style={{ width: "20px", height: "20px" }}
+            style={{ width: "20px", height: "20px", cursor: "pointer" }}
           />
         </Button>
       </AnimatedOpenMenu>
+      <div
+        className={`flex flex-wrap justify-center items-center`}
+        style={{
+          width: openMenu ? `calc(100vw - 280px)` : "100vw", // Adjust width based on openMenu state
+          position: "relative",
+          left: openMenu ? "280px" : "0px",
+        }}
+      >
+        {flashcardSets.map((flashcardSetId) => (
+          <div key={flashcardSetId} className="p-8 flex justify-center">
+            <Post flashcardSetId={flashcardSetId} />
+          </div>
+        ))}
+      </div>
     </div>
   );
 };

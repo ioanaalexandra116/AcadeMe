@@ -12,7 +12,7 @@ import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import Post from "./Post";
 import styled, { keyframes } from "styled-components";
-import SearchFlashcardsBackground from "@/assets/plant-background.svg";
+import SearchFlashcardsBackground from "@/assets/pinterest-img.jpg";
 
 const SlideIn = keyframes`
   0% {
@@ -542,7 +542,7 @@ export const SearchFlashcards = () => {
           left: openMenu ? "280px" : "0px",
         }}
       >
-        <div className="flex justify-center items-center flex-row m-auto space-x-4">
+        <div className="flex justify-center items-center flex-row m-auto space-x-4 pt-4 pb-4">
           <Input
             placeholder="Search flashcard set by title"
             type="text"

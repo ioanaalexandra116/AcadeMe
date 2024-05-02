@@ -312,19 +312,145 @@ export async function getAllFlashcardSetsIds() {
   return flashcardSetsIds;
 }
 
+export async function getFlashcardSetsIdsByTitle(title: string, category: string) {
+  const words = title.toLowerCase().split(" ");
+  const collectionRef = collection(db, "flashcardSets");
+  let querySnapshot = await getDocs(collectionRef);
+  if (category) {
+    querySnapshot = await getDocs(
+      query(collectionRef, where("category", "array-contains", category))
+    );
+  }
+  let flashcardSetsIds = <string[]>[];
+  let TitleIdPairs = <{ [key: string]: string }>{};
+  querySnapshot.forEach((doc) => {
+    TitleIdPairs[doc.data().title.toLowerCase()] = doc.id;
+  });
+  console.log(TitleIdPairs);
+  for (let key in TitleIdPairs) {
+    for (let word of words) {
+      if (key.includes(word)) {
+        flashcardSetsIds.push(TitleIdPairs[key]);
+        break;
+      }
+    }
+  }
+
+  return flashcardSetsIds;
+}
+
 export async function addForeignLanguages() {
   const collectionRef = collection(db, "categories");
   const docRef = doc(collectionRef, "Foreign Languages");
   const data = {
-    "Italian": ["Verbs", "Nouns", "Pronouns", "Adjectives", "Adverbs", "Tenses", "Articles", "Prepositions", "Vocabulary", "Other"],
-    "Spanish": ["Verbs", "Nouns", "Pronouns", "Adjectives", "Adverbs", "Tenses", "Articles", "Prepositions", "Vocabulary", "Other"],
-    "French": ["Verbs", "Nouns", "Pronouns", "Adjectives", "Adverbs", "Tenses", "Articles", "Prepositions", "Vocabulary", "Other"],
-    "German": ["Verbs", "Nouns", "Pronouns", "Adjectives", "Adverbs", "Tenses", "Articles", "Prepositions", "Vocabulary", "Other"],
-    "Japanese": ["Verbs", "Nouns", "Pronouns", "Adjectives", "Adverbs", "Tenses", "Articles", "Prepositions", "Vocabulary", "Other"],
-    "Korean": ["Verbs", "Nouns", "Pronouns", "Adjectives", "Adverbs", "Tenses", "Articles", "Prepositions", "Vocabulary", "Other"],
-    "Chinese": ["Verbs", "Nouns", "Pronouns", "Adjectives", "Adverbs", "Tenses", "Articles", "Prepositions", "Vocabulary", "Other"],
-    "Russian": ["Verbs", "Nouns", "Pronouns", "Adjectives", "Adverbs", "Tenses", "Articles", "Prepositions", "Vocabulary", "Other"],
-    "Romanian": ["Verbs", "Nouns", "Pronouns", "Adjectives", "Adverbs", "Tenses", "Articles", "Prepositions", "Vocabulary", "Other"],
+    Italian: [
+      "Verbs",
+      "Nouns",
+      "Pronouns",
+      "Adjectives",
+      "Adverbs",
+      "Tenses",
+      "Articles",
+      "Prepositions",
+      "Vocabulary",
+      "Other",
+    ],
+    Spanish: [
+      "Verbs",
+      "Nouns",
+      "Pronouns",
+      "Adjectives",
+      "Adverbs",
+      "Tenses",
+      "Articles",
+      "Prepositions",
+      "Vocabulary",
+      "Other",
+    ],
+    French: [
+      "Verbs",
+      "Nouns",
+      "Pronouns",
+      "Adjectives",
+      "Adverbs",
+      "Tenses",
+      "Articles",
+      "Prepositions",
+      "Vocabulary",
+      "Other",
+    ],
+    German: [
+      "Verbs",
+      "Nouns",
+      "Pronouns",
+      "Adjectives",
+      "Adverbs",
+      "Tenses",
+      "Articles",
+      "Prepositions",
+      "Vocabulary",
+      "Other",
+    ],
+    Japanese: [
+      "Verbs",
+      "Nouns",
+      "Pronouns",
+      "Adjectives",
+      "Adverbs",
+      "Tenses",
+      "Articles",
+      "Prepositions",
+      "Vocabulary",
+      "Other",
+    ],
+    Korean: [
+      "Verbs",
+      "Nouns",
+      "Pronouns",
+      "Adjectives",
+      "Adverbs",
+      "Tenses",
+      "Articles",
+      "Prepositions",
+      "Vocabulary",
+      "Other",
+    ],
+    Chinese: [
+      "Verbs",
+      "Nouns",
+      "Pronouns",
+      "Adjectives",
+      "Adverbs",
+      "Tenses",
+      "Articles",
+      "Prepositions",
+      "Vocabulary",
+      "Other",
+    ],
+    Russian: [
+      "Verbs",
+      "Nouns",
+      "Pronouns",
+      "Adjectives",
+      "Adverbs",
+      "Tenses",
+      "Articles",
+      "Prepositions",
+      "Vocabulary",
+      "Other",
+    ],
+    Romanian: [
+      "Verbs",
+      "Nouns",
+      "Pronouns",
+      "Adjectives",
+      "Adverbs",
+      "Tenses",
+      "Articles",
+      "Prepositions",
+      "Vocabulary",
+      "Other",
+    ],
   };
   await setDoc(docRef, data);
 }

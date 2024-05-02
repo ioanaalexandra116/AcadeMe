@@ -151,7 +151,7 @@ export default function Navbar() {
   }
 
   return (
-    <NavigationMenu className="backdrop-blur-lg fixed z-50 bg-transparent shadow-md">
+    <NavigationMenu className="backdrop-blur-lg fixed bg-transparent shadow-md z-50">
       <NavigationMenuItem className="flex justify-start items-left absolute left-0">
         <Link to="/">
           {!smallScreen ? (

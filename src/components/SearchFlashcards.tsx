@@ -3,13 +3,16 @@ import {
   getSecondCategories,
   getFlashcardSetsIdsByCategory,
   getAllFlashcardSetsIds,
+  getFlashcardSetsIdsByTitle,
 } from "@/firebase/firestore";
 import { useEffect, useState } from "react";
 import arrwRight from "@/assets/arrow-right.svg";
 import Menu from "@/assets/menu.svg";
 import { Button } from "./ui/button";
+import { Input } from "./ui/input";
 import Post from "./Post";
 import styled, { keyframes } from "styled-components";
+import SearchFlashcardsBackground from "@/assets/plant-background.svg";
 
 const SlideIn = keyframes`
   0% {
@@ -37,9 +40,8 @@ const SlideOut = keyframes`
 
 const AnimatedCard = styled.div<{ openMenu: boolean }>`
   width: 280px;
-  height: calc(100vh - 3.1rem);
+  height: calc(100vh - 3.2rem);
   overflow-y: auto;
-  border-radius: 8px;
   border: 1px solid #e5e7eb;
   animation: ${({ openMenu }) => (openMenu ? SlideIn : SlideOut)} 0.5s forwards;
   visibility: visible;
@@ -47,8 +49,10 @@ const AnimatedCard = styled.div<{ openMenu: boolean }>`
     ${({ openMenu }) => (openMenu ? "0s" : "0.5s")};
   pointer-events: ${({ openMenu }) => (openMenu ? "auto" : "none")};
   opacity: ${({ openMenu }) => (openMenu ? "1" : "0")};
-  z-index: 100;
+  z-index: 10;
   position: fixed;
+  background-color: "#FFFFFF";
+  backdrop-filter: blur(15px);
 `;
 
 const AnimatedOpenMenu = styled.div<{ openMenu: boolean }>`
@@ -58,7 +62,7 @@ const AnimatedOpenMenu = styled.div<{ openMenu: boolean }>`
     ${({ openMenu }) => (openMenu ? "0s" : "0.5s")};
   position: fixed;
   left: 280px;
-  z-index: 100;
+  z-index: 10;
 `;
 
 export const SearchFlashcards = () => {
@@ -84,6 +88,7 @@ export const SearchFlashcards = () => {
     string | null
   >(null);
   const [flashcardSets, setFlashcardSets] = useState<string[]>([]);
+  const [searchInTitle, setSearchInTitle] = useState("");
 
   useEffect(() => {
     console.log("reading categories");
@@ -241,12 +246,45 @@ export const SearchFlashcards = () => {
     setHoveredImg(false);
   };
 
-  return (
-    <div style={{ paddingTop: "3.1rem",
-    maxWidth: "100vw",
-    overflowX: "hidden",
+  const handleSearch = async () => {
+    try {
+      if (!searchInTitle) {
+        if (!chosenCategory) {
+          const fetchedFlashcardSets = await getAllFlashcardSetsIds();
+          setFlashcardSets(fetchedFlashcardSets);
+        } else {
+          const fetchedFlashcardSets = await getFlashcardSetsIdsByCategory(
+            chosenCategory
+          );
+          setFlashcardSets(fetchedFlashcardSets);
+        }
+      } else {
+        const fetchedFlashcardSets = await getFlashcardSetsIdsByTitle(
+          searchInTitle,
+          chosenCategory ? chosenCategory : ""
+        );
+        setFlashcardSets(fetchedFlashcardSets);
+      }
+    } catch (error) {
+      console.error("Error fetching flashcard sets:", error);
+    }
+  };
 
-     }} className="flex flex-row max-w-full">
+  return (
+    <div className="flex flex-col screen-height screen-width"
+    style={{
+      backgroundImage: `url(${SearchFlashcardsBackground})`,
+      backgroundSize: "cover",
+      backgroundPosition: "center",
+      backgroundAttachment: "fixed",
+      backgroundRepeat: "repeat",
+      width: "100vw",
+      height: "100vh",
+    }}>
+    <div
+      style={{ paddingTop: "3.2rem", maxWidth: "100vw", overflowX: "hidden" }}
+      className="flex flex-row max-w-full"
+    >
       <AnimatedCard openMenu={openMenu} className="shadow-xl">
         <div>
           {components.map((component) => (
@@ -269,7 +307,7 @@ export const SearchFlashcards = () => {
                       height: "36px",
                       backgroundColor:
                         hoveredImg && currentComponentTitle === component.title
-                          ? "#F3F3F3"
+                          ? "#FFFFFF"
                           : "transparent",
                       boxShadow: "none",
                       borderRadius: "10px",
@@ -304,7 +342,7 @@ export const SearchFlashcards = () => {
                     backgroundColor:
                       hoveredTitle === component.title &&
                       chosenCategory !== component.title
-                        ? "#F3F3F3"
+                        ? "#FFFFFF"
                         : "transparent",
                     borderRadius: "10px",
                     paddingRight: "12px",
@@ -350,7 +388,7 @@ export const SearchFlashcards = () => {
                             backgroundColor:
                               hoveredImg &&
                               currentComponentTitle === subcat.title
-                                ? "#F3F3F3"
+                                ? "#FFFFFF"
                                 : "transparent",
                             boxShadow: "none",
                             borderRadius: "10px",
@@ -389,7 +427,7 @@ export const SearchFlashcards = () => {
                             backgroundColor:
                               hoveredTitle === subcat.title &&
                               chosenCategory !== subcat.title
-                                ? "#F3F3F3"
+                                ? "#FFFFFF"
                                 : "transparent",
                             borderRadius: "10px",
                             paddingRight: "12px",
@@ -448,7 +486,7 @@ export const SearchFlashcards = () => {
                                     hoveredTitle === subsubcat &&
                                     chosenCategory !== subsubcat &&
                                     hovredParent === subcat.title
-                                      ? "#F3F3F3"
+                                      ? "#FFFFFF"
                                       : "transparent",
                                 }}
                                 key={subsubcat + subcat.title}
@@ -480,14 +518,12 @@ export const SearchFlashcards = () => {
         <Button
           onClick={() => setOpenMenu(!openMenu)}
           style={{
-            backgroundColor: "transparent",
-            border: "none",
+            backgroundColor: "#FFFFFF",
+            border: "0.5px solid #e5e7eb",
             borderTopLeftRadius: "5px",
             borderBottomLeftRadius: "5px",
             borderTopRightRadius: "5px",
             borderBottomRightRadius: "5px",
-            position: "relative",
-            zIndex: 100,
           }}
           className="shadow-md"
         >
@@ -499,19 +535,63 @@ export const SearchFlashcards = () => {
         </Button>
       </AnimatedOpenMenu>
       <div
-        className={`flex flex-wrap justify-center items-center`}
+        className="flex flex-col w-full pt-8"
         style={{
           width: openMenu ? `calc(100vw - 280px)` : "100vw", // Adjust width based on openMenu state
           position: "relative",
           left: openMenu ? "280px" : "0px",
         }}
       >
-        {flashcardSets.map((flashcardSetId) => (
-          <div key={flashcardSetId} className="p-8 flex justify-center">
-            <Post flashcardSetId={flashcardSetId} />
+        <div className="flex justify-center items-center flex-row m-auto space-x-4">
+          <Input
+            placeholder="Search flashcard set by title"
+            type="text"
+            id="search"
+            value={searchInTitle}
+            onChange={(e) => setSearchInTitle(e.target.value)}
+            style={{
+              width: "320px",
+              backgroundColor: "#FFFFFF",
+              border: "0.5px solid gray",
+            }}
+          />
+          <Button
+            style={{
+              backgroundColor: "#F987AF",
+              color: "#FFFFFF",
+            }}
+            onClick={handleSearch}
+          >
+            Search
+          </Button>
+        </div>
+        <div className="flex flex-col justify-center items-center w-full allign-center">
+        {flashcardSets.length === 0 ? (
+          <h1
+            className="text-4xl font-bold text-black contoured-text"
+            style={{
+              color: "#f987af",
+              textShadow: `-0.5px -0.5px 0 #000, 2px -0.5px 0 #000, -0.5px 1px 0 #000, 2px 1px 0 #000`,
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              minHeight: "calc(100vh - 8rem)",
+            }}
+          >
+            No flashcard sets found
+          </h1>
+        ) : (
+          <div className={`flex flex-wrap justify-center items-center`}>
+            {flashcardSets.map((flashcardSetId) => (
+              <div key={flashcardSetId} className="p-8 flex justify-center">
+                <Post flashcardSetId={flashcardSetId} />
+              </div>
+            ))}
           </div>
-        ))}
+        )}
+        </div>
       </div>
+    </div>
     </div>
   );
 };

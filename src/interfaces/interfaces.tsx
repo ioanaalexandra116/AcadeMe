@@ -35,10 +35,12 @@ export type UserData = {
   username: string;
   description: string;
   exp: number;
+  followers: string[];
   following: string[];
   posts: string[];
   favorites: string[];
   activity: { [key: string]: number[] };
+  notifications: { [key: string]: string[] };
 };
 
 

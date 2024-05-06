@@ -29,10 +29,12 @@ export async function createUserCollection(user: User, username: string) {
     username: username,
     description: "",
     exp: 0,
+    followers: [],
     following: [],
     posts: [],
     favorites: [],
     activity: {},
+    notifications: {},
   };
   setDoc(docRef, data)
     .then()
@@ -337,6 +339,38 @@ export async function getFlashcardSetsIdsByTitle(title: string, category: string
   }
 
   return flashcardSetsIds;
+}
+
+export async function FollowUser(uid: string, targetUid: string) {
+  const userRef = doc(db, "users", uid);
+  const targetUserRef = doc(db, "users", targetUid);
+  await updateDoc(userRef, {
+    following: arrayUnion(targetUid),
+  });
+  await updateDoc(targetUserRef, {
+    followers: arrayUnion(uid),
+    notifications: {
+      ...((await getDoc(targetUserRef)).data()?.notifications || {}),
+      [new Date().toISOString()]: `${uid} started following you.`,
+    },
+  });
+  return "Followed";
+}
+
+export async function UnfollowUser(uid: string, targetUid: string) {
+  const userRef = doc(db, "users", uid);
+  const targetUserRef = doc(db, "users", targetUid);
+  await updateDoc(userRef, {
+    following: arrayRemove(targetUid),
+  });
+  await updateDoc(targetUserRef, {
+    followers: arrayRemove(uid),
+    notifications: {
+      ...((await getDoc(targetUserRef)).data()?.notifications || {}),
+      [new Date().toISOString()]: `${uid} unfollowed you.`,
+    },
+  });
+  return "Unfollowed";
 }
 
 export async function addForeignLanguages() {

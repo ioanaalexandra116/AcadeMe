@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "@/context";
 import Loading from "@/components/Loading";
-import { getUserData } from "@/firebase/firestore";
+import { getUserData, FollowUser, UnfollowUser } from "@/firebase/firestore";
 import Post from "@/components/Post";
 import DotsBackground from "@/components/DotsBackground";
 import { useLocation, Link, useNavigate } from "react-router-dom";
@@ -10,15 +10,13 @@ import { AvatarProperties } from "@/interfaces";
 import Loader from "@/components/Loader";
 import { Card } from "@/components/ui/card";
 import Description from "@/assets/description.svg";
-import FileCabinet from "@/assets/file-cabinet.svg";
+import Friends from "@/assets/friends.svg";
 import User from "@/assets/username.svg";
 import WhiteCrown from "@/assets/white-crown.svg";
 import SaveIcon from "@/assets/favorite-posts.svg";
 import EditProfile from "@/assets/edit-profile.svg";
 import Posts from "@/assets/posts.svg";
 import { Button } from "@/components/ui/button";
-// import LevelRibbon from "@/assets/level-ribbon.svg";
-// import RibbonHeading from "@/components/RibbonHeading";
 
 const Profile = () => {
   const { user, userLoading } = useContext(AuthContext);
@@ -29,6 +27,8 @@ const Profile = () => {
   const [level, setLevel] = useState<number>(1);
   const [showPosts, setShowPosts] = useState<boolean>(true);
   const [favorites, setFavorites] = useState<string[]>([]);
+  const [following, setFollowing] = useState<string[]>([]);
+  const [followers, setFollowers] = useState<string[]>([]);
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const userId = queryParams.get("userId");
@@ -47,6 +47,8 @@ const Profile = () => {
   const [characterProperties, setCharacterProperties] =
     useState<AvatarProperties>(defaultCharacterProperties);
   const [loadingAvatar, setLoadingAvatar] = useState(true);
+  const [loadingFollow, setLoadingFollow] = useState(false);
+  const [followed, setFollowed] = useState(false);
 
   if (!user || userLoading) {
     return <Loading />;
@@ -68,6 +70,13 @@ const Profile = () => {
           setUsername(userData.username);
           setDescription(userData.description);
           setLevel(Math.floor(userData.exp / 1000) * 1000);
+          setFollowing(userData.following);
+          setFollowers(userData.followers);
+          if (userData.followers.includes(userId || "")) {
+            setFollowed(true);
+          } else {
+            setFollowed(false);
+          }
         }
       } catch (error) {
         console.error("Error fetching user data:", error);
@@ -76,6 +85,28 @@ const Profile = () => {
     };
     fetchUserData();
   }, [user]);
+
+  const FollowUser = async (follower: string, following: string) => {
+    setLoadingFollow(true);
+    try {
+      await FollowUser(follower, following);
+    } catch (error) {
+      console.error("Error following user:", error);
+    }
+    setLoadingFollow(false);
+    setFollowed(true);
+  };
+
+  const UnfollowUser = async (follower: string, following: string) => {
+    setLoadingFollow(true);
+    try {
+      await UnfollowUser(follower, following);
+    } catch (error) {
+      console.error("Error unfollowing user:", error);
+    }
+    setLoadingFollow(false);
+    setFollowed(false);
+  };
 
   return (
     <div className="flex flex-col items-center justify-center pt-16">
@@ -101,7 +132,13 @@ const Profile = () => {
                   alt="description"
                   className="w-5 h-5 mt-1"
                 />
-                <p style={{ fontStyle: "italic", textAlign: "left", maxWidth: "200px" }}>
+                <p
+                  style={{
+                    fontStyle: "italic",
+                    textAlign: "left",
+                    maxWidth: "200px",
+                  }}
+                >
                   {description}
                 </p>
               </div>
@@ -114,7 +151,7 @@ const Profile = () => {
               <p>Level {level + 1}</p>
             </div>
             <div className="relative flex flex-row text-md text-center items-center justify-center space-x-2 cursor-pointer">
-              <img src={FileCabinet} alt="file-cabinet" className="w-5 h-5" />
+              <img src={Friends} alt="friends" className="w-5 h-5" />
               <Link to="/followed-categories">following</Link>
             </div>
             <div className="absolute bottom-2 right-2">
@@ -142,8 +179,9 @@ const Profile = () => {
           </div>
         </div>
       </Card>
-      <div className="relative flex flex-row justify-between items-center space-x-2 mt-4 w-1/2"
-      style={{ width: window.innerWidth < 768 ? "100%" : "50%" }}
+      <div
+        className="relative flex flex-row justify-between items-center space-x-2 mt-4 w-1/2"
+        style={{ width: window.innerWidth < 768 ? "100%" : "50%" }}
       >
         <div
           style={{
@@ -175,6 +213,51 @@ const Profile = () => {
             onClick={() => setShowPosts(false)}
           />
         </div>
+        {userId !== user.uid && (
+          <div>
+            {!followed ? (
+              <Button
+                style={{
+                  backgroundColor: "#fccede",
+                  color: "#fff",
+                  height: "34px",
+                  width: "120px",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = "#f987af";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = "#fccede";
+                }}
+                onClick={() => {
+                  FollowUser(user.uid, userId || "");
+                }}
+              >
+                Follow
+              </Button>
+            ) : (
+              <Button
+                style={{
+                  backgroundColor: "#fccede",
+                  color: "#fff",
+                  height: "34px",
+                  width: "120px",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = "#f987af";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = "#fccede";
+                }}
+                onClick={() => {
+                  UnfollowUser(user.uid, userId || "");
+                }}
+              >
+                Unfollow
+              </Button>
+            )}
+          </div>
+        )}
       </div>
       {showPosts ? (
         <div className={`flex flex-wrap justify-center items-center`}>

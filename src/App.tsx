@@ -11,6 +11,7 @@ import Play from "./pages/Play";
 import Results from "./pages/Results";
 import EditProfile from "./pages/EditProfile";
 import SearchFlashcardSets from "./pages/SearchFlashcardSets";
+import Notifications from "./pages/Notifications";
 
 const router = createBrowserRouter([
   {
@@ -59,6 +60,10 @@ const router = createBrowserRouter([
             path: "/search/flashcards",
             element: <SearchFlashcardSets />,
           },
+          {
+            path: "/notifications",
+            element: <Notifications />,
+          }
         ],
       },
     ],

@@ -279,7 +279,7 @@ const Post = ({ flashcardSetId }: { flashcardSetId: string }) => {
               <p
                 onClick={() =>
                   window.location.replace(
-                    `/search/flashcards?categories=${flashcardSet.category}&&selected=${category}`
+                    `/search/flashcards?categories=${flashcardSet.category}&selected=${category}`
                   )
                 }
                 className="cursor-pointer"

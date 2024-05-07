@@ -85,7 +85,7 @@ export const SearchFlashcards = () => {
     }[]
   >([]);
   const [categsFromUrl, setCategsFromUrl] = useState<string[]>([]);
-  const [seletedFromUrl, setSelectedFromUrl] = useState<string | null>(null);
+  const [selectedFromUrl, setSelectedFromUrl] = useState<string | null>(null);
   const [chosenCategory, setChosenCategory] = useState<string | null>(null);
   const [openMenu, setOpenMenu] = useState(true);
   const [parentCategory, setParentCategory] = useState<string | null>(null);
@@ -165,7 +165,7 @@ export const SearchFlashcards = () => {
                 arrowPressed:
                   categsFromUrl.includes(category) &&
                   categsFromUrl.includes(key) &&
-                  (seletedFromUrl == categsFromUrl[1] || key == parentCategory)
+                  (selectedFromUrl == categsFromUrl[1] || key == parentCategory)
                     ? true
                     : false,
                 title: key,
@@ -227,6 +227,7 @@ export const SearchFlashcards = () => {
         try {
           const fetchedFlashcardSets = await getAllFlashcardSetsIds();
           setFlashcardSets(fetchedFlashcardSets);
+          setLoading(false);
         } catch (error) {
           console.error("Error fetching flashcard sets:", error);
         }

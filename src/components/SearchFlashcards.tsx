@@ -15,6 +15,7 @@ import styled, { keyframes } from "styled-components";
 import SearchFlashcardsBackground from "@/assets/search-background.svg";
 import { useLocation } from "react-router-dom";
 import RemoveFilter from "@/assets/remove-filter.svg";
+import Loading from "./Loading";
 
 const SlideIn = keyframes`
   0% {
@@ -96,6 +97,8 @@ export const SearchFlashcards = () => {
   >(null);
   const [flashcardSets, setFlashcardSets] = useState<string[]>([]);
   const [searchInTitle, setSearchInTitle] = useState("");
+  const [hoverRemoveFilter, setHoverRemoveFilter] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
@@ -224,7 +227,6 @@ export const SearchFlashcards = () => {
         try {
           const fetchedFlashcardSets = await getAllFlashcardSetsIds();
           setFlashcardSets(fetchedFlashcardSets);
-          console.log(fetchedFlashcardSets);
         } catch (error) {
           console.error("Error fetching flashcard sets:", error);
         }
@@ -239,7 +241,7 @@ export const SearchFlashcards = () => {
           chosenCategory
         );
         setFlashcardSets(fetchedFlashcardSets);
-        console.log(fetchedFlashcardSets);
+        setLoading(false);
       } catch (error) {
         console.error("Error fetching flashcard sets:", error);
       }
@@ -317,9 +319,10 @@ export const SearchFlashcards = () => {
       }
     };
     fetchAllFlashcardSets();
-  }
+  };
 
   return (
+    loading ? <Loading /> :
     <div
       className="flex flex-col screen-height screen-width"
       style={{
@@ -566,24 +569,27 @@ export const SearchFlashcards = () => {
             ))}
           </div>
           {chosenCategory && (
-          <Button
-            style={{
-              backgroundColor:"#FCCEDE",
-              boxShadow: "none",
-              position: "fixed",
-              top: "5px",
-              right: "5px",
-              color: "black",
-              padding: "10px",
-            }}
-            onClick={HandleRemoveFilter}
-          >
-            <img
-              src={RemoveFilter}
-              alt="remove filter"
-              style={{ width: "20px", height: "20px", cursor: "pointer" }}
-            />
-          </Button>)}
+            <Button
+              style={{
+                backgroundColor: hoverRemoveFilter ? "#EAF0EC" : "transparent",
+                boxShadow: "none",
+                position: "fixed",
+                top: "5px",
+                right: "5px",
+                color: "black",
+                padding: "10px",
+              }}
+              onClick={HandleRemoveFilter}
+              onMouseEnter={() => setHoverRemoveFilter(true)}
+              onMouseLeave={() => setHoverRemoveFilter(false)}
+            >
+              <img
+                src={RemoveFilter}
+                alt="remove filter"
+                style={{ width: "20px", height: "20px", cursor: "pointer" }}
+              />
+            </Button>
+          )}
         </AnimatedCard>
         <AnimatedOpenMenu openMenu={openMenu}>
           <Button

@@ -354,7 +354,7 @@ export async function FollowUser(uid: string, targetUid: string) {
     followers: arrayUnion(uid),
     notifications: {
       ...((await getDoc(targetUserRef)).data()?.notifications || {}),
-      [new Date().toISOString()]: `${uid} started following you.`,
+      [new Date().toISOString()]: [`${uid}`, "started following you", "unread"],
     },
   });
   return "Followed";
@@ -372,7 +372,7 @@ export async function UnfollowUser(uid: string, targetUid: string) {
   const targetUserDoc = await getDoc(targetUserRef);
   const notifications = targetUserDoc.data()?.notifications || {};
   for (let key in notifications) {
-    if (notifications[key].includes(`${uid} started following you.`)) {
+    if (notifications[key].includes(`${uid}`) && notifications[key].includes("started following you")) {
       delete notifications[key];
       await updateDoc(targetUserRef, {
         notifications: notifications,
@@ -381,6 +381,12 @@ export async function UnfollowUser(uid: string, targetUid: string) {
     }
   }
   return "Unfollowed";
+}
+
+export async function getNotifications(uid: string) {
+  const docRef = doc(db, "users", uid);
+  const docSnap = await getDoc(docRef);
+  return docSnap.data()?.notifications || {};
 }
 
 export async function addForeignLanguages() {

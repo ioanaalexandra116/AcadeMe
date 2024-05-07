@@ -76,7 +76,7 @@ const Profile = () => {
           setFollowingNum(userData.following.length);
           setFollowers(userData.followers);
           setFollowersNum(userData.followers.length);
-          if (userData.followers.includes(userId || "")) {
+          if (userData.followers.includes(user.uid || "")) {
             setFollowed(true);
           } else {
             setFollowed(false);
@@ -125,7 +125,23 @@ const Profile = () => {
         cardWidth={460}
       >
         <div className="flex flex-row justify-center items-center space-x-20 p-4">
-          {loadingAvatar ? <Loader /> : <Avatar {...characterProperties} />}
+          <div className="flex flex-col items-center justify-center space-y-2">
+            {loadingAvatar ? <Loader /> : <Avatar {...characterProperties} />}
+            {userId === user.uid && (
+              <Button
+                style={{
+                  backgroundColor: "#fccede",
+                  color: "#fff",
+                  height: "30px",
+                  width: "120px",
+                }}
+                onClick={() => navigate("/edit-profile")}
+              >
+                <img src={EditProfile} alt="edit" className="w-5 h-5" />
+                <p className="ml-1">Edit Profile</p>
+              </Button>
+            )}
+          </div>
           <div className="flex flex-col items-start justify-center space-y-1">
             <div className="flex flex-row text-md text-center items-center justify-center space-x-2 font-bold">
               <img src={User} alt="user" className="w-5 h-5" />
@@ -166,28 +182,7 @@ const Profile = () => {
                 {followingNum} Following
               </Link>
             </div>
-            <div className="absolute bottom-2 right-2">
-              {userId === user.uid && (
-                <Button
-                  style={{
-                    backgroundColor: "#fccede",
-                    color: "#fff",
-                    height: "34px",
-                    width: "120px",
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = "#f987af";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = "#fccede";
-                  }}
-                  onClick={() => navigate("/edit-profile")}
-                >
-                  <img src={EditProfile} alt="edit" className="w-5 h-5" />
-                  <p className="ml-1">Edit Profile</p>
-                </Button>
-              )}
-            </div>
+            <div className="absolute bottom-2 right-2"></div>
           </div>
         </div>
       </Card>
@@ -238,18 +233,13 @@ const Profile = () => {
                 height: "38px",
                 width: "120px",
                 position: "relative",
+                cursor: loadingFollow ? "wait" : "pointer",
               }}
               onClick={() => {
-                PressFollowUser(user.uid, userId || "");
+                if (!loadingFollow) PressFollowUser(user.uid, userId || "");
               }}
             >
-              {loadingFollow ? (
-                <div className="w-4 h-4 flex justify-center items-center">
-                  <Loader />
-                </div>
-              ) : (
-                "Follow"
-              )}
+              Follow
             </Button>
           ) : (
             <Button
@@ -259,18 +249,13 @@ const Profile = () => {
                 height: "38px",
                 width: "120px",
                 position: "relative",
+                cursor: loadingFollow ? "wait" : "pointer",
               }}
               onClick={() => {
-                PressUnfollowUser(user.uid, userId || "");
+                if (!loadingFollow) PressUnfollowUser(user.uid, userId || "");
               }}
             >
-              {loadingFollow ? (
-                <div className="w-4 h-4 flex justify-center items-center">
-                  <Loader />
-                </div>
-              ) : (
-                "Unfollow"
-              )}
+              Unfollow
             </Button>
           )}
         </div>

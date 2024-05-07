@@ -17,7 +17,12 @@ import {
 
 import { AuthContext } from "@/context";
 import Avatar from "@/components/Avatar";
-import { getAvatarProps, getUsername, getExp } from "@/firebase/firestore";
+import {
+  getAvatarProps,
+  getUsername,
+  getExp,
+  getNotifications,
+} from "@/firebase/firestore";
 import { AvatarProperties } from "@/interfaces/interfaces";
 import { useState, useContext, useEffect } from "react";
 import Loading from "@/components/Loading";
@@ -33,6 +38,7 @@ import { auth } from "@/firebase/config";
 import { Link } from "react-router-dom";
 import { Card } from "./ui/card";
 import Crown from "../assets/crown.svg";
+import Dot from "../assets/dot.svg";
 
 export default function Navbar() {
   const defaultCharacterProperties: AvatarProperties = {
@@ -59,6 +65,13 @@ export default function Navbar() {
   const smallScreen = window.innerWidth < 700;
   const [lower, setLower] = useState(0);
   const [levelHovered, setLevelHovered] = useState(false);
+  type notificationType = {
+    timestamp: string;
+    user: string;
+    message: string;
+    read: boolean;
+  };
+  const [notifications, setNotifications] = useState<notificationType[]>([]);
 
   const handleLogOut = async () => {
     try {
@@ -85,6 +98,63 @@ export default function Navbar() {
       img: Logout,
     },
   ];
+
+  useEffect(() => {
+    if (!user) {
+      return; // Exit early if user is not available
+    }
+  
+    const fetchNotifications = async () => {
+      try {
+        const notificationsFirebase = await getNotifications(user.uid);
+        const updatedNotifications = [] as notificationType[];
+  
+        // Reset notifications array before fetching new data
+        setNotifications([]);
+  
+        for (let key in notificationsFirebase) {
+          const notificationData = notificationsFirebase[key];
+          const timestamp = key;
+  
+          // Check if notification already exists based on timestamp
+          const existingNotification = notifications.find(
+            (notif) => notif.timestamp === timestamp
+          );
+  
+          if (!existingNotification) {
+            // Create a new notification object
+            const newNotification = {
+              timestamp,
+              user: notificationData[0],
+              message: notificationData[1],
+              read: notificationData[2] === "unread" ? false : true,
+            };
+  
+            updatedNotifications.push(newNotification);
+          }
+        }
+  
+        // Update notifications state only once after processing all notifications
+        setNotifications((prevNotifications) => [
+          ...prevNotifications,
+          ...updatedNotifications,
+        ]);
+  
+      } catch (error) {
+        console.error("Error fetching notifications:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+  
+    // Call fetchNotifications when user changes
+    fetchNotifications();
+  
+  }, [user]);
+
+  useEffect(() => {
+    console.log("notifications updated: ", notifications);
+  }, [notifications]);
 
   useEffect(() => {
     if (!user) {
@@ -207,6 +277,10 @@ export default function Navbar() {
                 <img src={Bell} alt="notifications" className="h-5 w-6" />
                 {smallScreen ? "" : "Notifications"}
               </div>
+              {notifications.some((notif) => !notif.read) && (
+              <div style={{ position: "absolute", top: "10px", paddingLeft: "7px" }}>
+                <img src={Dot} alt="notifications" className="h-5 w-5" />
+              </div>)}
             </Link>
           </NavigationMenuLink>
         </NavigationMenuItem>
@@ -244,7 +318,7 @@ export default function Navbar() {
                   }}
                   className="flex items-center justify-start mt-4 z-10"
                 >
-                  {exp && (
+                  {exp && exp > 70 && (
                     <Card
                       style={{
                         width: (exp / 1000) * 150 + "px",

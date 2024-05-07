@@ -13,6 +13,8 @@ import { Input } from "./ui/input";
 import Post from "./Post";
 import styled, { keyframes } from "styled-components";
 import SearchFlashcardsBackground from "@/assets/search-background.svg";
+import { useLocation } from "react-router-dom";
+import RemoveFilter from "@/assets/remove-filter.svg";
 
 const SlideIn = keyframes`
   0% {
@@ -52,7 +54,7 @@ const AnimatedCard = styled.div<{ openMenu: boolean }>`
   z-index: 10;
   position: fixed;
   background-color: "#FFFFFF";
-  backdrop-filter: blur(5px);
+  backdrop-filter: blur(4px);
 `;
 
 const AnimatedOpenMenu = styled.div<{ openMenu: boolean }>`
@@ -64,10 +66,11 @@ const AnimatedOpenMenu = styled.div<{ openMenu: boolean }>`
   left: 280px;
   z-index: 10;
   background-color: "#FFFFFF";
-  backdrop-filter: blur(5px);
+  backdrop-filter: blur(3px);
 `;
 
 export const SearchFlashcards = () => {
+  const location = useLocation();
   const [categories, setCategories] = useState<string[]>([]);
   const [components, setComponents] = useState<
     {
@@ -80,6 +83,8 @@ export const SearchFlashcards = () => {
       }[];
     }[]
   >([]);
+  const [categsFromUrl, setCategsFromUrl] = useState<string[]>([]);
+  const [seletedFromUrl, setSelectedFromUrl] = useState<string | null>(null);
   const [chosenCategory, setChosenCategory] = useState<string | null>(null);
   const [openMenu, setOpenMenu] = useState(true);
   const [parentCategory, setParentCategory] = useState<string | null>(null);
@@ -91,6 +96,23 @@ export const SearchFlashcards = () => {
   >(null);
   const [flashcardSets, setFlashcardSets] = useState<string[]>([]);
   const [searchInTitle, setSearchInTitle] = useState("");
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const categories = searchParams.get("categories")?.split(",") || [];
+    const selected = searchParams.get("selected");
+
+    setCategsFromUrl(categories);
+    console.log("categories: ", categories);
+    setSelectedFromUrl(selected);
+    setChosenCategory(selected);
+    if (selected == categories[1]) {
+      setParentCategory(categories[0]);
+    } else if (selected == categories[2]) {
+      setParentCategory(categories[1]);
+    }
+    setCurrentComponentTitle(selected);
+  }, [location.search]);
 
   useEffect(() => {
     console.log("reading categories");
@@ -125,21 +147,31 @@ export const SearchFlashcards = () => {
             if (Array.isArray(firebaseSubcategories)) {
               // Handle array of subcategories
               subcategories = firebaseSubcategories.map((subcat, index) => ({
-                arrowPressed: false,
+                arrowPressed:
+                  categsFromUrl.includes(category) &&
+                  categsFromUrl.includes(`${index}`) &&
+                  `${index}` != categsFromUrl[0]
+                    ? true
+                    : false,
                 title: `${index}`, // Using index as title
                 subcategories: subcat,
               }));
             } else {
               // Handle object of subcategories
               subcategories = Object.keys(firebaseSubcategories).map((key) => ({
-                arrowPressed: false,
+                arrowPressed:
+                  categsFromUrl.includes(category) &&
+                  categsFromUrl.includes(key) &&
+                  (seletedFromUrl == categsFromUrl[1] || key == parentCategory)
+                    ? true
+                    : false,
                 title: key,
                 subcategories: firebaseSubcategories[key],
               }));
             }
 
             return {
-              arrowPressed: false,
+              arrowPressed: categsFromUrl.includes(category) ? true : false,
               title: category,
               subcategories: subcategories,
             };
@@ -272,6 +304,21 @@ export const SearchFlashcards = () => {
     }
   };
 
+  const HandleRemoveFilter = () => {
+    setChosenCategory(null);
+    setParentCategory(null);
+    const fetchAllFlashcardSets = async () => {
+      try {
+        const fetchedFlashcardSets = await getAllFlashcardSetsIds();
+        setFlashcardSets(fetchedFlashcardSets);
+        console.log(fetchedFlashcardSets);
+      } catch (error) {
+        console.error("Error fetching flashcard sets:", error);
+      }
+    };
+    fetchAllFlashcardSets();
+  }
+
   return (
     <div
       className="flex flex-col screen-height screen-width"
@@ -290,7 +337,7 @@ export const SearchFlashcards = () => {
         className="flex flex-row max-w-full"
       >
         <AnimatedCard openMenu={openMenu} className="shadow-xl">
-          <div>
+          <div style={{ paddingTop: "20px" }}>
             {components.map((component) => (
               <div key={component.title}>
                 <div
@@ -312,7 +359,7 @@ export const SearchFlashcards = () => {
                         backgroundColor:
                           hoveredImg &&
                           currentComponentTitle === component.title
-                            ? "#FFFFFF"
+                            ? "#EAF0EC"
                             : "transparent",
                         boxShadow: "none",
                         borderRadius: "10px",
@@ -347,7 +394,7 @@ export const SearchFlashcards = () => {
                       backgroundColor:
                         hoveredTitle === component.title &&
                         chosenCategory !== component.title
-                          ? "#FFFFFF"
+                          ? "#EAF0EC"
                           : "transparent",
                       borderRadius: "10px",
                       paddingRight: "12px",
@@ -393,7 +440,7 @@ export const SearchFlashcards = () => {
                               backgroundColor:
                                 hoveredImg &&
                                 currentComponentTitle === subcat.title
-                                  ? "#FFFFFF"
+                                  ? "#EAF0EC"
                                   : "transparent",
                               boxShadow: "none",
                               borderRadius: "10px",
@@ -432,7 +479,7 @@ export const SearchFlashcards = () => {
                               backgroundColor:
                                 hoveredTitle === subcat.title &&
                                 chosenCategory !== subcat.title
-                                  ? "#FFFFFF"
+                                  ? "#EAF0EC"
                                   : "transparent",
                               borderRadius: "10px",
                               paddingRight: "12px",
@@ -491,7 +538,7 @@ export const SearchFlashcards = () => {
                                       hoveredTitle === subsubcat &&
                                       chosenCategory !== subsubcat &&
                                       hovredParent === subcat.title
-                                        ? "#FFFFFF"
+                                        ? "#EAF0EC"
                                         : "transparent",
                                   }}
                                   key={subsubcat + subcat.title}
@@ -518,6 +565,25 @@ export const SearchFlashcards = () => {
               </div>
             ))}
           </div>
+          {chosenCategory && (
+          <Button
+            style={{
+              backgroundColor:"#FCCEDE",
+              boxShadow: "none",
+              position: "fixed",
+              top: "5px",
+              right: "5px",
+              color: "black",
+              padding: "10px",
+            }}
+            onClick={HandleRemoveFilter}
+          >
+            <img
+              src={RemoveFilter}
+              alt="remove filter"
+              style={{ width: "20px", height: "20px", cursor: "pointer" }}
+            />
+          </Button>)}
         </AnimatedCard>
         <AnimatedOpenMenu openMenu={openMenu}>
           <Button

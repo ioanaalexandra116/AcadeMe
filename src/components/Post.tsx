@@ -161,7 +161,9 @@ const Post = ({ flashcardSetId }: { flashcardSetId: string }) => {
         <div className="flex justify-between items-center">
           <div
             className="flex items-center justify-start cursor-pointer"
-            onClick={() => window.location.replace(`/profile?userId=${flashcardSet.creator}`)}
+            onClick={() =>
+              window.location.replace(`/profile?userId=${flashcardSet.creator}`)
+            }
           >
             {loadingAvatar ? <Loader /> : <Avatar {...characterProperties} />}
             &nbsp;
@@ -274,9 +276,16 @@ const Post = ({ flashcardSetId }: { flashcardSetId: string }) => {
                   }}
                 />
               )}
-              <Link to={`/search?category=${category}`} className="relative">
+              <p
+                onClick={() =>
+                  window.location.replace(
+                    `/search/flashcards?categories=${flashcardSet.category}&&selected=${category}`
+                  )
+                }
+                className="cursor-pointer"
+              >
                 {category}
-              </Link>
+              </p>
             </span>
           ))}
         </div>

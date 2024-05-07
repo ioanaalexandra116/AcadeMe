@@ -27,25 +27,12 @@ import SimpleGirl from "../assets/girl.svg";
 import User from "../assets/user.svg";
 import Logout from "../assets/logout.svg";
 import Create from "../assets/create.svg";
-import Discover from "../assets/discover.svg";
+import Bell from "../assets/bell.svg";
 import Search from "../assets/search.svg";
 import { auth } from "@/firebase/config";
 import { Link } from "react-router-dom";
 import { Card } from "./ui/card";
 import Crown from "../assets/crown.svg";
-
-const components: { title: string; href: string; description: string }[] = [
-  {
-    title: "People",
-    href: "/search/people",
-    description: "Search for other users on the platform",
-  },
-  {
-    title: "Flashcard Sets",
-    href: "/search/flashcards",
-    description: "Search for flashcard sets created by other users",
-  },
-];
 
 export default function Navbar() {
   const defaultCharacterProperties: AvatarProperties = {
@@ -171,16 +158,26 @@ export default function Navbar() {
           )}
         </Link>
       </NavigationMenuItem>
+      <NavigationMenuItem className={navigationMenuTriggerStyle()}>
+        <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+          <Link to="/create">
+            <div className="flex items-center">
+              <img src={Create} alt="create" className="h-5 w-6" />
+              {smallScreen ? "" : "Create"}
+            </div>
+          </Link>
+        </NavigationMenuLink>
+      </NavigationMenuItem>
       <NavigationMenuList className="mb-1.5 mt-1 flex justify-center items-center">
         <NavigationMenuItem>
           <NavigationMenuTrigger onMouseEnter={() => setAvatarHover(false)}>
             <div className="flex items-center">
-              <img src={Discover} alt="discover" className="h-5 w-6" />
-              {smallScreen ? "" : "Discover"}
+              <img src={Search} alt="discover" className="h-5 w-6" />
+              {smallScreen ? "" : "Search"}
             </div>
           </NavigationMenuTrigger>
           <NavigationMenuContent className="flex justify-center items-center">
-            <ul className="grid gap-2 p-4 md:w-[200px] lg:w-[500px] lg:grid-cols-[.80fr_1fr] flex items-center justify-center">
+            <ul className="grid gap-2 p-4 md:w-[200px] lg:w-[440px] lg:grid-cols-[.80fr_1fr] flex items-center justify-center">
               <li className="row-span-2 flex justify-center items-center">
                 <NavigationMenuLink asChild className="bg-blue-400">
                   <div className="flex items-center justify-center select-none flex-col justify-end rounded-xl bg-gradient-to-b from-muted/50 to-muted p-4 no-underline outline-none focus:shadow-md">
@@ -188,48 +185,27 @@ export default function Navbar() {
                       src={Girl}
                       alt="girl"
                       sizes="400vw"
-                      className="h-48 w-80"
+                      className="h-44 w-80"
                     />
                   </div>
                 </NavigationMenuLink>
               </li>
-              <ListItem href="/discover/friends" title="New Friends">
-                Connect with other study enthusiasts sharing similar interests
+              <ListItem href="/search/people" title="People">
+                Connect with other study enthusiasts on the platform
               </ListItem>
-              <ListItem href="/discover/flascards" title="New Flashcard Sets">
-                Find flashcard sets recommended for you based on your favorite
-                ones
+              <ListItem href="/search/flashcards" title="Flashcard Sets">
+                Find flashcard sets based on your interests
               </ListItem>
             </ul>
           </NavigationMenuContent>
         </NavigationMenuItem>
-        <NavigationMenuItem>
-          <NavigationMenuTrigger onMouseEnter={() => setAvatarHover(false)}>
-            <div className="flex items-center">
-              <img src={Search} alt="create" className="h-5 w-5" />
-              {smallScreen ? "" : "Search"}
-            </div>
-          </NavigationMenuTrigger>
-          <NavigationMenuContent>
-            <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-1 lg:w-[280px]">
-              {components.map((component) => (
-                <ListItem
-                  key={component.title}
-                  title={component.title}
-                  href={component.href}
-                >
-                  {component.description}
-                </ListItem>
-              ))}
-            </ul>
-          </NavigationMenuContent>
-        </NavigationMenuItem>
+
         <NavigationMenuItem>
           <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-            <Link to="/create">
+            <Link to="/notifications">
               <div className="flex items-center">
-                <img src={Create} alt="create" className="h-5 w-5 rotate-90" />
-                {smallScreen ? "" : "Create"}
+                <img src={Bell} alt="notifications" className="h-5 w-6" />
+                {smallScreen ? "" : "Notifications"}
               </div>
             </Link>
           </NavigationMenuLink>
@@ -239,59 +215,66 @@ export default function Navbar() {
         className="flex items-right justify-end absolute"
         style={{ right: "1rem" }}
       >
-         <div className="flex flex-col z-10"> {/* Ensure a higher stacking context for the crown */}
-        {window.innerWidth > 700 && (
-            <div className="flex flex-row justify-center items-center z-10"> {/* Ensure a higher stacking context for the crown */}
-                <div className="relative top-1 left-3 z-20"> {/* Higher z-index for the crown */}
-                    <img src={Crown} className="h-5 w-5 z-20" /> {/* Higher z-index for the crown */}
-                </div>
-                <div className="flex flex-col">
-                    <Card
-                        onMouseEnter={() => setLevelHovered(true)}
-                        onMouseLeave={() => setLevelHovered(false)}
-                        style={{
-                            width: "150px",
-                            height: "10px",
-                            backgroundColor: "#fff",
-                            zIndex: 10,
-                            borderRight: "1px solid black",
-                            borderTop: "1px solid black",
-                            borderBottom: "1px solid black",
-                            cursor: "pointer",
-                        }}
-                        className="flex items-center justify-start mt-4 z-10"
-                    >
-                        {exp && (
-                            <Card
-                                style={{
-                                    width: (exp / 1000) * 150 + "px",
-                                    height: "10px",
-                                    backgroundColor: "#D09FDE",
-                                    zIndex: 10,
-                                }}
-                                className="flex justify-center items-center border border-black z-10"
-                            ></Card>
-                        )}
-                    </Card>
-                </div>
-            </div>
-        )}
-        {levelHovered && (
-            <p
-                style={{
+        <div className="flex flex-col z-10">
+          {" "}
+          {/* Ensure a higher stacking context for the crown */}
+          {window.innerWidth > 700 && (
+            <div className="flex flex-row justify-center items-center z-10">
+              {" "}
+              {/* Ensure a higher stacking context for the crown */}
+              <div className="relative top-1 left-3 z-20">
+                {" "}
+                {/* Higher z-index for the crown */}
+                <img src={Crown} className="h-5 w-5 z-20" />{" "}
+                {/* Higher z-index for the crown */}
+              </div>
+              <div className="flex flex-col">
+                <Card
+                  onMouseEnter={() => setLevelHovered(true)}
+                  onMouseLeave={() => setLevelHovered(false)}
+                  style={{
+                    width: "150px",
+                    height: "10px",
+                    backgroundColor: "#fff",
                     zIndex: 10,
-                    height: "1px",
-                }}
-                className="text-xs flex relative justify-center items-center mt-2 mb-1 ml-3"
+                    borderRight: "1px solid black",
+                    borderTop: "1px solid black",
+                    borderBottom: "1px solid black",
+                    cursor: "pointer",
+                  }}
+                  className="flex items-center justify-start mt-4 z-10"
+                >
+                  {exp && (
+                    <Card
+                      style={{
+                        width: (exp / 1000) * 150 + "px",
+                        height: "10px",
+                        backgroundColor: "#D09FDE",
+                        zIndex: 10,
+                      }}
+                      className="flex justify-center items-center border border-black z-10"
+                    ></Card>
+                  )}
+                </Card>
+              </div>
+            </div>
+          )}
+          {levelHovered && (
+            <p
+              style={{
+                zIndex: 10,
+                height: "1px",
+              }}
+              className="text-xs flex relative justify-center items-center mt-2 mb-1 ml-3"
             >
-                <div className="flex justify-center items-center">
-                    <p className="text-xs text-center">
-                        {1000 - exp} EXP to Level 2
-                    </p>
-                </div>
+              <div className="flex justify-center items-center">
+                <p className="text-xs text-center">
+                  {1000 - exp} EXP to Level {lower + 2}
+                </p>
+              </div>
             </p>
-        )}
-    </div>
+          )}
+        </div>
         <NavigationMenuTrigger onMouseEnter={() => setAvatarHover(true)}>
           <Avatar {...characterProperties} />
         </NavigationMenuTrigger>

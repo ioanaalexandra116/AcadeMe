@@ -8,10 +8,10 @@ const rot1 = keyframes`
 
 const LoaderStyled = styled.div`
   .loader {
-    width: 40px;
-    height: 40px;
+    width: 30px;
+    height: 30px;
     border-radius: 50%;
-    border: 3px solid rgba(249,135,175,0.5);
+    border: 3px solid #fccede;
     border-top-color: transparent;
     animation: ${rot1} 1.2s linear infinite;
   }

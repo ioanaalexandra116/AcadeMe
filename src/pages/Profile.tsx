@@ -28,7 +28,9 @@ const Profile = () => {
   const [showPosts, setShowPosts] = useState<boolean>(true);
   const [favorites, setFavorites] = useState<string[]>([]);
   const [following, setFollowing] = useState<string[]>([]);
+  const [followingNum, setFollowingNum] = useState<number>(0);
   const [followers, setFollowers] = useState<string[]>([]);
+  const [followersNum, setFollowersNum] = useState<number>(0);
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const userId = queryParams.get("userId");
@@ -71,7 +73,9 @@ const Profile = () => {
           setDescription(userData.description);
           setLevel(Math.floor(userData.exp / 1000) * 1000);
           setFollowing(userData.following);
+          setFollowingNum(userData.following.length);
           setFollowers(userData.followers);
+          setFollowersNum(userData.followers.length);
           if (userData.followers.includes(userId || "")) {
             setFollowed(true);
           } else {
@@ -86,7 +90,7 @@ const Profile = () => {
     fetchUserData();
   }, [user]);
 
-  const FollowUser = async (follower: string, following: string) => {
+  const PressFollowUser = async (follower: string, following: string) => {
     setLoadingFollow(true);
     try {
       await FollowUser(follower, following);
@@ -94,10 +98,11 @@ const Profile = () => {
       console.error("Error following user:", error);
     }
     setLoadingFollow(false);
+    setFollowersNum(followersNum + 1);
     setFollowed(true);
   };
 
-  const UnfollowUser = async (follower: string, following: string) => {
+  const PressUnfollowUser = async (follower: string, following: string) => {
     setLoadingFollow(true);
     try {
       await UnfollowUser(follower, following);
@@ -105,6 +110,7 @@ const Profile = () => {
       console.error("Error unfollowing user:", error);
     }
     setLoadingFollow(false);
+    setFollowersNum(followersNum - 1);
     setFollowed(false);
   };
 
@@ -152,7 +158,13 @@ const Profile = () => {
             </div>
             <div className="relative flex flex-row text-md text-center items-center justify-center space-x-2 cursor-pointer">
               <img src={Friends} alt="friends" className="w-5 h-5" />
-              <Link to="/followed-categories">following</Link>
+              <Link to={`/followers?userId=${userId}`}>
+                {followersNum} Followers
+              </Link>
+              <p> | </p>
+              <Link to={`/following?userId=${userId}`}>
+                {followingNum} Following
+              </Link>
             </div>
             <div className="absolute bottom-2 right-2">
               {userId === user.uid && (
@@ -179,86 +191,91 @@ const Profile = () => {
           </div>
         </div>
       </Card>
-      <div
-        className="relative flex flex-row justify-between items-center space-x-2 mt-4 w-1/2"
-        style={{ width: window.innerWidth < 768 ? "100%" : "50%" }}
-      >
+      {userId === user.uid && (
         <div
-          style={{
-            borderBottom: showPosts ? "1px solid black" : "none",
-            paddingBottom: "8px", // Adjust spacing if needed
-            width: "50%",
-          }}
-          className="flex flex-row justify-center items-center"
+          className="relative flex flex-row justify-between items-center space-x-2 mt-4 w-1/2"
+          style={{ width: window.innerWidth < 768 ? "100%" : "50%" }}
         >
-          <img
-            src={Posts}
-            alt="posts"
-            className="w-6 h-6 mt-4 ml-2 cursor-pointer"
-            onClick={() => setShowPosts(true)}
-          />
-        </div>
-        <div
-          style={{
-            borderBottom: !showPosts ? "1px solid black" : "none",
-            paddingBottom: "8px", // Adjust spacing if needed
-            width: "50%",
-          }}
-          className="flex flex-row justify-center items-center"
-        >
-          <img
-            src={SaveIcon}
-            alt="save"
-            className="w-6 h-6 mt-4 cursor-pointer"
-            onClick={() => setShowPosts(false)}
-          />
-        </div>
-        {userId !== user.uid && (
-          <div>
-            {!followed ? (
-              <Button
-                style={{
-                  backgroundColor: "#fccede",
-                  color: "#fff",
-                  height: "34px",
-                  width: "120px",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = "#f987af";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = "#fccede";
-                }}
-                onClick={() => {
-                  FollowUser(user.uid, userId || "");
-                }}
-              >
-                Follow
-              </Button>
-            ) : (
-              <Button
-                style={{
-                  backgroundColor: "#fccede",
-                  color: "#fff",
-                  height: "34px",
-                  width: "120px",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = "#f987af";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = "#fccede";
-                }}
-                onClick={() => {
-                  UnfollowUser(user.uid, userId || "");
-                }}
-              >
-                Unfollow
-              </Button>
-            )}
+          <div
+            style={{
+              borderBottom: showPosts ? "1px solid black" : "none",
+              paddingBottom: "8px", // Adjust spacing if needed
+              width: "50%",
+            }}
+            className="flex flex-row justify-center items-center"
+          >
+            <img
+              src={Posts}
+              alt="posts"
+              className="w-6 h-6 mt-4 ml-2 cursor-pointer"
+              onClick={() => setShowPosts(true)}
+            />
           </div>
-        )}
-      </div>
+          <div
+            style={{
+              borderBottom: !showPosts ? "1px solid black" : "none",
+              paddingBottom: "8px", // Adjust spacing if needed
+              width: "50%",
+            }}
+            className="flex flex-row justify-center items-center"
+          >
+            <img
+              src={SaveIcon}
+              alt="save"
+              className="w-6 h-6 mt-4 cursor-pointer"
+              onClick={() => setShowPosts(false)}
+            />
+          </div>
+        </div>
+      )}
+      {userId !== user.uid && (
+        <div className="mt-6 flex justify-center items-center justify-center">
+          {!followed ? (
+            <Button
+              style={{
+                backgroundColor: "#f987af",
+                color: "#fff",
+                height: "38px",
+                width: "120px",
+                position: "relative",
+              }}
+              onClick={() => {
+                PressFollowUser(user.uid, userId || "");
+              }}
+            >
+              {loadingFollow ? (
+                <div className="w-4 h-4 flex justify-center items-center">
+                  <Loader />
+                </div>
+              ) : (
+                "Follow"
+              )}
+            </Button>
+          ) : (
+            <Button
+              style={{
+                backgroundColor: "#CBCDCA",
+                color: "#fff",
+                height: "38px",
+                width: "120px",
+                position: "relative",
+              }}
+              onClick={() => {
+                PressUnfollowUser(user.uid, userId || "");
+              }}
+            >
+              {loadingFollow ? (
+                <div className="w-4 h-4 flex justify-center items-center">
+                  <Loader />
+                </div>
+              ) : (
+                "Unfollow"
+              )}
+            </Button>
+          )}
+        </div>
+      )}
+
       {showPosts ? (
         <div className={`flex flex-wrap justify-center items-center`}>
           {flashcardSets.map((flashcardSetId) => (

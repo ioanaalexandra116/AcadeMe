@@ -314,7 +314,10 @@ export async function getAllFlashcardSetsIds() {
   return flashcardSetsIds;
 }
 
-export async function getFlashcardSetsIdsByTitle(title: string, category: string) {
+export async function getFlashcardSetsIdsByTitle(
+  title: string,
+  category: string
+) {
   const words = title.toLowerCase().split(" ");
   const collectionRef = collection(db, "flashcardSets");
   let querySnapshot = await getDocs(collectionRef);
@@ -365,11 +368,18 @@ export async function UnfollowUser(uid: string, targetUid: string) {
   });
   await updateDoc(targetUserRef, {
     followers: arrayRemove(uid),
-    notifications: {
-      ...((await getDoc(targetUserRef)).data()?.notifications || {}),
-      [new Date().toISOString()]: `${uid} unfollowed you.`,
-    },
   });
+  const targetUserDoc = await getDoc(targetUserRef);
+  const notifications = targetUserDoc.data()?.notifications || {};
+  for (let key in notifications) {
+    if (notifications[key].includes(`${uid} started following you.`)) {
+      delete notifications[key];
+      await updateDoc(targetUserRef, {
+        notifications: notifications,
+      });
+      break;
+    }
+  }
   return "Unfollowed";
 }
 

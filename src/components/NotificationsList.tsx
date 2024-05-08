@@ -8,7 +8,7 @@ import {
   markAllNotificationsAsRead,
 } from "@/firebase/firestore";
 import { AuthContext } from "@/context";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import Loading from "./Loading";
 import Loader from "./Loader";
 import { Card } from "./ui/card";
@@ -27,7 +27,6 @@ export const NotificationsList = () => {
   const [usernames, setUsernames] = useState<string[]>([]);
   const [allRead, setAllRead] = useState(false);
   const location = useLocation();
-  const navigate = useNavigate();
 
   if (!user || userLoading) {
     return <Loading />;
@@ -137,8 +136,7 @@ export const NotificationsList = () => {
     try {
       setLoadingCursor(true);
       await markNotificationAsRead(user.uid, notification.timestamp);
-      setLoadingCursor(false);
-      navigate(`/profile?userId=${notification.id}`);
+      window.location.href = `/profile?userId=${notification.id}`;
     } catch (error) {
       console.error("Error marking notification as read:", error);
     }

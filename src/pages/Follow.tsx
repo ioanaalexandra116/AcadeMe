@@ -1,7 +1,8 @@
-import NotificationsList from "../components/NotificationsList";
-import Background from "@/assets/notif-background.svg";
+import FollowList from "@/components/FollowList";
 
-const Notifications = () => {
+import Background from "@/assets/follow-background.svg";
+
+const Follow = () => {
     const smallScreen = window.innerWidth < 780;
     return (
       <div style={{ position: "relative" }}>
@@ -31,11 +32,11 @@ const Notifications = () => {
           }}
         >
           <div className="pt-16">
-            <NotificationsList />
+            <FollowList />
           </div>
         </div>
       </div>
     );
   };
 
-export default Notifications;
+export default Follow;

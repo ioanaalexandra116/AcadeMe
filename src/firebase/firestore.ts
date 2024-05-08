@@ -401,6 +401,18 @@ export async function UnfollowUser(uid: string, targetUid: string) {
   return "Unfollowed";
 }
 
+export async function getFollowers(uid: string) {
+  const docRef = doc(db, "users", uid);
+  const docSnap = await getDoc(docRef);
+  return docSnap.data()?.followers || [];
+}
+
+export async function getFollowing(uid: string) {
+  const docRef = doc(db, "users", uid);
+  const docSnap = await getDoc(docRef);
+  return docSnap.data()?.following || [];
+}
+
 export async function getNotifications(uid: string) {
   const docRef = doc(db, "users", uid);
   const docSnap = await getDoc(docRef);

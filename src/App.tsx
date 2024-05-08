@@ -12,6 +12,7 @@ import Results from "./pages/Results";
 import EditProfile from "./pages/EditProfile";
 import SearchFlashcardSets from "./pages/SearchFlashcardSets";
 import Notifications from "./pages/Notifications";
+import Follow from "./pages/Follow";
 
 const router = createBrowserRouter([
   {
@@ -63,7 +64,15 @@ const router = createBrowserRouter([
           {
             path: "/notifications",
             element: <Notifications />,
-          }
+          },
+          {
+            path: "/followers",
+            element: <Follow />,
+          },
+          {
+            path: "/following",
+            element: <Follow />,
+          },
         ],
       },
     ],

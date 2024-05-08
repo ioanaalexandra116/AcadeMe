@@ -441,6 +441,16 @@ export async function markAllNotificationsAsRead(uid: string) {
   });
 }
 
+export async function getAllUsers() {
+  const collectionRef = collection(db, "users");
+  const querySnapshot = await getDocs(collectionRef);
+  const users = <UserData[]>[];
+  querySnapshot.forEach((doc) => {
+    users.push(doc.data() as UserData);
+  });
+  return users;
+}
+
 export async function addForeignLanguages() {
   const collectionRef = collection(db, "categories");
   const docRef = doc(collectionRef, "Foreign Languages");

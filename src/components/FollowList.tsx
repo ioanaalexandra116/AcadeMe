@@ -189,7 +189,7 @@ export const FollowList = () => {
                 {avatarsLoading ? (
                   <Loader />
                 ) : (
-                  <Avatar {...usersAvatarProps[index]} />
+                  <Avatar {...avatarProps} />
                 )}
                 <p className="text-lg font-bold">{usernames[index]}</p>
               </div>

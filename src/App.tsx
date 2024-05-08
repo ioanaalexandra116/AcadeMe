@@ -13,6 +13,7 @@ import EditProfile from "./pages/EditProfile";
 import SearchFlashcardSets from "./pages/SearchFlashcardSets";
 import Notifications from "./pages/Notifications";
 import Follow from "./pages/Follow";
+import SearchUserPage from "./pages/SearchUserPage";
 
 const router = createBrowserRouter([
   {
@@ -73,6 +74,10 @@ const router = createBrowserRouter([
             path: "/following",
             element: <Follow />,
           },
+          {
+            path: "/search/people",
+            element: <SearchUserPage />,
+          }
         ],
       },
     ],

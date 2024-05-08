@@ -318,7 +318,7 @@ export default function Navbar() {
                   }}
                   className="flex items-center justify-start mt-4 z-10"
                 >
-                  {exp && exp > 70 && (
+                  {exp > 70 && (
                     <Card
                       style={{
                         width: (exp / 1000) * 150 + "px",

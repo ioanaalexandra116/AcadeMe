@@ -24,6 +24,18 @@ import {
 
 export async function createUserCollection(user: User, username: string) {
   const docRef = doc(db, "users", user.uid);
+  const defaultCharacterProperties: AvatarProperties = {
+    gender: "man",
+    backgroundColor: "rgb(164,222,247)",
+    mouthColor: "rgb(224,134,114)",
+    eyeColor: "rgb(102,78,39)",
+    eyelidsColor: "rgb(12,10,9)",
+    hairColor: "rgb(89,70,64)",
+    skinColor: "rgb(255,225,189)",
+    noseColor: "rgb(230,183,150)",
+    dimensions: "175px",
+    bowColor: "transparent",
+  };
   const data = {
     id: user.uid,
     username: username,
@@ -35,6 +47,7 @@ export async function createUserCollection(user: User, username: string) {
     favorites: [],
     activity: {},
     notifications: {},
+    avatarProps: defaultCharacterProperties,
   };
   setDoc(docRef, data)
     .then()

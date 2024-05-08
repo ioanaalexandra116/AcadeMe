@@ -64,7 +64,7 @@ const EditProfile = () => {
     hairColor: "rgb(89,70,64)",
     skinColor: "rgb(255,225,189)",
     noseColor: "rgb(230,183,150)",
-    dimensions: "40px",
+    dimensions: "175px",
     bowColor: "transparent",
   };
   const [characterProperties, setCharacterProperties] =

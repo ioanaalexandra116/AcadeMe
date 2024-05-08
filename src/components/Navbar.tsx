@@ -23,7 +23,7 @@ import {
   getExp,
   getNotifications,
 } from "@/firebase/firestore";
-import { AvatarProperties } from "@/interfaces/interfaces";
+import { AvatarProperties, Notification } from "@/interfaces/interfaces";
 import { useState, useContext, useEffect } from "react";
 import Loading from "@/components/Loading";
 import { useLocation } from "react-router-dom";
@@ -65,13 +65,7 @@ export default function Navbar() {
   const smallScreen = window.innerWidth < 700;
   const [lower, setLower] = useState(0);
   const [levelHovered, setLevelHovered] = useState(false);
-  type notificationType = {
-    timestamp: string;
-    user: string;
-    message: string;
-    read: boolean;
-  };
-  const [notifications, setNotifications] = useState<notificationType[]>([]);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
 
   const handleLogOut = async () => {
     try {
@@ -107,7 +101,7 @@ export default function Navbar() {
     const fetchNotifications = async () => {
       try {
         const notificationsFirebase = await getNotifications(user.uid);
-        const updatedNotifications = [] as notificationType[];
+        const updatedNotifications = [] as Notification[];
   
         // Reset notifications array before fetching new data
         setNotifications([]);
@@ -125,7 +119,7 @@ export default function Navbar() {
             // Create a new notification object
             const newNotification = {
               timestamp,
-              user: notificationData[0],
+              id: notificationData[0],
               message: notificationData[1],
               read: notificationData[2] === "unread" ? false : true,
             };
@@ -150,7 +144,7 @@ export default function Navbar() {
     // Call fetchNotifications when user changes
     fetchNotifications();
   
-  }, [user]);
+  }, [user, location.pathname]);
 
   useEffect(() => {
     console.log("notifications updated: ", notifications);

@@ -27,7 +27,7 @@ export type AvatarProperties = {
   noseColor: string;
   bowColor?: string;
   dimensions: string;
-}
+};
 
 export type UserData = {
   id: string;
@@ -43,7 +43,6 @@ export type UserData = {
   notifications: { [key: string]: string[] };
 };
 
-
 export type FlashcardSet = {
   creator: string;
   title: string;
@@ -52,6 +51,13 @@ export type FlashcardSet = {
   category: string[];
   flashcards: { [key: string]: string };
   playCount: number;
+};
+
+export type Notification = {
+  timestamp: string;
+  id: string;
+  message: string;
+  read: boolean;
 };
 
 export type ErrorMessasge = string | null;

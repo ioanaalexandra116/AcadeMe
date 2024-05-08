@@ -133,6 +133,11 @@ export async function getAvatarProps(uid: string) {
   }
 }
 
+export async function changeDimensions(avatarProps: AvatarProperties, size: string) {
+  avatarProps.dimensions = size;
+  return avatarProps;
+}
+
 export async function getCategories() {
   const q = query(collection(db, "categories"));
   const querySnapshot = await getDocs(q);

@@ -407,6 +407,28 @@ export async function getNotifications(uid: string) {
   return docSnap.data()?.notifications || {};
 }
 
+export async function markNotificationAsRead(uid: string, timestamp: string) {
+  const docRef = doc(db, "users", uid);
+  const docSnap = await getDoc(docRef);
+  const notifications = docSnap.data()?.notifications || {};
+  notifications[timestamp][2] = "read";
+  await updateDoc(docRef, {
+    notifications: notifications,
+  });
+}
+
+export async function markAllNotificationsAsRead(uid: string) {
+  const docRef = doc(db, "users", uid);
+  const docSnap = await getDoc(docRef);
+  const notifications = docSnap.data()?.notifications || {};
+  for (let key in notifications) {
+    notifications[key][2] = "read";
+  }
+  await updateDoc(docRef, {
+    notifications: notifications,
+  });
+}
+
 export async function addForeignLanguages() {
   const collectionRef = collection(db, "categories");
   const docRef = doc(collectionRef, "Foreign Languages");

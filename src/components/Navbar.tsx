@@ -97,53 +97,63 @@ export default function Navbar() {
     if (!user) {
       return; // Exit early if user is not available
     }
-  
+
     const fetchNotifications = async () => {
       try {
         const notificationsFirebase = await getNotifications(user.uid);
         const updatedNotifications = [] as Notification[];
-  
+
         // Reset notifications array before fetching new data
-        setNotifications([]);
-  
+
         for (let key in notificationsFirebase) {
           const notificationData = notificationsFirebase[key];
           const timestamp = key;
-  
+
           // Check if notification already exists based on timestamp
-          const existingNotification = notifications.find(
-            (notif) => notif.timestamp === timestamp
-          );
-  
-          if (!existingNotification) {
+
+
             // Create a new notification object
             const newNotification = {
-              timestamp,
+              timestamp: key,
               id: notificationData[0],
               message: notificationData[1],
               read: notificationData[2] === "unread" ? false : true,
             };
-  
+
+            // remove existing notification if it exists
+
+              setNotifications((prevNotifications) =>
+                prevNotifications.filter(
+                  (notif) => notif.timestamp !== timestamp
+                )
+              );
+            
+
+
+
+
             updatedNotifications.push(newNotification);
-          }
+          
         }
-  
+
         // Update notifications state only once after processing all notifications
-        setNotifications((prevNotifications) => [
-          ...prevNotifications,
-          ...updatedNotifications,
-        ]);
-  
+        if (updatedNotifications.length > 0) {
+          setNotifications([]);
+          setNotifications((prevNotifications) => [
+            ...prevNotifications,
+            ...updatedNotifications,
+          ]);
+        }
+        console.log("notifications: ", notifications);
       } catch (error) {
         console.error("Error fetching notifications:", error);
       } finally {
         setLoading(false);
       }
     };
-  
+
     // Call fetchNotifications when user changes
     fetchNotifications();
-  
   }, [user, location.pathname]);
 
   useEffect(() => {
@@ -272,9 +282,16 @@ export default function Navbar() {
                 {smallScreen ? "" : "Notifications"}
               </div>
               {notifications.some((notif) => !notif.read) && (
-              <div style={{ position: "absolute", top: "10px", paddingLeft: "7px" }}>
-                <img src={Dot} alt="notifications" className="h-5 w-5" />
-              </div>)}
+                <div
+                  style={{
+                    position: "absolute",
+                    top: "10px",
+                    paddingLeft: "7px",
+                  }}
+                >
+                  <img src={Dot} alt="notifications" className="h-5 w-5" />
+                </div>
+              )}
             </Link>
           </NavigationMenuLink>
         </NavigationMenuItem>

@@ -122,7 +122,7 @@ const Profile = () => {
         <DotsBackground />
       </div>
       <Card
-        className="relative flex justify-center items-center border border-black"
+        className="relative flex justify-center items-center border border-black mt-4"
         style={{ backgroundColor: "#fff", height: "240px", maxWidth: "480px" }}
         cardWidth={460}
       >
@@ -267,62 +267,73 @@ const Profile = () => {
         <div className={`flex flex-wrap justify-center items-center`}>
           {flashcardSets.length === 0 ? (
             <div className="flex flex-col items-center justify-center space-y-8">
-            <h1
-              className="text-4xl font-bold text-black contoured-text"
-              style={{
-                color: "#f987af",
-                textShadow: `-0.5px -0.5px 0 #000, 2px -0.5px 0 #000, -0.5px 1px 0 #000, 2px 1px 0 #000`,
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                paddingTop: "130px",
-              }}
-            >
-              No flashcard sets yet
-            </h1>
-            <Button style={{
-              backgroundColor: "#f987af",
-              cursor: "pointer",
-              position: "relative",
-            }}
-            onClick={() => navigate("/create")}
-            >Create your first one</Button>
+              <h1
+                className="text-4xl font-bold text-black contoured-text"
+                style={{
+                  color: "#f987af",
+                  textShadow: `-0.5px -0.5px 0 #000, 2px -0.5px 0 #000, -0.5px 1px 0 #000, 2px 1px 0 #000`,
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  paddingTop: "130px",
+                }}
+              >
+                No flashcard sets yet
+              </h1>
+              {userId === user.uid && (
+                <Button
+                  style={{
+                    backgroundColor: "#f987af",
+                    cursor: "pointer",
+                    position: "relative",
+                  }}
+                  onClick={() => navigate("/create")}
+                >
+                  Create your first one
+                </Button>
+              )}
             </div>
           ) : (
-          flashcardSets.map((flashcardSetId) => (
-            <div key={flashcardSetId} className="p-8 flex justify-center">
-              <Post flashcardSetId={flashcardSetId} />
-            </div>
-          )))}
+            flashcardSets.map((flashcardSetId) => (
+              <div key={flashcardSetId} className="p-6 flex justify-center">
+                <Post flashcardSetId={flashcardSetId} />
+              </div>
+            ))
+          )}
         </div>
       ) : (
         <div className={`flex flex-wrap justify-center items-center`}>
           {favorites.length === 0 ? (
             <div className="flex flex-col items-center justify-center space-y-8">
-            <h1
-              className="text-4xl font-bold text-black contoured-text"
-              style={{
-                color: "#f987af",
-                textShadow: `-0.5px -0.5px 0 #000, 2px -0.5px 0 #000, -0.5px 1px 0 #000, 2px 1px 0 #000`,
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                paddingTop: "130px",
-              }}
-            >
-              No favorite flashcard sets yet
-            </h1>
-            <Button style={{
-              backgroundColor: "#f987af",
-              cursor: "pointer",
-              position: "relative",
-            }}
-            onClick={() => navigate("/search/flashcards")}
-            >Search for some</Button>
-          </div>
+              <h1
+                className="text-4xl font-bold text-black contoured-text"
+                style={{
+                  color: "#f987af",
+                  textShadow: `-0.5px -0.5px 0 #000, 2px -0.5px 0 #000, -0.5px 1px 0 #000, 2px 1px 0 #000`,
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  paddingTop: "130px",
+                }}
+              >
+                No favorite flashcard sets yet
+              </h1>
+              {userId === user.uid && (
+                <Button
+                  style={{
+                    backgroundColor: "#f987af",
+                    cursor: "pointer",
+                    position: "relative",
+                  }}
+                  onClick={() => navigate("/search/flashcards")}
+                >
+                  Search for some
+                </Button>
+              )}
+            </div>
           ) : (
             favorites.map((flashcardSetId) => (
-              <div key={flashcardSetId} className="p-8 flex justify-center">
+              <div key={flashcardSetId} className="p-6 flex justify-center">
                 <Post flashcardSetId={flashcardSetId} />
               </div>
             ))

@@ -45,6 +45,7 @@ export async function createUserCollection(user: User, username: string) {
     following: [],
     posts: [],
     favorites: [],
+    feed: [],
     activity: {},
     notifications: {},
     avatarProps: defaultCharacterProperties,
@@ -133,7 +134,10 @@ export async function getAvatarProps(uid: string) {
   }
 }
 
-export async function changeDimensions(avatarProps: AvatarProperties, size: string) {
+export async function changeDimensions(
+  avatarProps: AvatarProperties,
+  size: string
+) {
   avatarProps.dimensions = size;
   return avatarProps;
 }
@@ -368,6 +372,12 @@ export async function FollowUser(uid: string, targetUid: string) {
   await updateDoc(userRef, {
     following: arrayUnion(targetUid),
   });
+  // update uid feed with targets posts
+  const targetUserDoc = await getDoc(targetUserRef);
+  const targetPosts = targetUserDoc.data()?.posts || [];
+  await updateDoc(userRef, {
+    feed: arrayUnion(...targetPosts),
+  });
   await updateDoc(targetUserRef, {
     followers: arrayUnion(uid),
     notifications: {
@@ -390,7 +400,10 @@ export async function UnfollowUser(uid: string, targetUid: string) {
   const targetUserDoc = await getDoc(targetUserRef);
   const notifications = targetUserDoc.data()?.notifications || {};
   for (let key in notifications) {
-    if (notifications[key].includes(`${uid}`) && notifications[key].includes("started following you")) {
+    if (
+      notifications[key].includes(`${uid}`) &&
+      notifications[key].includes("started following you")
+    ) {
       delete notifications[key];
       await updateDoc(targetUserRef, {
         notifications: notifications,

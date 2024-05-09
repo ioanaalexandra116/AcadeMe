@@ -175,6 +175,19 @@ export const FollowList = () => {
       </h1>
       {loading ? (
         <Loading />
+      ) : usersAvatarProps.length === 0 ? (
+        <h1
+          className="text-4xl font-bold text-black mt-48 mb-10 contoured-text"
+          style={{
+            color: "#f987af",
+            textShadow: `-0.5px -0.5px 0 #000, 2px -0.5px 0 #000, -0.5px 1px 0 #000, 2px 1px 0 #000`,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          No users to display
+        </h1>
       ) : (
         <Card>
           {usersAvatarProps.map((avatarProps, index) => (
@@ -186,21 +199,19 @@ export const FollowList = () => {
                 className="flex flex-row items-center w-full cursor-pointer space-x-4"
                 onClick={() => navigate(`/profile?userId=${followList[index]}`)}
               >
-                {avatarsLoading ? (
-                  <Loader />
-                ) : (
-                  <Avatar {...avatarProps} />
-                )}
-                <p className="text-lg font-bold">{usernames[index]}</p>
+                {avatarsLoading ? <Loader /> : <Avatar {...avatarProps} />}
+                <p>{usernames[index]}</p>
               </div>
               {user.uid !== followList[index] && (
                 <Button
-                style={{
-                    backgroundColor: userFollowingStates[index] ? "#CBCDCA" : "#F987AF",
+                  style={{
+                    backgroundColor: userFollowingStates[index]
+                      ? "#CBCDCA"
+                      : "#F987AF",
                     color: "#FFFFFF",
                     width: "120px",
                     cursor: loadingCursor ? "wait" : "pointer",
-                }}
+                  }}
                   onClick={() =>
                     userFollowingStates[index]
                       ? pressUnfollowUser(followList[index])

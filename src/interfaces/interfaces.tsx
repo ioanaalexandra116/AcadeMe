@@ -39,6 +39,7 @@ export type UserData = {
   following: string[];
   posts: string[];
   favorites: string[];
+  feed: string[];
   activity: { [key: string]: number[] };
   notifications: { [key: string]: string[] };
 };

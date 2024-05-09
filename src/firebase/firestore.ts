@@ -372,7 +372,6 @@ export async function FollowUser(uid: string, targetUid: string) {
   await updateDoc(userRef, {
     following: arrayUnion(targetUid),
   });
-  // update uid feed with targets posts
   const targetUserDoc = await getDoc(targetUserRef);
   const targetPosts = targetUserDoc.data()?.posts || [];
   await updateDoc(userRef, {
@@ -462,6 +461,13 @@ export async function getAllUsers() {
     users.push(doc.data() as UserData);
   });
   return users;
+}
+
+export async function getFeedPostsIds(uid: string) {
+  const docRef = doc(db, "users", uid);
+  const docSnap = await getDoc(docRef);
+  const feed = docSnap.data()?.feed || [];
+  return feed;
 }
 
 export async function addForeignLanguages() {

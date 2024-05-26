@@ -181,6 +181,13 @@ export async function createFlashcardSet(
   await updateDoc(userRef, {
     posts: arrayUnion(SetId),
   });
+  const followers = await getFollowers(uid);
+  followers.forEach(async (follower: string) => {
+    const followerRef = doc(db, "users", follower);
+    await updateDoc(followerRef, {
+      feed: arrayUnion(SetId),
+    });
+  });
   return SetId;
 }
 

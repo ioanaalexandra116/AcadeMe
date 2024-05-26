@@ -81,7 +81,7 @@ const Create = () => {
   const [description, setDescription] = useState("");
   const [next, setNext] = useState(false);
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [imageUpload, setImageUpload] = useState<File | null>(null);
   const [currentPhoto, setCurrentPhoto] = useState("");
   const [photoLoading, setPhotoLoading] = useState(false);
@@ -113,7 +113,6 @@ const Create = () => {
     const fetchCategories = async () => {
       const data = await getCategories();
       setCategories(data);
-      setLoading(false);
     };
     fetchCategories();
   }, [user]);
@@ -296,6 +295,7 @@ const Create = () => {
       setErr("Flashcard front side must be unique");
       return;
     }
+    setLoading(true);
     const flashcardSet: FlashcardSet = {
       creator: user.uid,
       title,
@@ -317,6 +317,7 @@ const Create = () => {
     if (response) {
       navigate(`/profile?userId=${user.uid}`);
     }
+    setLoading(false);
   };
 
   const getSpaceXClass = () => {
@@ -327,7 +328,9 @@ const Create = () => {
     }
   };
 
-  return (
+  return loading ? (
+    <Loading />
+  ) : (
     <div className="flex flex-col relative">
       <div className="absolute inset-0 z-0">
         <BubbleBackground contentHeight={contentHeight} />
@@ -351,7 +354,7 @@ const Create = () => {
       )}
       <div className="relative z-10 flex flex-col items-center justify-center space-y-5">
         <h1
-          className="text-4xl font-bold text-black mt-20 mb-5 contoured-text"
+          className="text-4xl font-bold text-black mt-20 mb-4 contoured-text"
           style={{
             color: "#f987af",
             textShadow: `-0.5px -0.5px 0 #000, 2px -0.5px 0 #000, -0.5px 1px 0 #000, 2px 1px 0 #000`,
@@ -538,22 +541,39 @@ const Create = () => {
                 </div>
                 <div className="flex flex-col space-y-1">
                   <h1 className="text-muted-foreground">Description</h1>
-                  <Textarea
-                    placeholder="Enter a short description"
-                    className="w-[300px] rounded-xl h-[80px]"
-                    style={{
-                      border: "1px solid #000",
-                      backgroundColor: "#fff",
-                      resize: "none"
-                    }}
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                  />
+                  <div
+                    style={{ position: "relative", display: "inline-block" }}
+                  >
+                    <Textarea
+                      placeholder="Enter a short description"
+                      className="w-[300px] rounded-xl h-[100px]"
+                      style={{
+                        border: "1px solid #000",
+                        backgroundColor: "#fff",
+                        resize: "none",
+                        boxSizing: "border-box",
+                      }}
+                      maxLength={120}
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value)}
+                    />
+                    <div
+                      style={{
+                        position: "absolute",
+                        bottom: "0px",
+                        right: "5px",
+                        fontSize: "12px",
+                        color: "#888",
+                      }}
+                    >
+                      {description.length}/120
+                    </div>
+                  </div>
                 </div>
               </CardContent>
-              <div className="flex flex-row items-center justify-end space-x-7 mr-10 mb-7">
+              <div className="flex flex-row items-center justify-end mr-5 mb-5">
                 <Button
-                  className="w-24 h-11 rounded-full"
+                  className="w-24 h-10 rounded-full"
                   style={{ backgroundColor: "#f987af" }}
                   onClick={handleNext}
                 >

@@ -171,7 +171,7 @@ export const NotificationsList = () => {
       {loading ? (
         <Loading />
       ) : (
-        <div className="flex flex-col items-center justify-between space-y-4 pb-4">
+        <div className="flex flex-col items-center justify-start space-y-4 pb-4">
           {notifications.map((notification, index) => (
             <Card
               key={notification.timestamp}
@@ -180,13 +180,13 @@ export const NotificationsList = () => {
                 width: "400px",
                 paddingTop: "12px",
                 paddingBottom: "12px",
-                paddingLeft: "70px",
-                paddingRight: "70px",
+                paddingLeft: "20px",
+                paddingRight: "0px",
                 cursor: "pointer",
               }}
               onClick={pressFollowNotification.bind(this, notification)}
             >
-              <div className="flex flex-row items-center justify-between">
+              <div className="flex flex-row items-center justify-start">
                 {usersAvatarProps &&
                   usernames &&
                   usersAvatarProps[index] &&
@@ -197,7 +197,7 @@ export const NotificationsList = () => {
                       ) : (
                         <Avatar {...usersAvatarProps[index]} />
                       )}
-                      <p className="contoured-text font-bold"
+                      <p className="contoured-text font-bold pr-2"
                       style={{
                         color: "#E09BAC"
                       }}>

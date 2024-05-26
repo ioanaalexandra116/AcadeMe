@@ -7,6 +7,7 @@ import {
 } from "@/firebase/firestore";
 import { useEffect, useState } from "react";
 import arrwRight from "@/assets/arrow-right.svg";
+import xRemove from "@/assets/x-remove.svg";
 import Menu from "@/assets/menu.svg";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
@@ -226,7 +227,7 @@ export const SearchFlashcards = () => {
       const fetchAllFlashcardSets = async () => {
         try {
           const fetchedFlashcardSets = await getAllFlashcardSetsIds();
-          setFlashcardSets(fetchedFlashcardSets);
+          setFlashcardSets(fetchedFlashcardSets.reverse());
           setLoading(false);
         } catch (error) {
           console.error("Error fetching flashcard sets:", error);
@@ -241,7 +242,7 @@ export const SearchFlashcards = () => {
         const fetchedFlashcardSets = await getFlashcardSetsIdsByCategory(
           chosenCategory
         );
-        setFlashcardSets(fetchedFlashcardSets);
+        setFlashcardSets(fetchedFlashcardSets.reverse());
         setLoading(false);
       } catch (error) {
         console.error("Error fetching flashcard sets:", error);
@@ -288,19 +289,19 @@ export const SearchFlashcards = () => {
       if (!searchInTitle) {
         if (!chosenCategory) {
           const fetchedFlashcardSets = await getAllFlashcardSetsIds();
-          setFlashcardSets(fetchedFlashcardSets);
+          setFlashcardSets(fetchedFlashcardSets.reverse());
         } else {
           const fetchedFlashcardSets = await getFlashcardSetsIdsByCategory(
             chosenCategory
           );
-          setFlashcardSets(fetchedFlashcardSets);
+          setFlashcardSets(fetchedFlashcardSets.reverse());
         }
       } else {
         const fetchedFlashcardSets = await getFlashcardSetsIdsByTitle(
           searchInTitle,
           chosenCategory ? chosenCategory : ""
         );
-        setFlashcardSets(fetchedFlashcardSets);
+        setFlashcardSets(fetchedFlashcardSets.reverse());
       }
     } catch (error) {
       console.error("Error fetching flashcard sets:", error);
@@ -313,7 +314,7 @@ export const SearchFlashcards = () => {
     const fetchAllFlashcardSets = async () => {
       try {
         const fetchedFlashcardSets = await getAllFlashcardSetsIds();
-        setFlashcardSets(fetchedFlashcardSets);
+        setFlashcardSets(fetchedFlashcardSets.reverse());
         console.log(fetchedFlashcardSets);
       } catch (error) {
         console.error("Error fetching flashcard sets:", error);
@@ -322,8 +323,9 @@ export const SearchFlashcards = () => {
     fetchAllFlashcardSets();
   };
 
-  return (
-    loading ? <Loading /> :
+  return loading ? (
+    <Loading />
+  ) : (
     <div
       className="flex flex-col screen-height screen-width"
       style={{
@@ -620,18 +622,38 @@ export const SearchFlashcards = () => {
           }}
         >
           <div className="flex justify-center items-center flex-row m-auto space-x-4 pt-4 pb-4">
-            <Input
-              placeholder="Search flashcard set by title"
-              type="text"
-              id="search"
-              value={searchInTitle}
-              onChange={(e) => setSearchInTitle(e.target.value)}
-              style={{
-                width: "320px",
-                backgroundColor: "#FFFFFF",
-                border: "0.5px solid gray",
-              }}
-            />
+            <div style={{ position: "relative", display: "inline-block" }}>
+              <Input
+                placeholder="Search flashcard set by title"
+                type="text"
+                id="search"
+                value={searchInTitle}
+                onChange={(e) => setSearchInTitle(e.target.value)}
+                style={{
+                  width: "320px",
+                  backgroundColor: "#FFFFFF",
+                  border: "0.5px solid #AA7D8C",
+                  paddingRight: "30px",
+                }}
+              />
+              <img
+                src={xRemove}
+                alt="remove"
+                style={{
+                  width: "20px",
+                  height: "20px",
+                  cursor: "pointer",
+                  position: "absolute",
+                  right: "10px",
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                }}
+                onClick={() => {
+                  setSearchInTitle("");
+                  HandleRemoveFilter();
+                }}
+              />
+            </div>
             <Button
               style={{
                 backgroundColor: "#F987AF",

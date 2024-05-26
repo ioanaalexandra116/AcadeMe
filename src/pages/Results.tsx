@@ -176,7 +176,8 @@ const Results = () => {
                     }}
                   />
                 )}
-                <Link to={`/search?category=${category}`} className="relative">
+                <Link to={`/search/flashcards?categories=${flashcardSet?.category}&selected=${category}`}
+                className="relative">
                   {category}
                 </Link>
               </span>

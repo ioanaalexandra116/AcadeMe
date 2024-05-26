@@ -68,7 +68,7 @@ const Profile = () => {
         if (userData) {
           userData.avatarProps.dimensions = "175px";
           setCharacterProperties(userData.avatarProps);
-          setFlashcardSets(userData.posts);
+          setFlashcardSets(userData.posts.reverse());
           setFavorites(userData.favorites);
           setUsername(userData.username);
           setDescription(userData.description);
@@ -295,7 +295,7 @@ const Profile = () => {
             </div>
           ) : (
             flashcardSets.map((flashcardSetId) => (
-              <div key={flashcardSetId} className="p-6 flex justify-center">
+              <div key={flashcardSetId} className="flex justify-center">
                 <Post flashcardSetId={flashcardSetId} />
               </div>
             ))

@@ -145,8 +145,7 @@ const EditProfile = () => {
 
   useEffect(() => {
     setFullWidth(window.innerWidth > 700);
-  }
-  , [fullWidth, editAvatarComp]);
+  }, [fullWidth, editAvatarComp]);
 
   return (
     <div
@@ -158,7 +157,7 @@ const EditProfile = () => {
       }}
     >
       {!editAvatarComp ? (
-        <AnimatedFirst className="flex flex-col items-center justify-center h-screen pt-16">
+        <AnimatedFirst className="flex flex-col items-center justify-center h-screen pt-12">
           <h1
             className="text-4xl font-bold text-black contoured-text z-10 mt-10"
             style={{
@@ -197,17 +196,31 @@ const EditProfile = () => {
             </div>
             <div className="flex flex-col space-y-1 relative bottom-8">
               <h1 className="text-muted-foreground">Description</h1>
-              <Textarea
-                placeholder="Enter a short description for your profile"
-                className="w-[300px] rounded-xl h-[60px]"
-                style={{
-                  border: "1px solid #000",
-                  backgroundColor: "#fff",
-                  resize: "none",
-                }}
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-              />
+              <div style={{ position: "relative", display: "inline-block" }}>
+                <Textarea
+                  placeholder="Enter a short description for your profile"
+                  className="w-[300px] rounded-xl h-[80px]"
+                  style={{
+                    border: "1px solid #000",
+                    backgroundColor: "#fff",
+                    resize: "none",
+                  }}
+                  maxLength={70}
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                />
+                <div
+                  style={{
+                    position: "absolute",
+                    bottom: "0px",
+                    right: "5px",
+                    fontSize: "12px",
+                    color: "#888",
+                  }}
+                >
+                  {description.length}/70
+                </div>
+              </div>
             </div>
             <div className="flex flex-row space-x-5 relative">
               <Button
@@ -263,26 +276,26 @@ const EditProfile = () => {
         </AnimatedNext>
       ) : (
         //-----------------------------edit-avatar-phone--------------------------
-          <AnimatedNext
-            style={cardStyles}
-            className="flex flex-col items-center justify-center space-y-8"
+        <AnimatedNext
+          style={cardStyles}
+          className="flex flex-col items-center justify-center space-y-8"
+        >
+          <div className="bg-transparent rounded-full shadow-2xl">
+            <Avatar {...characterProperties} />
+          </div>
+          <CustomAvatarTabs
+            onCharacterPropertiesChange={handleCharacterProperties}
+            recievedCharacterProperties={characterProperties}
+          />
+          <Button
+            style={{
+              backgroundColor: "#F987AF",
+              boxShadow: "0px 8px 14px rgba(0, 0, 0, 0.2)",
+            }}
+            onClick={handleBack}
           >
-            <div className="bg-transparent rounded-full shadow-2xl">
-              <Avatar {...characterProperties} />
-            </div>
-            <CustomAvatarTabs
-              onCharacterPropertiesChange={handleCharacterProperties}
-              recievedCharacterProperties={characterProperties}
-            />
-            <Button
-              style={{
-                backgroundColor: "#F987AF",
-                boxShadow: "0px 8px 14px rgba(0, 0, 0, 0.2)",
-              }}
-              onClick={handleBack}
-            >
-              Back to Edit Profile
-            </Button>
+            Back to Edit Profile
+          </Button>
         </AnimatedNext>
       )}
     </div>

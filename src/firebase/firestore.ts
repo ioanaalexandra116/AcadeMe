@@ -397,6 +397,10 @@ export async function UnfollowUser(uid: string, targetUid: string) {
     followers: arrayRemove(uid),
   });
   const targetUserDoc = await getDoc(targetUserRef);
+  const targetPosts = targetUserDoc.data()?.posts || [];
+  await updateDoc(userRef, {
+    feed: arrayRemove(...targetPosts),
+  });
   const notifications = targetUserDoc.data()?.notifications || {};
   for (let key in notifications) {
     if (

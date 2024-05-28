@@ -24,7 +24,7 @@ import MoreIcon from "../assets/more-icon.svg";
 import DeletePost from "../assets/delete-post.svg";
 import EditPost from "../assets/edit-post.svg";
 import Avatar from "./Avatar";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import {
   DropdownMenu,
   DropdownMenuContent,

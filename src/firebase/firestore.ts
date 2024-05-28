@@ -495,6 +495,17 @@ export async function getMostPlayedSetId() {
   return mostPlayedSetId;
 }
 
+export async function getUserRanking() {
+  const collectionRef = collection(db, "users");
+  const querySnapshot = await getDocs(collectionRef);
+  let users = <UserData[]>[];
+  querySnapshot.forEach((doc) => {
+    users.push(doc.data() as UserData);
+  });
+  users.sort((a, b) => b.exp - a.exp);
+  return users as UserData[];
+}
+
 export async function addForeignLanguages() {
   const collectionRef = collection(db, "categories");
   const docRef = doc(collectionRef, "Foreign Languages");

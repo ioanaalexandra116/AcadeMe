@@ -481,6 +481,20 @@ export async function getFeedPostsIds(uid: string) {
   return feed;
 }
 
+export async function getMostPlayedSetId() {
+  const collectionRef = collection(db, "flashcardSets");
+  const querySnapshot = await getDocs(collectionRef);
+  let maxPlayCount = 0;
+  let mostPlayedSetId = "";
+  querySnapshot.forEach((doc) => {
+    if (doc.data().playCount > maxPlayCount) {
+      maxPlayCount = doc.data().playCount;
+      mostPlayedSetId = doc.id;
+    }
+  });
+  return mostPlayedSetId;
+}
+
 export async function addForeignLanguages() {
   const collectionRef = collection(db, "categories");
   const docRef = doc(collectionRef, "Foreign Languages");

@@ -1,22 +1,22 @@
 import { useEffect, useState, useRef } from "react";
 import Autoplay from "embla-carousel-autoplay";
 import GirlTitle from "../assets/main-logo.svg";
-import { FlashcardSet, AvatarProperties, UserData } from "@/interfaces";
+import { FlashcardSet, UserData } from "@/interfaces";
 import {
   getMostPlayedSetId,
   getFlashcardSet,
   getUsername,
-  getAvatarProps,
   getUserRanking,
 } from "@/firebase/firestore";
 import Loading from "./Loading";
 import MostPopular from "@/assets/most-popular.svg";
 import AdvanceCateg from "@/assets/advance-categ.svg";
 import FancyButton from "./FancyButton";
+import GoldenButtonComponent from "./GoldenButton";
 import { useNavigate } from "react-router-dom";
 import PlayPreview from "@/assets/play-preview.svg";
-import SecondCardBackground from "@/assets/carousel-background-2.jpg";
 import Podium from "@/assets/podium.svg";
+import CarouselTitleTop from "@/assets/carousel-title-top.svg";
 import Avatar from "./Avatar";
 
 import { Card, CardContent } from "@/components/ui/card";
@@ -34,9 +34,12 @@ export function CarouselPlugin() {
   const [loading, setLoading] = useState(true);
   const [username, setUsername] = useState<string>("");
   const [topUsers, setTopUsers] = useState<UserData[]>([]);
+  const [firstHovered, setFirstHovered] = useState(false);
+  const [secondHovered, setSecondHovered] = useState(false);
+  const [thirdHovered, setThirdHovered] = useState(false);
   const navigate = useNavigate();
 
-  const plugin = useRef(Autoplay({ delay: 3000, stopOnInteraction: true }));
+  const plugin = useRef(Autoplay({ delay: 2500, stopOnInteraction: true }));
 
   useEffect(() => {
     const fetchMostPlayedSet = async () => {
@@ -59,7 +62,7 @@ export function CarouselPlugin() {
           let avatarProps = ranking[i].avatarProps;
           avatarProps = {
             ...avatarProps,
-            dimensions: "80px",
+            dimensions: "60px",
           };
           ranking[i].avatarProps = avatarProps;
         }
@@ -85,11 +88,18 @@ export function CarouselPlugin() {
 
     if (flashcardSet) {
       fetchUsername();
-      setLoading(false);
     }
   }, [flashcardSet]);
 
+  useEffect(() => {
+    if (flashcardSet && username && topUsers.length > 0) {
+      setLoading(false);
+    }
+  }
+  , [flashcardSet, username, topUsers]);
+
   return (
+    loading ? <Loading /> :
     <Carousel
       plugins={[plugin.current]}
       className="w-full max-w-4xl flex items-center justify-center"
@@ -99,7 +109,8 @@ export function CarouselPlugin() {
       <CarouselPrevious />
       <CarouselContent>
         <CarouselItem key={"logo"}>
-          <div className="p-0.5">
+        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-yellow-100 via-white to-pink-100 z-0"></div>
+          <div className="p-0.5 z-10">
             <Card style={{ width: 880, height: 400 }}>
               <CardContent className="flex items-center justify-center h-full">
                 <img
@@ -107,6 +118,7 @@ export function CarouselPlugin() {
                   style={{
                     width: "400px",
                     height: "400px",
+                    zIndex: 10,
                   }}
                 />
               </CardContent>
@@ -116,34 +128,152 @@ export function CarouselPlugin() {
 
         <CarouselItem key={"podium"}>
           <div className="p-0.5">
-          <Card style={{ width: 880, height: 400, overflow: "hidden" }}>
-      <CardContent className="flex relative">
-        {/* Second place (left) */}
-        <div className="absolute" style={{ top: 100, left: 220, zIndex: 10 }}>
-          <Avatar {...topUsers[1]?.avatarProps}/>
-        </div>
-        {/* First place (center) */}
-        <div className="absolute" style={{ top: 10, left: 395, zIndex: 10 }}>
-          <Avatar {...topUsers[0]?.avatarProps}/>
-        </div>
-        {/* Third place (right) */}
-        <div className="absolute" style={{ top: 170, left: 580, zIndex: 10 }}>
-          <Avatar {...topUsers[2]?.avatarProps}/>
-        </div>
-        {/* Podium Image */}
-        <img
-          src={Podium}
-          alt="Podium"
-          style={{
-            position: "relative",
-            width: "520px",
-            height: "410px",
-            top: "30px",
-            left: "145px",
-          }}
-        />
-      </CardContent>
-    </Card>
+            <Card style={{ width: 880, height: 400, overflow: "hidden" }}>
+              <CardContent className="flex relative">
+                <div
+                  className="relative top-44 flex flex-col space-y-4 items-center z-20"
+                  style={{ position: "relative", left: "400px" }}
+                >
+                  <h1
+                    className="relative text-3xl font-bold text-black contoured-text z-20"
+                    style={{
+                      background:
+                        "linear-gradient(90deg, #9B7960, #F987AF, #F2D755)",
+                      WebkitBackgroundClip: "text",
+                      WebkitTextFillColor: "transparent",
+                      width: "400px",
+                    }}
+                  >
+                    Will you make it to the top?
+                  </h1>
+                  <GoldenButtonComponent />
+                </div>
+                <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-yellow-100 via-red-100 to-yellow-100"></div>
+                <img
+                  src={CarouselTitleTop}
+                  alt="Carousel Title"
+                  style={{
+                    width: "800px",
+                    height: "80px",
+                    right: "296px",
+                    top: "10px",
+                    position: "relative",
+                    objectFit: "contain",
+                  }}
+                />
+                <img
+                  src={Podium}
+                  alt="Podium"
+                  style={{
+                    position: "relative",
+                    width: "320px",
+                    height: "410px",
+                    top: "100px",
+                    right: "968px",
+                  }}
+                />
+
+                <div className="flex flex-row items-center justify-center">
+                  <div className="flex flex-col items-center justify-center w-full h-full">
+                    {/* Second place (left) */}
+                    <div className="flex flex-col items-center justify-center">
+                      <div
+                        className="absolute cursor-pointer bg-transparent rounded-full"
+                        style={{ top: 205, left: 80, zIndex: 10, boxShadow:
+                          "0 4px 8px rgba(0, 0, 0, 0.1), 0 6px 20px rgba(0, 0, 0, 0.1)" }}
+                        onClick={() =>
+                          navigate(`/profile?userId=${topUsers[1]?.id}`)
+                        }
+                        onMouseEnter={() => setSecondHovered(true)}
+                        onMouseLeave={() => setSecondHovered(false)}
+                      >
+                        <Avatar {...topUsers[1]?.avatarProps} />
+                      </div>
+                      {secondHovered && (
+                        <div
+                          className="absolute"
+                          style={{ top: 185, left: 110, zIndex: 10 }}
+                        >
+                          <p className="text-xs text-black z-10">
+                            {topUsers[1]?.username}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                    {/* First place (center) */}
+                    <div className="flex flex-col items-center justify-center">
+                      <div
+                        className="absolute cursor-pointer bg-transparent rounded-full"
+                        style={{ top: 150, left: 190, zIndex: 10, boxShadow:
+                          "0 4px 8px rgba(0, 0, 0, 0.1), 0 6px 20px rgba(0, 0, 0, 0.1)" }}
+                        onClick={() =>
+                          navigate(`/profile?userId=${topUsers[0]?.id}`)
+                        }
+                        onMouseEnter={() => setFirstHovered(true)}
+                        onMouseLeave={() => setFirstHovered(false)}
+                      >
+                        <Avatar {...topUsers[0]?.avatarProps} />
+                      </div>
+                      {firstHovered && (
+                        <div
+                          className="absolute"
+                          style={{ top: 130, left: 220, zIndex: 10 }}
+                        >
+                          <p className="text-xs text-black z-10">
+                            {topUsers[0]?.username}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                    {/* Third place (right) */}
+                    <div className="flex flex-col items-center justify-center">
+                      <div
+                        className="absolute cursor-pointer bg-transparent rounded-full"
+                        style={{
+                          top: 250,
+                          left: 300,
+                          zIndex: 10,
+                          boxShadow:
+                            "0 4px 8px rgba(0, 0, 0, 0.1), 0 6px 20px rgba(0, 0, 0, 0.1)",
+                        }}
+                        onClick={() =>
+                          navigate(`/profile?userId=${topUsers[2]?.id}`)
+                        }
+                        onMouseEnter={() => setThirdHovered(true)}
+                        onMouseLeave={() => setThirdHovered(false)}
+                      >
+                        <Avatar {...topUsers[2]?.avatarProps} />
+                      </div>
+                      {thirdHovered && (
+                        <div
+                          className="absolute"
+                          style={{ top: 230, left: 330, zIndex: 10 }}
+                        >
+                          <p className="text-xs text-black z-10">
+                            {topUsers[2]?.username}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                    {/* Podium Image */}
+                  </div>
+                  <div className="relative bottom-5 w-full flex flex-col space-y-4 items-center z-20">
+                    <h1
+                      className="text-3xl font-bold text-black contoured-text z-20"
+                      style={{
+                        background:
+                          "linear-gradient(90deg, #9B7960, #F987AF, #F2D755)",
+                        WebkitBackgroundClip: "text",
+                        WebkitTextFillColor: "transparent",
+                      }}
+                    >
+                      Will you make it to the top?
+                    </h1>
+                    <GoldenButtonComponent />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </CarouselItem>
 
@@ -153,12 +283,12 @@ export function CarouselPlugin() {
               style={{
                 width: 880,
                 height: 400,
-                backgroundImage: `url(${SecondCardBackground})`,
               }}
             >
-              <CardContent className="h-full w-full flex-col items-center justify-center">
+              <CardContent className="relative h-full w-full flex-col items-center justify-center">
+              <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-pink-100 via-yellow-100 to-sky-100 z-0"></div>
                 <img
-                  className="text-4xl font-bold text-black contoured-text flex justify-center z-10"
+                  className="relative text-4xl font-bold text-black contoured-text flex justify-center z-10"
                   src={MostPopular}
                   style={{ width: "800px", height: "105px" }}
                 />
@@ -264,6 +394,7 @@ export function CarouselPlugin() {
                     />
                   </div>
                 </div>
+                
               </CardContent>
             </Card>
           </div>

@@ -9,6 +9,7 @@ import { CarouselPlugin } from "@/components/HomeCarousel";
 const Home = () => {
   const [feed, setFeed] = useState<string[]>([]);
   const { user, userLoading } = useContext(AuthContext);
+  const [loading, setLoading] = useState(true);
 
   if (!user || userLoading) {
     return <Loading />;
@@ -19,6 +20,7 @@ const Home = () => {
       try {
         const feed = await getFeedPostsIds(user.uid);
         setFeed(feed.reverse());
+        setLoading(false);
       } catch (error) {
         console.error("Error fetching feed:", error);
       }
@@ -28,6 +30,7 @@ const Home = () => {
   }, []);
 
   return (
+    loading ? <Loading /> :
     <div style={{ position: "relative"}}>
       <div
         style={{

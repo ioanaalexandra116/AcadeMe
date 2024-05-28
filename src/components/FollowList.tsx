@@ -17,7 +17,8 @@ import Avatar from "./Avatar";
 import { Button } from "./ui/button";
 
 export const FollowList = () => {
-  const [followList, setFollowList] = useState<string[]>([]);
+  // initialize with null
+  const [followList, setFollowList] = useState<string[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [loadingCursor, setLoadingCursor] = useState(false);
   const [avatarsLoading, setAvatarsLoading] = useState(true);
@@ -60,7 +61,6 @@ export const FollowList = () => {
           const following = await getFollowing(userId);
           setFollowList(following);
         }
-        setLoading(false);
       } catch (error) {
         console.error("Error fetching notifications:", error);
       }
@@ -77,6 +77,9 @@ export const FollowList = () => {
 
     const fetchUsersDetails = async () => {
       try {
+        if (!followList) {
+          return [];
+        }
         const users = await Promise.all(
           followList.map(async (userId) => {
             const username = await getUsername(userId);
@@ -127,9 +130,10 @@ export const FollowList = () => {
     try {
       setLoadingCursor(true);
       await FollowUser(user.uid, userId);
-      const index = followList.indexOf(userId);
+      const index = followList?.indexOf(userId);
       const newFollowing = [...following, userId];
       const newFollowStates = [...userFollowingStates];
+      if (index !== undefined)
       newFollowStates[index] = true;
       setUserFollowingStates(newFollowStates);
       setFollowing(newFollowing);
@@ -144,9 +148,10 @@ export const FollowList = () => {
     try {
       setLoadingCursor(true);
       await UnfollowUser(user.uid, userId);
-      const index = followList.indexOf(userId);
+      const index = followList?.indexOf(userId);
       const newFollowing = following.filter((id) => id !== userId);
       const newFollowStates = [...userFollowingStates];
+      if (index !== undefined)
       newFollowStates[index] = false;
       setUserFollowingStates(newFollowStates);
       setFollowing(newFollowing);
@@ -157,7 +162,7 @@ export const FollowList = () => {
     }
   };
 
-  return loading ? (
+  return loading || avatarsLoading ? (
     <Loading />
   ) : (
     <div className="flex flex-col items-center">
@@ -173,9 +178,9 @@ export const FollowList = () => {
       >
         {list === "followers" ? "Followers" : "Following"}
       </h1>
-      {loading ? (
+      {loading || avatarsLoading ? (
         <Loading />
-      ) : usersAvatarProps.length === 0 ? (
+      ) : usersAvatarProps.length === 0 && usernames.length === 0 || !followList ? (
         <h1
           className="text-4xl font-bold text-black mt-48 mb-10 contoured-text"
           style={{

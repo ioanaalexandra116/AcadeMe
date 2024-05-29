@@ -1,0 +1,21 @@
+  .leaderboard-title {
+    letter-spacing: 1px;
+    font-size: 36px;
+    bottom: 87px;
+    padding-bottom: 24px;
+    font-weight: bold;
+    background-image: linear-gradient(
+      to right,
+      #C69400 0%, 
+      #E5B700 22%,
+      #F7C600 45%,
+      #F7D800 50%,
+      #F7C600 55%,
+      #E5B700 78%,
+      #C69400 100%
+    );
+    color:transparent;
+    background-clip: text;
+    -webkit-background-clip: text;
+  }
+  

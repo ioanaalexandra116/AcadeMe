@@ -1,12 +1,13 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { UserData } from "@/interfaces/interfaces";
 import { getUserRanking } from "@/firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import Loading from "./Loading";
 import { Card } from "./ui/card";
 import Avatar from "./Avatar";
+import './Leaderboard.css'; // Import the CSS file
 
-export const Leaderboard = () => {
+export const Leaderboard: React.FC = () => {
   const [userRanking, setUserRanking] = useState<UserData[] | null>(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
@@ -38,22 +39,25 @@ export const Leaderboard = () => {
   ) : (
     <div className="flex flex-col items-center">
       <h1
-        className="text-4xl font-bold text-black mt-5 mb-10 contoured-text"
+        className="relative text-4xl font-bold text-black mt-5 mb-10 contoured-text z-0"
         style={{
-          color: "#f987af",
+          color: "#E5B700",
           textShadow: `-0.5px -0.5px 0 #000, 2px -0.5px 0 #000, -0.5px 1px 0 #000, 2px 1px 0 #000`,
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
+          letterSpacing: "1px",
         }}
       >
         Leaderboard
       </h1>
-      <Card>
+      <span className="leaderboard-title z-10 relative"
+      >Leaderboard</span>
+      <Card className="relative" style={{ bottom: "87px", width: "400px" }}>
         {userRanking?.map((user, index) => (
           <div
             key={index}
-            className="flex flex-row items-center justify-between w-full p-2"
+            className="flex flex-row items-center justify-between w-full p-2 pl-6 pr-6"
           >
             <div
               className="flex flex-row items-center w-full space-x-4"
@@ -91,4 +95,5 @@ export const Leaderboard = () => {
     </div>
   );
 };
+
 export default Leaderboard;

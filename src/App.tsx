@@ -29,6 +29,10 @@ const router = createBrowserRouter([
         element: <Login />,
       },
       {
+        path: "/play",
+        element: <Play />,
+      },
+      {
         element: <PrivateRoute />,
         children: [
           {
@@ -46,10 +50,6 @@ const router = createBrowserRouter([
           {
             path: "/edit-post",
             element: <EditPost />,
-          },
-          {
-            path: "/play",
-            element: <Play />,
           },
           {
             path: "/play/results",

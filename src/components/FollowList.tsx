@@ -17,7 +17,6 @@ import Avatar from "./Avatar";
 import { Button } from "./ui/button";
 
 export const FollowList = () => {
-  // initialize with null
   const [followList, setFollowList] = useState<string[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [loadingCursor, setLoadingCursor] = useState(false);

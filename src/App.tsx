@@ -14,6 +14,7 @@ import SearchFlashcardSets from "./pages/SearchFlashcardSets";
 import Notifications from "./pages/Notifications";
 import Follow from "./pages/Follow";
 import SearchUserPage from "./pages/SearchUserPage";
+import Leaderboard from "./pages/Leaderboard";
 
 const router = createBrowserRouter([
   {
@@ -77,6 +78,10 @@ const router = createBrowserRouter([
           {
             path: "/search/people",
             element: <SearchUserPage />,
+          },
+          {
+            path: "/leaderboard",
+            element: <Leaderboard />,
           }
         ],
       },

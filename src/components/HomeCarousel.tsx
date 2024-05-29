@@ -95,11 +95,11 @@ export function CarouselPlugin() {
     if (flashcardSet && username && topUsers.length > 0) {
       setLoading(false);
     }
-  }
-  , [flashcardSet, username, topUsers]);
+  }, [flashcardSet, username, topUsers]);
 
-  return (
-    loading ? <Loading /> :
+  return loading ? (
+    <Loading />
+  ) : (
     <Carousel
       plugins={[plugin.current]}
       className="w-full max-w-4xl flex items-center justify-center"
@@ -109,9 +109,12 @@ export function CarouselPlugin() {
       <CarouselPrevious />
       <CarouselContent>
         <CarouselItem key={"logo"}>
-        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-yellow-100 via-white to-pink-100 z-0"></div>
           <div className="p-0.5 z-10">
-            <Card style={{ width: 880, height: 400 }}>
+            <Card
+              style={{ width: 880, height: 400 }}
+              className="relative overflow-hidden"
+            >
+              <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-yellow-100 via-white to-pink-100 z-0"></div>
               <CardContent className="flex items-center justify-center h-full">
                 <img
                   src={GirlTitle}
@@ -179,8 +182,13 @@ export function CarouselPlugin() {
                     <div className="flex flex-col items-center justify-center">
                       <div
                         className="absolute cursor-pointer bg-transparent rounded-full"
-                        style={{ top: 205, left: 80, zIndex: 10, boxShadow:
-                          "0 4px 8px rgba(0, 0, 0, 0.1), 0 6px 20px rgba(0, 0, 0, 0.1)" }}
+                        style={{
+                          top: 205,
+                          left: 80,
+                          zIndex: 10,
+                          boxShadow:
+                            "0 4px 8px rgba(0, 0, 0, 0.1), 0 6px 20px rgba(0, 0, 0, 0.1)",
+                        }}
                         onClick={() =>
                           navigate(`/profile?userId=${topUsers[1]?.id}`)
                         }
@@ -204,8 +212,13 @@ export function CarouselPlugin() {
                     <div className="flex flex-col items-center justify-center">
                       <div
                         className="absolute cursor-pointer bg-transparent rounded-full"
-                        style={{ top: 150, left: 190, zIndex: 10, boxShadow:
-                          "0 4px 8px rgba(0, 0, 0, 0.1), 0 6px 20px rgba(0, 0, 0, 0.1)" }}
+                        style={{
+                          top: 150,
+                          left: 190,
+                          zIndex: 10,
+                          boxShadow:
+                            "0 4px 8px rgba(0, 0, 0, 0.1), 0 6px 20px rgba(0, 0, 0, 0.1)",
+                        }}
                         onClick={() =>
                           navigate(`/profile?userId=${topUsers[0]?.id}`)
                         }
@@ -286,7 +299,7 @@ export function CarouselPlugin() {
               }}
             >
               <CardContent className="relative h-full w-full flex-col items-center justify-center">
-              <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-pink-100 via-yellow-100 to-sky-100 z-0"></div>
+                <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-pink-100 via-yellow-100 to-sky-100 z-0"></div>
                 <img
                   className="relative text-4xl font-bold text-black contoured-text flex justify-center z-10"
                   src={MostPopular}
@@ -394,7 +407,6 @@ export function CarouselPlugin() {
                     />
                   </div>
                 </div>
-                
               </CardContent>
             </Card>
           </div>

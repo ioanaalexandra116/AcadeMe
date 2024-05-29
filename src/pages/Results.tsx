@@ -115,7 +115,7 @@ const Results = () => {
             }}
             className="flex justify-center items-center border border-black"
           >
-            <p className="text-xs">{percentage + "%"}</p>
+            <p className="text-xs">{Math.floor(percentage) + "%"}</p>
           </Card>
         )}
       </Card>

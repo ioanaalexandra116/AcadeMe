@@ -398,6 +398,7 @@ export function CarouselPlugin() {
                           "linear-gradient(90deg, #F2D755, #F987AF, #9B7960)",
                         WebkitBackgroundClip: "text",
                         WebkitTextFillColor: "transparent",
+                        textAlign: "center",
                       }}
                     >
                       {flashcardSet?.title}

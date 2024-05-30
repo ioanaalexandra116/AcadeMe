@@ -227,7 +227,7 @@ const Results = () => {
               { locked ? (
               <img src={Lock} alt="lock" className="w-8 h-8 z-20 relative top-40" />) :
               (
-              <img src={Unlock} alt="unlock" className="w-8 h-8 z-20 relative top-40" />
+              <img src={Unlock} alt="unlock" className="w-8 h-8 z-20 relative top-40 left-1" />
               )}
               <h1
                 className="text-2xl font-bold text-black contoured-text z-20 relative top-40"

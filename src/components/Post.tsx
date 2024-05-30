@@ -37,7 +37,7 @@ import { AuthContext } from "@/context";
 import AdvanceCateg from "../assets/advance-categ.svg";
 
 const Post = ({ flashcardSetId }: { flashcardSetId: string }) => {
-  const { user } = useContext(AuthContext);
+  const { user, userLoading } = useContext(AuthContext);
   const navigate = useNavigate();
   const defaultCharacterProperties: AvatarProperties = {
     gender: "man",
@@ -70,6 +70,13 @@ const Post = ({ flashcardSetId }: { flashcardSetId: string }) => {
   const [loadingAvatar, setLoadingAvatar] = useState(true);
   const [showMore, setShowMore] = useState(false);
   const [isDeleted, setIsDeleted] = useState(false);
+  const [unauthorized, setUnauthorized] = useState(false);
+
+  useEffect(() => {
+    if (!user && !userLoading) {
+      setUnauthorized(true);
+    }
+  }, [user, userLoading]);
 
   useEffect(() => {
     if (!user) {
@@ -134,6 +141,7 @@ const Post = ({ flashcardSetId }: { flashcardSetId: string }) => {
 
   const handleSave = () => {
     if (!user) {
+      navigate("/login");
       return;
     }
     setIsSaved(!isSaved);
@@ -162,11 +170,15 @@ const Post = ({ flashcardSetId }: { flashcardSetId: string }) => {
           <div className="flex justify-between items-center">
             <div
               className="flex items-center justify-start cursor-pointer"
-              onClick={() =>
+              onClick={() => {
+                if (unauthorized) {
+                  navigate("/unauthorized");
+                  return;
+                }
                 window.location.replace(
                   `/profile?userId=${flashcardSet.creator}`
-                )
-              }
+                );
+              }}
             >
               {loadingAvatar ? <Loader /> : <Avatar {...characterProperties} />}
               &nbsp;

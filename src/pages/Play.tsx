@@ -222,15 +222,17 @@ const Play = () => {
       setFlashcardSet(flashcardSet);
       setLoading(false);
     };
-    
+
     fetchFlashcardSet();
   }, [postId]);
 
   useEffect(() => {
     if (result !== null) {
-      navigate(`/play/results?flashcardSetId=${postId}`);
+      if (!user) {
+        navigate(`/play/results?flashcardSetId=${postId}&&score=${result}`);
+      } else navigate(`/play/results?flashcardSetId=${postId}`);
     }
-  }, [result, postId]);
+  }, [result, postId, user]);
 
   useEffect(() => {
     if (!flashcardSet?.flashcards) {
@@ -248,6 +250,10 @@ const Play = () => {
             setResult(result);
           })
           .catch((error) => console.error("Error updating activity:", error));
+      }
+      else if (unauthorized) {
+        setUpdated(true);
+        setResult(score);
       }
     }
   }, [questionIndex, flashcardSet, postId, score, user]);
@@ -299,29 +305,29 @@ const Play = () => {
       style={{ backgroundImage: `url(${PreviewCreate})` }}
     >
       <div className="flex flex-row justify-between">
-        {window.innerWidth > 786 ? (
-          !unauthorized &&
-          <h1
-            className="text-4xl font-bold text-black contoured-text flex justify-start ml-6"
-            style={{
-              color: "#F987AF",
-              textShadow: `-0.5px -0.5px 0 #000, 2px -0.5px 0 #000, -0.5px 1px 0 #000, 2px 1px 0 #000`,
-            }}
-          >
-            {score} exp
-          </h1>
-        ) : (
-          !unauthorized &&
-          <h1
-            className="text-xl font-bold text-black contoured-text flex justify-start ml-6"
-            style={{
-              color: "#F987AF",
-              textShadow: `-0.5px -0.5px 0 #000, 2px -0.5px 0 #000, -0.5px 1px 0 #000, 2px 1px 0 #000`,
-            }}
-          >
-            {score} exp
-          </h1>
-        )}
+        {window.innerWidth > 786
+          ? !unauthorized && (
+              <h1
+                className="text-4xl font-bold text-black contoured-text flex justify-start ml-6"
+                style={{
+                  color: "#F987AF",
+                  textShadow: `-0.5px -0.5px 0 #000, 2px -0.5px 0 #000, -0.5px 1px 0 #000, 2px 1px 0 #000`,
+                }}
+              >
+                {score} exp
+              </h1>
+            )
+          : !unauthorized && (
+              <h1
+                className="text-xl font-bold text-black contoured-text flex justify-start ml-6"
+                style={{
+                  color: "#F987AF",
+                  textShadow: `-0.5px -0.5px 0 #000, 2px -0.5px 0 #000, -0.5px 1px 0 #000, 2px 1px 0 #000`,
+                }}
+              >
+                {score} exp
+              </h1>
+            )}
         {window.innerWidth > 786 ? (
           <h1
             className="text-4xl font-bold text-black contoured-text flex justify-end mr-6 ml-6"

@@ -8,9 +8,14 @@ import Background from "@/assets/laptop-background.svg";
 import ReplayButton from "@/assets/replay-button.svg";
 import { Card } from "@/components/ui/card";
 import AdvanceCateg from "../assets/advance-categ.svg";
+import Lock from "../assets/lock.svg";
+import Unlock from "../assets/unlock.svg";
+import FancyButton from "@/components/FancyButton";
 
 const Results = () => {
-  const [scores, setScores] = useState<number[]>([]);
+  const [scores, setScores] = useState<number[]>([
+    50, 10, 30, 20, 40, 20, 20, 40, 50,
+  ]);
   const [flashcardSet, setFlashcardSet] = useState<FlashcardSet | null>(null);
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
@@ -20,6 +25,9 @@ const Results = () => {
   const navigate = useNavigate();
   const [percentage, setPercentage] = useState(0);
   const [barColor, setBarColor] = useState("#7DD999");
+  const unauthorizedScore = queryParams.get("score");
+  const [currentScore, setCurrentScore] = useState(0);
+  const [locked, setLocked] = useState(true);
 
   // if (!user || userLoading) {
   //   return;
@@ -40,23 +48,33 @@ const Results = () => {
       getActivities(user.uid, postId).then((data) => {
         setScores(data);
       });
-      getFlashcardSet(postId).then((data) => {
-        if (data) {
-          setFlashcardSet(data);
-        }
-      });
     }
+    getFlashcardSet(postId).then((data) => {
+      if (data) {
+        setFlashcardSet(data);
+      }
+    });
   }, [userLoading, user, postId]);
 
   useEffect(() => {
-    if (flashcardSet && scores) {
-      setPercentage(
-        (scores[scores.length - 1] /
-          Object.keys(flashcardSet.flashcards).length) *
-          10
-      );
+    if (flashcardSet) {
+      if (unauthorized && unauthorizedScore) {
+        setCurrentScore(parseInt(unauthorizedScore || "0"));
+        setPercentage(
+          (parseInt(unauthorizedScore || "0") /
+            Object.keys(flashcardSet.flashcards).length) *
+            10
+        );
+      } else {
+        setCurrentScore(scores[scores.length - 1]);
+        setPercentage(
+          (scores[scores.length - 1] /
+            Object.keys(flashcardSet.flashcards).length) *
+            10
+        );
+      }
     }
-  }, [flashcardSet, scores]);
+  }, [flashcardSet, scores, unauthorizedScore, unauthorized]);
 
   useEffect(() => {
     console.log(percentage);
@@ -86,17 +104,25 @@ const Results = () => {
         ></div>
       </div>
       <h1
-        className="text-4xl font-bold text-black mb-4 contoured-text flex justify-center z-10"
+        className="text-4xl font-bold text-black mb-4 contoured-text flex justify-center z-10 relative"
         style={{
           color: "#F987AF",
           textShadow: `-0.5px -0.5px 0 #000, 2px -0.5px 0 #000, -0.5px 1px 0 #000, 2px 1px 0 #000`,
+          top: unauthorized ? "70px" : "0px",
         }}
       >
         {unauthorized
           ? "Results"
           : `You gained ${scores[scores.length - 1]} exp`}
       </h1>
-      <h1 className="z-10 mb-2">Accuracy</h1>
+      <h1
+        className="z-10 mb-2 relative"
+        style={{
+          top: unauthorized ? "70px" : "0px",
+        }}
+      >
+        Accuracy
+      </h1>
       <Card
         style={{
           width: "480px",
@@ -107,15 +133,15 @@ const Results = () => {
           borderRight: "1px solid black",
           borderTop: "1px solid black",
           borderBottom: "1px solid black",
+          top: unauthorized ? "70px" : "0",
         }}
-        className="flex items-center justify-start"
+        className="flex items-center justify-start relative mb-10"
       >
         {flashcardSet && (
           <Card
             style={{
               width:
-                (scores[scores.length - 1] /
-                  Object.keys(flashcardSet.flashcards).length) *
+                (currentScore / Object.keys(flashcardSet.flashcards).length) *
                   48 +
                 "px",
               height: "20px",
@@ -196,19 +222,57 @@ const Results = () => {
           </div>
         </div>
         <div className="flex flex-col items-center">
-          <h1 className="z-10 mb-2">Progress</h1>
+          {unauthorized ? (
+            <div className="flex flex-col items-center justify-center">
+              { locked ? (
+              <img src={Lock} alt="lock" className="w-8 h-8 z-20 relative top-40" />) :
+              (
+              <img src={Unlock} alt="unlock" className="w-8 h-8 z-20 relative top-40" />
+              )}
+              <h1
+                className="text-2xl font-bold text-black contoured-text z-20 relative top-40"
+                style={{
+                  background: "linear-gradient(90deg, #F4D201, #DC0B72)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  textAlign: "center",
+                  width: "350px",
+                }}
+              >
+                Create an account to track your progress
+              </h1>
+              <div className="z-20 relative top-44">
+              <FancyButton
+                message="UNLOCK"
+                onClick={() => navigate("/register")}
+                onMouseEnter={() => setLocked(false)}
+                onMouseLeave={() => setLocked(true)}
+                />
+                </div>
+                </div>
+          ) : (
+            <h1
+              className="text-black contoured-text z-20 mb-10"
+              style={{
+                textAlign: "center",
+                width: "350px",
+              }}
+            >
+              Progress
+            </h1>
+          )}
           <div className="z-10">
             <Card
               style={{
                 width: "540px",
                 height: "360px",
                 backgroundColor: "#fff",
-                // Conditionally apply additional styles if unauthorized
-                opacity: unauthorized ? 0.5 : 1, // Reduce opacity if unauthorized
-                filter: unauthorized ? "blur(4px)" : "none", // Apply blur effect if unauthorized
-                zIndex: unauthorized ? 0 : 10, // Adjust z-index if unauthorized
+                filter: unauthorized ? "blur(6px)" : "none",
+                zIndex: unauthorized ? 0 : 10,
+                transform: unauthorized ? "scale(0.9)" : "scale(1)",
+                bottom: unauthorized ? "74px" : "40px",
               }}
-              className="flex items-center justify-center border border-black"
+              className="flex items-center justify-center border border-black relative"
             >
               <ReactApexChart
                 options={{
@@ -243,6 +307,18 @@ const Results = () => {
                 type="line"
                 width={500}
               />
+              {unauthorized && (
+                <div
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    width: "100%",
+                    height: "100%",
+                    zIndex: 20,
+                  }}
+                />
+              )}
             </Card>
           </div>
         </div>
@@ -272,7 +348,9 @@ const Results = () => {
           textShadow: `-0.5px -0.5px 0 #000, 2px -0.5px 0 #000, -0.5px 1px 0 #000, 2px 1px 0 #000`,
         }}
       >
-        You gained {scores[scores.length - 1]} exp
+        {unauthorized
+          ? "Results"
+          : `You gained {scores[scores.length - 1]} exp`}
       </h1>
       <h1 className="z-10 mb-2">Accuracy</h1>
       <Card
@@ -291,8 +369,7 @@ const Results = () => {
           <Card
             style={{
               width:
-                (scores[scores.length - 1] /
-                  Object.keys(flashcardSet.flashcards).length) *
+                (currentScore / Object.keys(flashcardSet.flashcards).length) *
                   34 +
                 "px",
               height: "20px",
@@ -350,8 +427,7 @@ const Results = () => {
                     },
                   ]}
                   type="line"
-                  width={window.innerWidth - 10}
-                  height={window.innerHeight / 4}
+                  width={500}
                 />
               </Card>
             </div>

@@ -3,6 +3,9 @@ import styled from "styled-components";
 
 interface FancyButtonProps {
   onClick?: () => void; // Optional onClick prop
+  onMouseEnter?: () => void;
+  onMouseLeave?: () => void;
+  message?: string;
 }
 
 const Button = styled.button`
@@ -123,14 +126,16 @@ const Stars = styled.div`
   }
 `;
 
-const FancyButton: React.FC<FancyButtonProps> = ({ onClick }) => {
+const FancyButton: React.FC<FancyButtonProps> = ({ onClick, onMouseEnter, onMouseLeave,  message }) => {
   return (
-    <Button className="btn" onClick={onClick}
+    <Button className="btn" onClick={onClick} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}
     >
       <ContainerStars id="container-stars">
         <Stars id="stars"></Stars>
       </ContainerStars>
-      <Strong>PLAY NOW</Strong>
+      <Strong>
+        {message || "PLAY NOW"}
+        </Strong>
       <Glow id="glow">
         <Circle1 className="circle"></Circle1>
         <Circle2 className="circle"></Circle2>

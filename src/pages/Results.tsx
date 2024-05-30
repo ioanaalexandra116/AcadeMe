@@ -16,20 +16,27 @@ const Results = () => {
   const queryParams = new URLSearchParams(location.search);
   const postId = queryParams.get("flashcardSetId");
   const { user, userLoading } = useContext(AuthContext);
+  const [unauthorized, setUnauthorized] = useState(false);
   const navigate = useNavigate();
   const [percentage, setPercentage] = useState(0);
   const [barColor, setBarColor] = useState("#7DD999");
 
-  if (!user || userLoading) {
-    return;
-  }
+  // if (!user || userLoading) {
+  //   return;
+  // }
+
+  useEffect(() => {
+    if (!user && !userLoading) {
+      setUnauthorized(true);
+    }
+  }, [user, userLoading]);
 
   if (!postId) {
     return;
   }
 
   useEffect(() => {
-    if (!userLoading) {
+    if (user) {
       getActivities(user.uid, postId).then((data) => {
         setScores(data);
       });
@@ -85,7 +92,9 @@ const Results = () => {
           textShadow: `-0.5px -0.5px 0 #000, 2px -0.5px 0 #000, -0.5px 1px 0 #000, 2px 1px 0 #000`,
         }}
       >
-        You gained {scores[scores.length - 1]} exp
+        {unauthorized
+          ? "Results"
+          : `You gained ${scores[scores.length - 1]} exp`}
       </h1>
       <h1 className="z-10 mb-2">Accuracy</h1>
       <Card
@@ -176,8 +185,10 @@ const Results = () => {
                     }}
                   />
                 )}
-                <Link to={`/search/flashcards?categories=${flashcardSet?.category}&selected=${category}`}
-                className="relative">
+                <Link
+                  to={`/search/flashcards?categories=${flashcardSet?.category}&selected=${category}`}
+                  className="relative"
+                >
                   {category}
                 </Link>
               </span>
@@ -192,6 +203,10 @@ const Results = () => {
                 width: "540px",
                 height: "360px",
                 backgroundColor: "#fff",
+                // Conditionally apply additional styles if unauthorized
+                opacity: unauthorized ? 0.5 : 1, // Reduce opacity if unauthorized
+                filter: unauthorized ? "blur(4px)" : "none", // Apply blur effect if unauthorized
+                zIndex: unauthorized ? 0 : 10, // Adjust z-index if unauthorized
               }}
               className="flex items-center justify-center border border-black"
             >
@@ -336,7 +351,7 @@ const Results = () => {
                   ]}
                   type="line"
                   width={window.innerWidth - 10}
-                  height={window.innerHeight /4}
+                  height={window.innerHeight / 4}
                 />
               </Card>
             </div>

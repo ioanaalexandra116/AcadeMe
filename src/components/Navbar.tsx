@@ -31,6 +31,7 @@ import Girl from "../assets/cover.svg";
 import SimpleGirl from "../assets/girl.svg";
 import User from "../assets/user.svg";
 import Logout from "../assets/logout.svg";
+import Login from "../assets/login.svg";
 import Create from "../assets/create.svg";
 import Bell from "../assets/bell.svg";
 import Search from "../assets/search.svg";
@@ -40,21 +41,28 @@ import { Card } from "./ui/card";
 import Crown from "../assets/crown.svg";
 import Dot from "../assets/dot.svg";
 
+type MenuItems = {
+  title: string;
+  href: string;
+  img: string;
+};
+
 export default function Navbar() {
   const defaultCharacterProperties: AvatarProperties = {
     gender: "man",
-    backgroundColor: "rgb(164,222,247)",
-    mouthColor: "rgb(224,134,114)",
-    eyeColor: "rgb(102,78,39)",
-    eyelidsColor: "rgb(12,10,9)",
-    hairColor: "rgb(89,70,64)",
-    skinColor: "rgb(255,225,189)",
-    noseColor: "rgb(230,183,150)",
+    backgroundColor: "#000",
+    mouthColor: "#000",
+    eyeColor: "#000",
+    eyelidsColor: "#000",
+    hairColor: "#000",
+    skinColor: "#000",
+    noseColor: "#000",
     dimensions: "40px",
     bowColor: "transparent",
   };
 
   const { user, userLoading } = useContext(AuthContext);
+  const [unauthorized, setUnauthorized] = useState(false);
   const [loading, setLoading] = useState(true);
   const [avatarHover, setAvatarHover] = useState(false);
   const location = useLocation();
@@ -66,6 +74,7 @@ export default function Navbar() {
   const [lower, setLower] = useState(0);
   const [levelHovered, setLevelHovered] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [profileMenuItems, setProfileMenuItems] = useState<MenuItems[]>([]);
 
   const handleLogOut = async () => {
     try {
@@ -76,22 +85,29 @@ export default function Navbar() {
     }
   };
 
-  if (!user || userLoading) {
-    return <Loading />;
-  }
+  useEffect(() => {
+    if (!user && !userLoading) {
+      setUnauthorized(true);
+      setProfileMenuItems([{
+        title: "Log in",
+        href: "/login",
+        img: Login,
+      }]);
+    } else if (user) {
+      setUnauthorized(false);
+      setProfileMenuItems([{
+        title: "Profile",
+        href: `/profile?userId=${user.uid}`,
+        img: User,
+      },
+      {
+        title: "Log out",
+        href: "/login",
+        img: Logout,
+      }]);
+    }
 
-  const profileMenuItems: { title: string; href: string; img: string }[] = [
-    {
-      title: "Profile",
-      href: `/profile?userId=${user.uid}`,
-      img: User,
-    },
-    {
-      title: "Log out",
-      href: "/login",
-      img: Logout,
-    },
-  ];
+  }, [user, userLoading]);
 
   useEffect(() => {
     if (!user) {
@@ -207,7 +223,7 @@ export default function Navbar() {
     fetchExp();
   }, [user, location.pathname]);
 
-  if (loading) {
+  if (loading && user) {
     return <Loading />;
   }
 
@@ -273,7 +289,7 @@ export default function Navbar() {
             </ul>
           </NavigationMenuContent>
         </NavigationMenuItem>
-
+          {!unauthorized && (
         <NavigationMenuItem>
           <NavigationMenuLink className={navigationMenuTriggerStyle()}>
             <Link to="/notifications">
@@ -294,7 +310,7 @@ export default function Navbar() {
               )}
             </Link>
           </NavigationMenuLink>
-        </NavigationMenuItem>
+        </NavigationMenuItem>)}
       </NavigationMenuList>
       <NavigationMenuItem
         className="flex items-right justify-end absolute"
@@ -303,7 +319,7 @@ export default function Navbar() {
         <div className="flex flex-col z-10">
           {" "}
           {/* Ensure a higher stacking context for the crown */}
-          {window.innerWidth > 700 && (
+          {window.innerWidth > 700 && !unauthorized && (
             <div className="flex flex-row justify-center items-center z-10">
               {" "}
               {/* Ensure a higher stacking context for the crown */}
@@ -365,9 +381,12 @@ export default function Navbar() {
         </NavigationMenuTrigger>
         <NavigationMenuContent className="flex justify-end items-right absolute right-0">
           <ul className="grid w-[500px] gap-3 p-4 md:w-[200px] md:grid-cols-1 lg:w-[160px]">
+            {!unauthorized ? (
             <ListItem className="hover:bg-transparent">
               Signed in as {username}
-            </ListItem>
+            </ListItem>) : (<ListItem className="hover:bg-transparent">
+              Log in to access more features
+            </ListItem>)}
             {profileMenuItems.map((component) => (
               <ListItem
                 img={component.img}

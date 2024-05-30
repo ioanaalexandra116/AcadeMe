@@ -147,6 +147,7 @@ const CardBack = styled.div`
 
 const Play = () => {
   const { user, userLoading } = useContext(AuthContext);
+  const [unauthorized, setUnauthorized] = useState(false);
   const [next, setNext] = useState(true);
   const [score, setScore] = useState(0);
   const [questionIndex, setQuestionIndex] = useState(0);
@@ -172,6 +173,16 @@ const Play = () => {
   const [timeEnd, setTimeEnd] = useState(Date.now());
   const [updated, setUpdated] = useState(false);
   const [resultsPressed, setResultsPressed] = useState(false);
+
+  //   if (userLoading) {
+  //   return <Loading />;
+  // }
+
+  useEffect(() => {
+    if (!user && !userLoading) {
+      setUnauthorized(true);
+    }
+  }, [user, userLoading]);
 
   useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {
@@ -211,12 +222,15 @@ const Play = () => {
       setFlashcardSet(flashcardSet);
       setLoading(false);
     };
+    
     fetchFlashcardSet();
   }, [postId]);
 
-  if (!user || userLoading) {
-    return <Loading />;
-  }
+  useEffect(() => {
+    if (result !== null) {
+      navigate(`/play/results?flashcardSetId=${postId}`);
+    }
+  }, [result, postId]);
 
   useEffect(() => {
     if (!flashcardSet?.flashcards) {
@@ -227,20 +241,16 @@ const Play = () => {
         return;
       }
       updatePlayCount(postId);
-      updateActivity(user.uid, postId, score)
-        .then((result: number) => {
-          setUpdated(true);
-          setResult(result);
-        })
-        .catch((error) => console.error("Error updating activity:", error));
+      if (user) {
+        updateActivity(user.uid, postId, score)
+          .then((result: number) => {
+            setUpdated(true);
+            setResult(result);
+          })
+          .catch((error) => console.error("Error updating activity:", error));
+      }
     }
-  }, [questionIndex, flashcardSet]);
-
-  useEffect(() => {
-    if (result !== null) {
-      navigate(`/play/results?flashcardSetId=${postId}`);
-    }
-  }, [result, postId]);
+  }, [questionIndex, flashcardSet, postId, score, user]);
 
   const handleAnswer = () => {
     setInputDisabled(true);
@@ -290,6 +300,7 @@ const Play = () => {
     >
       <div className="flex flex-row justify-between">
         {window.innerWidth > 786 ? (
+          !unauthorized &&
           <h1
             className="text-4xl font-bold text-black contoured-text flex justify-start ml-6"
             style={{
@@ -300,6 +311,7 @@ const Play = () => {
             {score} exp
           </h1>
         ) : (
+          !unauthorized &&
           <h1
             className="text-xl font-bold text-black contoured-text flex justify-start ml-6"
             style={{
@@ -312,7 +324,7 @@ const Play = () => {
         )}
         {window.innerWidth > 786 ? (
           <h1
-            className="text-4xl font-bold text-black contoured-text flex justify-end mr-6"
+            className="text-4xl font-bold text-black contoured-text flex justify-end mr-6 ml-6"
             style={{
               color: "#F987AF",
               textShadow: `-0.5px -0.5px 0 #000, 2px -0.5px 0 #000, -0.5px 1px 0 #000, 2px 1px 0 #000`,

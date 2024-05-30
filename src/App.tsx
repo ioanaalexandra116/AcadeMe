@@ -15,6 +15,7 @@ import Notifications from "./pages/Notifications";
 import Follow from "./pages/Follow";
 import SearchUserPage from "./pages/SearchUserPage";
 import Leaderboard from "./pages/Leaderboard";
+import Navbar from "./components/Navbar";
 
 const router = createBrowserRouter([
   {
@@ -30,7 +31,21 @@ const router = createBrowserRouter([
       },
       {
         path: "/play",
-        element: <Play />,
+        element: (
+          <>
+            <Navbar />
+            <Play />
+          </>
+        ),
+      },
+      {
+        path: "/play/results",
+        element: (
+          <>
+            <Navbar />
+            <Results />
+          </>
+        ),
       },
       {
         element: <PrivateRoute />,
@@ -50,10 +65,6 @@ const router = createBrowserRouter([
           {
             path: "/edit-post",
             element: <EditPost />,
-          },
-          {
-            path: "/play/results",
-            element: <Results />,
           },
           {
             path: "/edit-profile",
@@ -82,7 +93,7 @@ const router = createBrowserRouter([
           {
             path: "/leaderboard",
             element: <Leaderboard />,
-          }
+          },
         ],
       },
     ],

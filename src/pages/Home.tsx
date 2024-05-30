@@ -29,9 +29,10 @@ const Home = () => {
     fetchFeed();
   }, []);
 
-  return (
-    loading ? <Loading /> :
-    <div style={{ position: "relative"}}>
+  return loading ? (
+    <Loading />
+  ) : (
+    <div style={{ position: "relative" }}>
       <div
         style={{
           backgroundImage: `url(${Background})`,
@@ -51,7 +52,7 @@ const Home = () => {
           className="flex justify-center items-center pt-20"
           style={{ zIndex: 10, width: "100%" }}
         >
-          <CarouselPlugin />
+          {window.innerWidth > 768 && <CarouselPlugin />}
         </div>
         <div
           style={{

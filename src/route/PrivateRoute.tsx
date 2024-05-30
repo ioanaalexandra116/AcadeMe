@@ -6,9 +6,9 @@ import Navbar from '@/components/Navbar';
 
 const Privateroute = () => {
     const { user, userLoading } = useContext(AuthContext);
-    if (!userLoading && !user) {
-        return <Navigate to="/login" />;
-    }
+    // if (!userLoading && !user) {
+    //     return <Navigate to="/login" />;
+    // }
     return userLoading ? (
         <Loading />
     ) : (

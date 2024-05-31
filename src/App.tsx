@@ -16,7 +16,6 @@ import Follow from "./pages/Follow";
 import SearchUserPage from "./pages/SearchUserPage";
 import Leaderboard from "./pages/Leaderboard";
 import Navbar from "./components/Navbar";
-import Unauthorized from "./pages/Unauthorized";
 
 const router = createBrowserRouter([
   {
@@ -38,10 +37,6 @@ const router = createBrowserRouter([
             <Play />
           </>
         ),
-      },
-      {
-        path: "/unauthorized",
-        element: <Unauthorized />,
       },
       {
         path: "/play/results",

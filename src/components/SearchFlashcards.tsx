@@ -5,7 +5,7 @@ import {
   getAllFlashcardSetsIds,
   getFlashcardSetsIdsByTitle,
 } from "@/firebase/firestore";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import arrwRight from "@/assets/arrow-right.svg";
 import xRemove from "@/assets/x-remove.svg";
 import Menu from "@/assets/menu.svg";
@@ -100,6 +100,21 @@ export const SearchFlashcards = () => {
   const [searchInTitle, setSearchInTitle] = useState("");
   const [hoverRemoveFilter, setHoverRemoveFilter] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    const handleKeyPress = (event: KeyboardEvent) => {
+      if (event.key === "Enter") {
+        if (buttonRef.current) buttonRef.current.click();
+      }
+    
+    }
+    window.addEventListener("keydown", handleKeyPress);
+    return () => {
+      window.removeEventListener("keydown", handleKeyPress);
+    }
+  }
+  , []);
 
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
@@ -660,6 +675,7 @@ export const SearchFlashcards = () => {
                 color: "#FFFFFF",
               }}
               onClick={handleSearch}
+              ref={buttonRef}
             >
               Search
             </Button>

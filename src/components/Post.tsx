@@ -32,28 +32,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import logo from "@/assets/sad-girl.svg";
-import happy from "@/assets/happy-girl.svg";
-import {
-  AlertDialog,
-  AlertDialogContent,
-  AlertDialogOverlay,
-  AlertDialogTitle,
-  AlertDialogDescription,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogFooter,
-} from "@/components/ui/alert-dialog";
 import { useContext } from "react";
 import { AuthContext } from "@/context";
 import AdvanceCateg from "../assets/advance-categ.svg";
-
-const buttonStyle = {
-  background: "linear-gradient(45deg, #F987AF, #F2D755)",
-  boxShadow: "0 3px 5px 2px rgba(255, 105, 135, .3)",
-  backgroundSize: "200% 200%",
-  animation: "gradientAnimation 2s ease infinite",
-};
+import UnauthorizedPopup from "./UnauthorizedPopup";
 
 const Post = ({ flashcardSetId }: { flashcardSetId: string }) => {
   const { user, userLoading } = useContext(AuthContext);
@@ -91,7 +73,6 @@ const Post = ({ flashcardSetId }: { flashcardSetId: string }) => {
   const [isDeleted, setIsDeleted] = useState(false);
   const [unauthorized, setUnauthorized] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [sad, setSad] = useState(true);
 
   useEffect(() => {
     if (!user && !userLoading) {
@@ -183,48 +164,7 @@ const Post = ({ flashcardSetId }: { flashcardSetId: string }) => {
 
   return !isDeleted ? (
     <>
-      <AlertDialog open={success} onOpenChange={setSuccess}>
-        <AlertDialogOverlay />
-        <AlertDialogContent>
-          <div className="flex flex-col items-center justify-center space-y-4">
-            {sad ? (
-              <img src={logo} alt="logo" className="w-40" />
-            ) : (
-              <img src={happy} alt="logo" className="w-40" />
-            )}
-            <AlertDialogTitle>Limited Access</AlertDialogTitle>
-            <AlertDialogDescription>
-              Create an account or log in to unlock the full AcadeMe experience!
-              
-            </AlertDialogDescription>
-            <AlertDialogFooter>
-              <AlertDialogCancel onClick={() => setSuccess(false)}>
-                Close
-              </AlertDialogCancel>
-              <div>
-                {!sad && (
-                <style>
-                {`
-                  @keyframes gradientAnimation {
-                    0% { background-position: 0% 50%; }
-                    50% { background-position: 100% 50%; }
-                    100% { background-position: 0% 50%; }
-                  }
-                `}
-                </style>)}
-                <AlertDialogAction
-                  onClick={() => navigate("/login")}
-                  onMouseEnter={() => setSad(false)}
-                  onMouseLeave={() => setSad(true)}
-                  style= {!sad ? buttonStyle : {backgroundColor: '#F987AF'}}
-                >
-                  Sign in
-                </AlertDialogAction>
-              </div>
-            </AlertDialogFooter>
-          </div>
-        </AlertDialogContent>
-      </AlertDialog>
+    {unauthorized && <UnauthorizedPopup success={success} setSuccess={setSuccess} />}
       <div className="p-6 flex items-center justify-center">
         <Card
           className="flex flex-col border-black rounded-xl"

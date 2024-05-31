@@ -40,6 +40,7 @@ import { Link } from "react-router-dom";
 import { Card } from "./ui/card";
 import Crown from "../assets/crown.svg";
 import Dot from "../assets/dot.svg";
+import UnauthorizedPopup from "./UnauthorizedPopup";
 
 type MenuItems = {
   title: string;
@@ -75,6 +76,7 @@ export default function Navbar() {
   const [levelHovered, setLevelHovered] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [profileMenuItems, setProfileMenuItems] = useState<MenuItems[]>([]);
+  const [success, setSuccess] = useState(false);
 
   const handleLogOut = async () => {
     try {
@@ -88,25 +90,28 @@ export default function Navbar() {
   useEffect(() => {
     if (!user && !userLoading) {
       setUnauthorized(true);
-      setProfileMenuItems([{
-        title: "Log in",
-        href: "/login",
-        img: Login,
-      }]);
+      setProfileMenuItems([
+        {
+          title: "Log in",
+          href: "/login",
+          img: Login,
+        },
+      ]);
     } else if (user) {
       setUnauthorized(false);
-      setProfileMenuItems([{
-        title: "Profile",
-        href: `/profile?userId=${user.uid}`,
-        img: User,
-      },
-      {
-        title: "Log out",
-        href: "/login",
-        img: Logout,
-      }]);
+      setProfileMenuItems([
+        {
+          title: "Profile",
+          href: `/profile?userId=${user.uid}`,
+          img: User,
+        },
+        {
+          title: "Log out",
+          href: "/login",
+          img: Logout,
+        },
+      ]);
     }
-
   }, [user, userLoading]);
 
   useEffect(() => {
@@ -127,29 +132,21 @@ export default function Navbar() {
 
           // Check if notification already exists based on timestamp
 
+          // Create a new notification object
+          const newNotification = {
+            timestamp: key,
+            id: notificationData[0],
+            message: notificationData[1],
+            read: notificationData[2] === "unread" ? false : true,
+          };
 
-            // Create a new notification object
-            const newNotification = {
-              timestamp: key,
-              id: notificationData[0],
-              message: notificationData[1],
-              read: notificationData[2] === "unread" ? false : true,
-            };
+          // remove existing notification if it exists
 
-            // remove existing notification if it exists
+          setNotifications((prevNotifications) =>
+            prevNotifications.filter((notif) => notif.timestamp !== timestamp)
+          );
 
-              setNotifications((prevNotifications) =>
-                prevNotifications.filter(
-                  (notif) => notif.timestamp !== timestamp
-                )
-              );
-            
-
-
-
-
-            updatedNotifications.push(newNotification);
-          
+          updatedNotifications.push(newNotification);
         }
 
         // Update notifications state only once after processing all notifications
@@ -228,9 +225,22 @@ export default function Navbar() {
   }
 
   return (
-    <NavigationMenu className="backdrop-blur-lg fixed bg-transparent shadow-md z-50">
-      <NavigationMenuItem className="flex justify-start items-left absolute left-0">
-        <Link to="/">
+    <>
+      {unauthorized && (
+        <UnauthorizedPopup success={success} setSuccess={setSuccess} />
+      )}
+      <NavigationMenu className="backdrop-blur-lg fixed bg-transparent shadow-md z-50">
+        <NavigationMenuItem
+          className="flex justify-start items-left absolute left-0 cursor-pointer"
+          onClick={() => {
+            if (unauthorized) {
+              setSuccess(true);
+            } else {
+              window.location.href = "/";
+            }
+          }}
+        >
+          {/* <Link to="/"> */}
           {!smallScreen ? (
             <img
               src={Logo}
@@ -246,171 +256,192 @@ export default function Navbar() {
               style={{ marginLeft: "1.5rem" }}
             />
           )}
-        </Link>
-      </NavigationMenuItem>
-      <NavigationMenuItem className={navigationMenuTriggerStyle()}>
-        <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-          <Link to="/create">
-            <div className="flex items-center">
+          {/* </Link> */}
+        </NavigationMenuItem>
+        <NavigationMenuItem className={navigationMenuTriggerStyle()}>
+          <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+            <div
+              className="flex items-center cursor-pointer"
+              onClick={() => {
+                if (unauthorized) {
+                  setSuccess(true);
+                } else {
+                  window.location.href = "/create";
+                }
+              }}
+            >
               <img src={Create} alt="create" className="h-5 w-6" />
               {smallScreen ? "" : "Create"}
             </div>
-          </Link>
-        </NavigationMenuLink>
-      </NavigationMenuItem>
-      <NavigationMenuList className="mb-1.5 mt-1 flex justify-center items-center">
-        <NavigationMenuItem>
-          <NavigationMenuTrigger onMouseEnter={() => setAvatarHover(false)}>
-            <div className="flex items-center">
-              <img src={Search} alt="discover" className="h-5 w-6" />
-              {smallScreen ? "" : "Search"}
-            </div>
-          </NavigationMenuTrigger>
-          <NavigationMenuContent className="flex justify-center items-center">
-            <ul className="grid gap-2 p-4 md:w-[200px] lg:w-[440px] lg:grid-cols-[.80fr_1fr] flex items-center justify-center">
-              <li className="row-span-2 flex justify-center items-center">
-                <NavigationMenuLink asChild className="bg-blue-400">
-                  <div className="flex items-center justify-center select-none flex-col justify-end rounded-xl bg-gradient-to-b from-muted/50 to-muted p-4 no-underline outline-none focus:shadow-md">
-                    <img
-                      src={Girl}
-                      alt="girl"
-                      sizes="400vw"
-                      className="h-44 w-80"
-                    />
+          </NavigationMenuLink>
+        </NavigationMenuItem>
+        <NavigationMenuList className="mb-1.5 mt-1 flex justify-center items-center">
+          <NavigationMenuItem>
+            <NavigationMenuTrigger onMouseEnter={() => setAvatarHover(false)}>
+              <div className="flex items-center">
+                <img src={Search} alt="discover" className="h-5 w-6" />
+                {smallScreen ? "" : "Search"}
+              </div>
+            </NavigationMenuTrigger>
+            <NavigationMenuContent className="flex justify-center items-center">
+              <ul className="grid gap-2 p-4 md:w-[200px] lg:w-[440px] lg:grid-cols-[.80fr_1fr] flex items-center justify-center">
+                <li className="row-span-2 flex justify-center items-center">
+                  <NavigationMenuLink asChild className="bg-blue-400">
+                    <div className="flex items-center justify-center select-none flex-col justify-end rounded-xl bg-gradient-to-b from-muted/50 to-muted p-4 no-underline outline-none focus:shadow-md">
+                      <img
+                        src={Girl}
+                        alt="girl"
+                        sizes="400vw"
+                        className="h-44 w-80"
+                      />
+                    </div>
+                  </NavigationMenuLink>
+                </li>
+                <ListItem className="cursor-pointer" title="People"
+                onClick={() => {
+                  if (unauthorized) {
+                    setSuccess(true);
+                  } else {
+                    window.location.href = "/search/people";
+                  }}}
+                >
+                  Connect with other study enthusiasts on the platform
+                </ListItem>
+                <ListItem href="/search/flashcards" title="Flashcard Sets">
+                  Find flashcard sets based on your interests
+                </ListItem>
+              </ul>
+            </NavigationMenuContent>
+          </NavigationMenuItem>
+          {!unauthorized && (
+            <NavigationMenuItem>
+              <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                <Link to="/notifications">
+                  <div className="flex items-center">
+                    <img src={Bell} alt="notifications" className="h-5 w-6" />
+                    {smallScreen ? "" : "Notifications"}
                   </div>
-                </NavigationMenuLink>
-              </li>
-              <ListItem href="/search/people" title="People">
-                Connect with other study enthusiasts on the platform
-              </ListItem>
-              <ListItem href="/search/flashcards" title="Flashcard Sets">
-                Find flashcard sets based on your interests
-              </ListItem>
+                  {notifications.some((notif) => !notif.read) && (
+                    <div
+                      style={{
+                        position: "absolute",
+                        top: "10px",
+                        paddingLeft: "7px",
+                      }}
+                    >
+                      <img src={Dot} alt="notifications" className="h-5 w-5" />
+                    </div>
+                  )}
+                </Link>
+              </NavigationMenuLink>
+            </NavigationMenuItem>
+          )}
+        </NavigationMenuList>
+        <NavigationMenuItem
+          className="flex items-right justify-end absolute"
+          style={{ right: "1rem" }}
+        >
+          <div className="flex flex-col z-10">
+            {" "}
+            {/* Ensure a higher stacking context for the crown */}
+            {window.innerWidth > 700 && !unauthorized && (
+              <div className="flex flex-row justify-center items-center z-10">
+                {" "}
+                {/* Ensure a higher stacking context for the crown */}
+                <div className="relative top-1 left-3 z-20">
+                  {" "}
+                  {/* Higher z-index for the crown */}
+                  <img src={Crown} className="h-5 w-5 z-20" />{" "}
+                  {/* Higher z-index for the crown */}
+                </div>
+                <div className="flex flex-col">
+                  <Card
+                    onMouseEnter={() => setLevelHovered(true)}
+                    onMouseLeave={() => setLevelHovered(false)}
+                    style={{
+                      width: "150px",
+                      height: "10px",
+                      backgroundColor: "#fff",
+                      zIndex: 10,
+                      borderRight: "1px solid black",
+                      borderTop: "1px solid black",
+                      borderBottom: "1px solid black",
+                      cursor: "pointer",
+                    }}
+                    className="flex items-center justify-start mt-4 z-10"
+                  >
+                    {exp > 70 && (
+                      <Card
+                        style={{
+                          width: (exp / 1000) * 150 + "px",
+                          height: "10px",
+                          backgroundColor: "#D09FDE",
+                          zIndex: 10,
+                        }}
+                        className="flex justify-center items-center border border-black z-10"
+                      ></Card>
+                    )}
+                  </Card>
+                </div>
+              </div>
+            )}
+            {levelHovered && (
+              <p
+                style={{
+                  zIndex: 10,
+                  height: "1px",
+                }}
+                className="text-xs flex relative justify-center items-center mt-2 mb-1 ml-3"
+              >
+                <div className="flex justify-center items-center">
+                  <p className="text-xs text-center">
+                    {1000 - exp} EXP to Level {lower + 2}
+                  </p>
+                </div>
+              </p>
+            )}
+          </div>
+          <NavigationMenuTrigger onMouseEnter={() => setAvatarHover(true)}>
+            <Avatar {...characterProperties} />
+          </NavigationMenuTrigger>
+          <NavigationMenuContent className="flex justify-end items-right absolute right-0">
+            <ul className="grid w-[500px] gap-3 p-4 md:w-[200px] md:grid-cols-1 lg:w-[160px]">
+              {!unauthorized ? (
+                <ListItem className="hover:bg-transparent">
+                  Signed in as {username}
+                </ListItem>
+              ) : (
+                <ListItem className="hover:bg-transparent">
+                  Log in to access more features
+                </ListItem>
+              )}
+              {profileMenuItems.map((component) => (
+                <ListItem
+                  img={component.img}
+                  key={component.title}
+                  title={component.title}
+                  href={component.href}
+                  onClick={
+                    component.href === "/login" ? handleLogOut : undefined
+                  }
+                ></ListItem>
+              ))}
             </ul>
           </NavigationMenuContent>
         </NavigationMenuItem>
-          {!unauthorized && (
-        <NavigationMenuItem>
-          <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-            <Link to="/notifications">
-              <div className="flex items-center">
-                <img src={Bell} alt="notifications" className="h-5 w-6" />
-                {smallScreen ? "" : "Notifications"}
-              </div>
-              {notifications.some((notif) => !notif.read) && (
-                <div
-                  style={{
-                    position: "absolute",
-                    top: "10px",
-                    paddingLeft: "7px",
-                  }}
-                >
-                  <img src={Dot} alt="notifications" className="h-5 w-5" />
-                </div>
-              )}
-            </Link>
-          </NavigationMenuLink>
-        </NavigationMenuItem>)}
-      </NavigationMenuList>
-      <NavigationMenuItem
-        className="flex items-right justify-end absolute"
-        style={{ right: "1rem" }}
-      >
-        <div className="flex flex-col z-10">
-          {" "}
-          {/* Ensure a higher stacking context for the crown */}
-          {window.innerWidth > 700 && !unauthorized && (
-            <div className="flex flex-row justify-center items-center z-10">
-              {" "}
-              {/* Ensure a higher stacking context for the crown */}
-              <div className="relative top-1 left-3 z-20">
-                {" "}
-                {/* Higher z-index for the crown */}
-                <img src={Crown} className="h-5 w-5 z-20" />{" "}
-                {/* Higher z-index for the crown */}
-              </div>
-              <div className="flex flex-col">
-                <Card
-                  onMouseEnter={() => setLevelHovered(true)}
-                  onMouseLeave={() => setLevelHovered(false)}
-                  style={{
-                    width: "150px",
-                    height: "10px",
-                    backgroundColor: "#fff",
-                    zIndex: 10,
-                    borderRight: "1px solid black",
-                    borderTop: "1px solid black",
-                    borderBottom: "1px solid black",
-                    cursor: "pointer",
-                  }}
-                  className="flex items-center justify-start mt-4 z-10"
-                >
-                  {exp > 70 && (
-                    <Card
-                      style={{
-                        width: (exp / 1000) * 150 + "px",
-                        height: "10px",
-                        backgroundColor: "#D09FDE",
-                        zIndex: 10,
-                      }}
-                      className="flex justify-center items-center border border-black z-10"
-                    ></Card>
-                  )}
-                </Card>
-              </div>
-            </div>
-          )}
-          {levelHovered && (
-            <p
-              style={{
-                zIndex: 10,
-                height: "1px",
-              }}
-              className="text-xs flex relative justify-center items-center mt-2 mb-1 ml-3"
-            >
-              <div className="flex justify-center items-center">
-                <p className="text-xs text-center">
-                  {1000 - exp} EXP to Level {lower + 2}
-                </p>
-              </div>
-            </p>
-          )}
-        </div>
-        <NavigationMenuTrigger onMouseEnter={() => setAvatarHover(true)}>
-          <Avatar {...characterProperties} />
-        </NavigationMenuTrigger>
-        <NavigationMenuContent className="flex justify-end items-right absolute right-0">
-          <ul className="grid w-[500px] gap-3 p-4 md:w-[200px] md:grid-cols-1 lg:w-[160px]">
-            {!unauthorized ? (
-            <ListItem className="hover:bg-transparent">
-              Signed in as {username}
-            </ListItem>) : (<ListItem className="hover:bg-transparent">
-              Log in to access more features
-            </ListItem>)}
-            {profileMenuItems.map((component) => (
-              <ListItem
-                img={component.img}
-                key={component.title}
-                title={component.title}
-                href={component.href}
-                onClick={component.href === "/login" ? handleLogOut : undefined}
-              ></ListItem>
-            ))}
-          </ul>
-        </NavigationMenuContent>
-      </NavigationMenuItem>
-      {avatarHover && !smallScreen ? (
-        <NavigationMenuViewport
-          className={cn(
-            "flex justify-end items-right absolute right-7 top-full"
-          )}
-        />
-      ) : (
-        <NavigationMenuViewport
-          className={cn("absolute top-full flex justify-center")}
-        />
-      )}
-    </NavigationMenu>
+        {avatarHover && !smallScreen ? (
+          <NavigationMenuViewport
+            className={cn(
+              "flex justify-end items-right absolute right-7 top-full"
+            )}
+          />
+        ) : (
+          <NavigationMenuViewport
+            className={cn("absolute top-full flex justify-center")}
+          />
+        )}
+      </NavigationMenu>
+    </>
   );
 }
 

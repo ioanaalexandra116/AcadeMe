@@ -5,7 +5,7 @@ const Unauthorized = () => {
   return (
     <>
       <div className="flex flex-col items-center justify-center">
-        <img src={logo} alt="logo" className="w-80" />
+        <img src={logo} alt="logo" className="w-160" />
         <h1
           className="text-4xl font-bold z-10"
           style={{

@@ -19,7 +19,7 @@ const AlertDialogOverlay = React.forwardRef<
       "fixed inset-0 z-20 bg-yellow-200 bg-opacity-40 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
       className
     )}
-    style = {{ backgroundColor: 'rgba(255, 255, 255, 0.4)' }}
+    style = {{ backgroundColor: 'rgba(255, 255, 255, 0.5)' }}
     {...props}
     ref={ref}
   />

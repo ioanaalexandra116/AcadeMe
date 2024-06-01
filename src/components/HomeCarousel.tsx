@@ -170,7 +170,15 @@ export function CarouselPlugin() {
                         }
                       }}
                     >
-                      <GoldenButtonComponent />
+                      <GoldenButtonComponent
+                        onClick={() => {
+                          if (unauthorized) {
+                            setSuccess(true);
+                          } else {
+                            navigate("/leaderboard");
+                          }
+                        }}
+                      />
                     </div>
                   </div>
                   <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-yellow-100 via-red-100 to-yellow-100"></div>

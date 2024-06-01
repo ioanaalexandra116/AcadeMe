@@ -15,6 +15,7 @@ import { useLocation } from "react-router-dom";
 import SadHamster from "@/assets/sad-hamster.png";
 import HappyHamster from "@/assets/happy-hamster.png";
 import PreviewCreate from "@/assets/preview-create.svg";
+import Navbar from "@/components/Navbar";
 
 const myAnim = keyframes`
   0% {
@@ -300,6 +301,8 @@ const Play = () => {
   return flashcardSet === null || (resultsPressed && !updated) ? (
     <Loading />
   ) : (
+    <>
+    <Navbar />
     <div
       className="bg-cover bg-center h-screen w-screen flex flex-col space-y-10 pt-16 relative"
       style={{ backgroundImage: `url(${PreviewCreate})` }}
@@ -509,6 +512,7 @@ const Play = () => {
         </div>
       )}
     </div>
+    </>
   );
 };
 

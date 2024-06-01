@@ -29,6 +29,7 @@ const UnauthorizedPopup = ({ success, setSuccess }: UnauthorizedPopupProps) => {
   const navigate = useNavigate();
   const [sad, setSad] = useState(true);
   return (
+    <div style={{zIndex: 50}}>
     <AlertDialog open={success} onOpenChange={setSuccess}>
       <AlertDialogOverlay />
       <AlertDialogContent>
@@ -71,6 +72,7 @@ const UnauthorizedPopup = ({ success, setSuccess }: UnauthorizedPopupProps) => {
         </div>
       </AlertDialogContent>
     </AlertDialog>
+    </div>
   );
 };
 

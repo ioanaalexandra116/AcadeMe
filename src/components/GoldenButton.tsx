@@ -1,6 +1,10 @@
 import React from 'react';
 import styled from 'styled-components';
-import { useNavigate } from 'react-router-dom';
+
+interface FancyButtonProps {
+  onClick?: () => void;
+}
+
 
 const GoldenButton = styled.button`
   touch-action: manipulation;
@@ -50,9 +54,8 @@ const GoldenButton = styled.button`
   }
 `;
 
-const GoldenButtonComponent: React.FC = () => {
-    const navigate = useNavigate();
-  return <GoldenButton onClick={() => navigate('/leaderboard')}>Leaderboard</GoldenButton>;
+const GoldenButtonComponent: React.FC<FancyButtonProps> = ({ onClick }) => {
+  return <GoldenButton onClick={onClick}>LEADERBOARD</GoldenButton>;
 };
 
 export default GoldenButtonComponent;

@@ -15,7 +15,6 @@ import Notifications from "./pages/Notifications";
 import Follow from "./pages/Follow";
 import SearchUserPage from "./pages/SearchUserPage";
 import Leaderboard from "./pages/Leaderboard";
-import Navbar from "./components/Navbar";
 
 const router = createBrowserRouter([
   {
@@ -31,39 +30,19 @@ const router = createBrowserRouter([
       },
       {
         path: "/play",
-        element: (
-          <>
-            <Navbar />
-            <Play />
-          </>
-        ),
+        element: <Play />,
       },
       {
         path: "/play/results",
-        element: (
-          <>
-            <Navbar />
-            <Results />
-          </>
-        ),
+        element: <Results />,
       },
       {
         path: "/",
-        element: (
-          <>
-            <Navbar />
-            <Home />
-          </>
-        ),
+        element: <Home />,
       },
       {
         path: "/search/flashcards",
-        element: (
-          <>
-            <Navbar />
-            <SearchFlashcardSets />
-          </>
-        ),
+        element: <SearchFlashcardSets />,
       },
       {
         element: <PrivateRoute />,

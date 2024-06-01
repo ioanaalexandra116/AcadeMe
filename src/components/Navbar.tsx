@@ -231,16 +231,9 @@ export default function Navbar() {
       )}
       <NavigationMenu className="backdrop-blur-lg fixed bg-transparent shadow-md z-50">
         <NavigationMenuItem
-          className="flex justify-start items-left absolute left-0 cursor-pointer"
-          onClick={() => {
-            if (unauthorized) {
-              setSuccess(true);
-            } else {
-              window.location.href = "/";
-            }
-          }}
+          className="flex justify-start items-left absolute left-0"
         >
-          {/* <Link to="/"> */}
+          <Link to="/">
           {!smallScreen ? (
             <img
               src={Logo}
@@ -256,7 +249,7 @@ export default function Navbar() {
               style={{ marginLeft: "1.5rem" }}
             />
           )}
-          {/* </Link> */}
+          </Link>
         </NavigationMenuItem>
         <NavigationMenuItem className={navigationMenuTriggerStyle()}>
           <NavigationMenuLink className={navigationMenuTriggerStyle()}>
@@ -412,7 +405,7 @@ export default function Navbar() {
                 </ListItem>
               ) : (
                 <ListItem className="hover:bg-transparent">
-                  Log in to access more features
+                  Log in to access your profile
                 </ListItem>
               )}
               {profileMenuItems.map((component) => (

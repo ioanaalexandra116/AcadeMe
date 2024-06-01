@@ -48,12 +48,26 @@ const router = createBrowserRouter([
         ),
       },
       {
+        path: "/",
+        element: (
+          <>
+            <Navbar />
+            <Home />
+          </>
+        ),
+      },
+      {
+        path: "/search/flashcards",
+        element: (
+          <>
+            <Navbar />
+            <SearchFlashcardSets />
+          </>
+        ),
+      },
+      {
         element: <PrivateRoute />,
         children: [
-          {
-            path: "/",
-            element: <Home />,
-          },
           {
             path: "/profile",
             element: <Profile />,
@@ -69,10 +83,6 @@ const router = createBrowserRouter([
           {
             path: "/edit-profile",
             element: <EditProfile />,
-          },
-          {
-            path: "/search/flashcards",
-            element: <SearchFlashcardSets />,
           },
           {
             path: "/notifications",

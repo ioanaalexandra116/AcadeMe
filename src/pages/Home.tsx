@@ -5,8 +5,8 @@ import { AuthContext } from "@/context";
 import Loading from "@/components/Loading";
 import Background from "@/assets/home-background.svg";
 import { CarouselPlugin } from "@/components/HomeCarousel";
-import FancyButton from "@/components/FancyButton";
 import Navbar from "@/components/Navbar";
+import { Button } from "@/components/ui/button";
 
 const Home = () => {
   const [feed, setFeed] = useState<string[]>([]);
@@ -82,41 +82,42 @@ const Home = () => {
               >
                 <div className="flex justify-center items-center">
                   <h1
-                    className="text-4xl font-bold contoured-text pt-4"
+                    className="text-3xl font-bold contoured-text pt-4"
                     style={{
                       background: "linear-gradient(90deg, #F4D201, #DC0B72)",
                       WebkitBackgroundClip: "text",
                       WebkitTextFillColor: "transparent",
                       textAlign: "center",
                       width: "400px",
-                      height: "100px",
                       alignItems: "center",
                     }}
                   >
                     Log in to your account to see your feed
                   </h1>
                 </div>
-                <FancyButton
-                  onClick={() => window.location.assign("/login")}
-                  message="GO TO LOGIN"
-                />
+                <Button
+                  onClick={() => window.location.assign("/search/people")}
+                  className="bg-gradient-to-r from-yellow-400 to-pink-400 rounded-full"
+                  size={"lg"}
+
+                > Go To Login
+                </Button>
               </div>
             )}
             {!unauthorized && feed.length === 0 && (
               <div
                 className="flex flex-col justify-center items-center space-y-4"
-                style={{ height: "220px" }}
+                style={{ height: "180px" }}
               >
                 <div className="flex justify-center items-center">
                   <h1
-                    className="text-4xl font-bold contoured-text pt-4"
+                    className="text-3xl font-bold contoured-text pt-4"
                     style={{
                       background: "linear-gradient(90deg, #F4D201, #DC0B72)",
                       WebkitBackgroundClip: "text",
                       WebkitTextFillColor: "transparent",
                       textAlign: "center",
                       width: "650px",
-                      height: "140px",
                       alignItems: "center",
                     }}
                   >
@@ -124,10 +125,13 @@ const Home = () => {
                     their posts here!
                   </h1>
                 </div>
-                <FancyButton
+                <Button
                   onClick={() => window.location.assign("/search/people")}
-                  message="FIND CREATORS"
-                />
+                  className="bg-gradient-to-r from-yellow-400 to-pink-400 rounded-full"
+                  size={"lg"}
+
+                > Find Creators
+                </Button>
               </div>
             )}
             <div className="flex flex-wrap justify-center items-center">

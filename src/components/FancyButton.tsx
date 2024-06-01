@@ -65,9 +65,8 @@ const ContainerStars = styled.div`
 
 const Strong = styled.strong`
   z-index: 2;
-  font-family: "Avalors Personal Use";
   font-size: 12px;
-  letter-spacing: 5px;
+  letter-spacing: 2px;
   color: #ffffff;
   text-shadow: 0 0 4px white;
 `;

@@ -15,6 +15,7 @@ import Notifications from "./pages/Notifications";
 import Follow from "./pages/Follow";
 import SearchUserPage from "./pages/SearchUserPage";
 import Leaderboard from "./pages/Leaderboard";
+import VerifyPage from "./pages/VerifyPage";
 
 const router = createBrowserRouter([
   {
@@ -83,6 +84,10 @@ const router = createBrowserRouter([
             path: "/leaderboard",
             element: <Leaderboard />,
           },
+          {
+            path: "/verify",
+            element: <VerifyPage />,
+          }
         ],
       },
     ],

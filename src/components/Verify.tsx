@@ -4,11 +4,9 @@ import { useEffect, useState, useContext } from "react";
 import { AuthContext } from "@/context";
 import Loading from "@/components/Loading";
 import Background from "@/assets/home-background.svg";
-import { CarouselPlugin } from "@/components/HomeCarousel";
-import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 
-const Home = () => {
+const Verify = () => {
   const [feed, setFeed] = useState<string[]>([]);
   const { user, userLoading } = useContext(AuthContext);
   const [loading, setLoading] = useState(true);
@@ -54,7 +52,6 @@ const Home = () => {
     <Loading />
   ) : (
     <>
-      <Navbar />
       <div style={{ position: "relative" }}>
         <div
           style={{
@@ -71,12 +68,6 @@ const Home = () => {
           }}
         />
         <div style={{ position: "relative" }}>
-          <div
-            className="flex justify-center items-center pt-20"
-            style={{ zIndex: 10, width: "100%" }}
-          >
-            {window.innerWidth > 768 && <CarouselPlugin />}
-          </div>
           <div
             style={{
               position: "relative",
@@ -194,4 +185,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default Verify;

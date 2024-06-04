@@ -469,7 +469,7 @@ export async function getAllUsers() {
   const querySnapshot = await getDocs(collectionRef);
   const users = <UserData[]>[];
   querySnapshot.forEach((doc) => {
-    users.push(doc.data() as UserData);
+    if (doc.data().username !== "admin") users.push(doc.data() as UserData);
   });
   return users;
 }
@@ -500,7 +500,7 @@ export async function getUserRanking() {
   const querySnapshot = await getDocs(collectionRef);
   let users = <UserData[]>[];
   querySnapshot.forEach((doc) => {
-    users.push(doc.data() as UserData);
+    if (doc.data().username !== "admin") users.push(doc.data() as UserData);
   });
   users.sort((a, b) => b.exp - a.exp);
   return users as UserData[];

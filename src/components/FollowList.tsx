@@ -22,6 +22,7 @@ export const FollowList = () => {
   const [loadingCursor, setLoadingCursor] = useState(false);
   const [avatarsLoading, setAvatarsLoading] = useState(true);
   const { user, userLoading } = useContext(AuthContext);
+  const [contextUsername, setContextUsername] = useState<string>("");
   const [usersAvatarProps, setUsersAvatarProps] = useState<AvatarProperties[]>(
     []
   );
@@ -65,8 +66,18 @@ export const FollowList = () => {
       }
     };
 
+    const fetchContextUsername = async () => {
+      try {
+        const username = await getUsername(user.uid);
+        setContextUsername(username);
+      } catch (error) {
+        console.error("Error fetching context username:", error);
+      }
+    }
+
     fetchFollowing();
     fetchFollowList();
+    fetchContextUsername();
   }, [user, userId, list]);
 
   useEffect(() => {
@@ -206,7 +217,7 @@ export const FollowList = () => {
                 {avatarsLoading ? <Loader /> : <Avatar {...avatarProps} />}
                 <p>{usernames[index]}</p>
               </div>
-              {user.uid !== followList[index] && (
+              {user.uid !== followList[index] && contextUsername !== "admin" && (
                 <Button
                   style={{
                     backgroundColor: userFollowingStates[index]

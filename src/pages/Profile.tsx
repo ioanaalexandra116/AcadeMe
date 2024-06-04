@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "@/context";
 import Loading from "@/components/Loading";
-import { getUserData, FollowUser, UnfollowUser } from "@/firebase/firestore";
+import { getUserData, FollowUser, UnfollowUser, getUsername } from "@/firebase/firestore";
 import Post from "@/components/Post";
 import DotsBackground from "@/components/DotsBackground";
 import { useLocation, Link, useNavigate } from "react-router-dom";
@@ -21,6 +21,7 @@ import { Button } from "@/components/ui/button";
 const Profile = () => {
   const { user, userLoading } = useContext(AuthContext);
   const navigate = useNavigate();
+  const [contextUsername, setContextUsername] = useState<string>("");
   const [flashcardSets, setFlashcardSets] = useState<string[]>([]);
   const [username, setUsername] = useState<string>("");
   const [description, setDescription] = useState<string>("");
@@ -89,7 +90,18 @@ const Profile = () => {
       }
       setLoadingAvatar(false);
     };
+
+    const fetchUsername = async () => {
+      try {
+        const username = await getUsername(user.uid);
+        setContextUsername(username);
+      } catch (error) {
+        console.error("Error fetching username:", error);
+      }
+    }
+
     fetchUserData();
+    fetchUsername();
   }, [user]);
 
   const PressFollowUser = async (follower: string, following: string) => {
@@ -225,7 +237,7 @@ const Profile = () => {
           </div>
         </div>
       )}
-      {userId !== user.uid && (
+      {userId !== user.uid && contextUsername !== "admin" && (
         <div className="mt-6 flex justify-center items-center justify-center">
           {!followed ? (
             <Button

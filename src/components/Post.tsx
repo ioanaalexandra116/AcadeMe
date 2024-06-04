@@ -39,6 +39,7 @@ import UnauthorizedPopup from "./UnauthorizedPopup";
 
 const Post = ({ flashcardSetId }: { flashcardSetId: string }) => {
   const { user, userLoading } = useContext(AuthContext);
+  const [contextUsername, setContextUsername] = useState<string>("");
   const navigate = useNavigate();
   const defaultCharacterProperties: AvatarProperties = {
     gender: "man",
@@ -78,13 +79,23 @@ const Post = ({ flashcardSetId }: { flashcardSetId: string }) => {
     if (!user && !userLoading) {
       setUnauthorized(true);
     }
+
+    const fetchContextUsername = async () => {
+      if (!user) {
+        return;
+      }
+      const username = await getUsername(user.uid);
+      setContextUsername(username);
+    };
+
+    fetchContextUsername();
   }, [user, userLoading]);
 
   useEffect(() => {
     if (!user) {
       return;
     }
-    if (flashcardSet.creator === user.uid) {
+    if (flashcardSet.creator === user.uid || contextUsername === "admin") {
       setShowMore(true);
     }
   }, [user, flashcardSet.creator]);
@@ -164,7 +175,9 @@ const Post = ({ flashcardSetId }: { flashcardSetId: string }) => {
 
   return !isDeleted ? (
     <>
-    {unauthorized && <UnauthorizedPopup success={success} setSuccess={setSuccess} />}
+      {unauthorized && (
+        <UnauthorizedPopup success={success} setSuccess={setSuccess} />
+      )}
       <div className="p-6 flex items-center justify-center">
         <Card
           className="flex flex-col border-black rounded-xl"
@@ -277,6 +290,7 @@ const Post = ({ flashcardSetId }: { flashcardSetId: string }) => {
                   />
                 )}
               </Card>
+              { contextUsername !== "admin" && (
               <img
                 src={PlayButton}
                 alt="play button"
@@ -284,7 +298,7 @@ const Post = ({ flashcardSetId }: { flashcardSetId: string }) => {
                 onClick={() =>
                   navigate(`/play?flashcardSetId=${flashcardSetId}`)
                 }
-              />
+              />)}
             </div>
             <div className="flex flex-wrap items-center justify-center">
               {flashcardSet.category.map((category, index) => (
@@ -327,7 +341,7 @@ const Post = ({ flashcardSetId }: { flashcardSetId: string }) => {
             style={{ height: "28px" }}
           >
             <div className="flex justify-between items-center w-full">
-              <div className="flex flex-row items-center">
+              <div className="flex flex-row items-center h-8">
                 {Object.keys(flashcardSet.flashcards).length}
                 &nbsp;
                 <Card
@@ -345,23 +359,25 @@ const Post = ({ flashcardSetId }: { flashcardSetId: string }) => {
               ) : (
                 <div>played {flashcardSet.playCount} times</div>
               )}
-              <div className="flex items-end">
-                {!isSaved ? (
-                  <img
-                    src={SaveIcon}
-                    alt="save icon"
-                    className="relative w-9 h-8 cursor-pointer"
-                    onClick={handleSave}
-                  />
-                ) : (
-                  <img
-                    src={SavedIcon}
-                    alt="saved icon"
-                    className="relative w-9 h-8 cursor-pointer"
-                    onClick={handleSave}
-                  />
-                )}
-              </div>
+              {contextUsername !== "admin" && (
+                <div className="flex items-end">
+                  {!isSaved ? (
+                    <img
+                      src={SaveIcon}
+                      alt="save icon"
+                      className="relative w-9 h-8 cursor-pointer"
+                      onClick={handleSave}
+                    />
+                  ) : (
+                    <img
+                      src={SavedIcon}
+                      alt="saved icon"
+                      className="relative w-9 h-8 cursor-pointer"
+                      onClick={handleSave}
+                    />
+                  )}
+                </div>
+              )}
             </div>
           </CardFooter>
         </Card>

@@ -57,6 +57,16 @@ export async function createUserCollection(user: User, username: string) {
     });
 }
 
+export async function getAdminId() {
+  const q = query(collection(db, "users"), where("username", "==", "admin"));
+
+  const querySnapshot = await getDocs(q);
+  if (querySnapshot.empty) {
+    return null;
+  }
+  return querySnapshot.docs[0].id;
+}
+
 export async function checkUsername(username: string) {
   const q = query(collection(db, "users"), where("username", "==", username));
 
@@ -188,6 +198,12 @@ export async function createFlashcardSet(
       feed: arrayUnion(SetId),
     });
   });
+  const adminRef = await getAdminId();
+  if (adminRef) {
+    await updateDoc(doc(db, "users", adminRef), {
+      check: arrayUnion(SetId),
+    });
+  }
   return SetId;
 }
 
@@ -479,6 +495,13 @@ export async function getFeedPostsIds(uid: string) {
   const docSnap = await getDoc(docRef);
   const feed = docSnap.data()?.feed || [];
   return feed;
+}
+
+export async function getCheckPostsIds(uid: string) {
+  const docRef = doc(db, "users", uid);
+  const docSnap = await getDoc(docRef);
+  const check = docSnap.data()?.check || [];
+  return check;
 }
 
 export async function getMostPlayedSetId() {

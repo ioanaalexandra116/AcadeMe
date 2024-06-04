@@ -178,7 +178,7 @@ const Post = ({ flashcardSetId }: { flashcardSetId: string }) => {
       {unauthorized && (
         <UnauthorizedPopup success={success} setSuccess={setSuccess} />
       )}
-      <div className="p-6 flex items-center justify-center">
+      <div className="pl-6 pr-6 pb-4 flex items-center justify-center">
         <Card
           className="flex flex-col border-black rounded-xl"
           style={{ width: "370px", height: "470px", backgroundColor: "#fff" }}

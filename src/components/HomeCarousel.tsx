@@ -110,7 +110,7 @@ export function CarouselPlugin() {
   return loading ? (
     <Loading />
   ) : (
-    <>
+    <div className="pb-6">
       {unauthorized && (
         <UnauthorizedPopup success={success} setSuccess={setSuccess} />
       )}
@@ -463,6 +463,6 @@ export function CarouselPlugin() {
         </CarouselContent>
         <CarouselNext />
       </Carousel>
-    </>
+    </div>
   );
 }

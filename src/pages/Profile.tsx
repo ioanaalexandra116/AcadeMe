@@ -276,7 +276,7 @@ const Profile = () => {
       )}
 
       {showPosts ? (
-        <div className={`flex flex-wrap justify-center items-center`}>
+        <div className={`flex flex-wrap justify-center items-center pt-8`}>
           {flashcardSets.length === 0 ? (
             <div className="flex flex-col items-center justify-center space-y-8">
               <h1
@@ -314,7 +314,7 @@ const Profile = () => {
           )}
         </div>
       ) : (
-        <div className={`flex flex-wrap justify-center items-center`}>
+        <div className={`flex flex-wrap justify-center items-center pt-8`}>
           {favorites.length === 0 ? (
             <div className="flex flex-col items-center justify-center space-y-8">
               <h1
@@ -345,7 +345,7 @@ const Profile = () => {
             </div>
           ) : (
             favorites.map((flashcardSetId) => (
-              <div key={flashcardSetId} className="p-6 flex justify-center">
+              <div key={flashcardSetId} className="flex justify-center">
                 <Post flashcardSetId={flashcardSetId} />
               </div>
             ))

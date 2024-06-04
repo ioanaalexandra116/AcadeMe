@@ -14,12 +14,15 @@ import {
   addToFavorites,
   removeFromFavorites,
   deleteFlashcardSet,
+  deleteFromCheckAdmin,
 } from "@/firebase/firestore";
 import { useState, useEffect } from "react";
 import Loader from "./Loader";
 import PlayButton from "../assets/play-button.svg";
 import SaveIcon from "../assets/save-icon.svg";
 import SavedIcon from "../assets/saved-icon.svg";
+import Confirm from "@/assets/confirm.svg";
+import Delete from "@/assets/x-delete.svg";
 import MoreIcon from "../assets/more-icon.svg";
 import DeletePost from "../assets/delete-post.svg";
 import EditPost from "../assets/edit-post.svg";
@@ -36,6 +39,7 @@ import { useContext } from "react";
 import { AuthContext } from "@/context";
 import AdvanceCateg from "../assets/advance-categ.svg";
 import UnauthorizedPopup from "./UnauthorizedPopup";
+import { Button } from "./ui/button";
 
 const Post = ({ flashcardSetId }: { flashcardSetId: string }) => {
   const { user, userLoading } = useContext(AuthContext);
@@ -170,18 +174,30 @@ const Post = ({ flashcardSetId }: { flashcardSetId: string }) => {
       return;
     }
     setIsDeleted(true);
-    await deleteFlashcardSet(flashcardSetId, user.uid);
+    await deleteFlashcardSet(flashcardSetId, flashcardSet.creator);
   };
+
+  const handleApprove = async () => {
+    if (!user) {
+      return;
+    }
+    setIsDeleted(true);
+    await deleteFromCheckAdmin(flashcardSetId, user.uid);
+  }
 
   return !isDeleted ? (
     <>
       {unauthorized && (
         <UnauthorizedPopup success={success} setSuccess={setSuccess} />
       )}
-      <div className="pl-6 pr-6 pb-4 flex items-center justify-center">
+      <div className="flex items-center justify-center pl-8 pr-8 pb-16">
         <Card
           className="flex flex-col border-black rounded-xl"
-          style={{ width: "370px", height: "470px", backgroundColor: "#fff" }}
+          style={{
+            width: "370px",
+            height: contextUsername === "admin" ? "370px" : "470px",
+            backgroundColor: "#fff",
+          }}
         >
           <CardHeader>
             <div className="flex justify-between items-center">
@@ -290,76 +306,82 @@ const Post = ({ flashcardSetId }: { flashcardSetId: string }) => {
                   />
                 )}
               </Card>
-              { contextUsername !== "admin" && (
-              <img
-                src={PlayButton}
-                alt="play button"
-                className="relative bottom-4 left-56 w-16 h-16 z-10 cursor-pointer"
-                onClick={() =>
-                  navigate(`/play?flashcardSetId=${flashcardSetId}`)
-                }
-              />)}
+              {contextUsername !== "admin" && (
+                <img
+                  src={PlayButton}
+                  alt="play button"
+                  className="relative bottom-4 left-56 w-16 h-16 z-10 cursor-pointer"
+                  onClick={() =>
+                    navigate(`/play?flashcardSetId=${flashcardSetId}`)
+                  }
+                />
+              )}
             </div>
-            <div className="flex flex-wrap items-center justify-center">
-              {flashcardSet.category.map((category, index) => (
-                <span
-                  key={index}
-                  className="text-sm text-sky-400"
-                  style={{ display: "flex", alignItems: "center" }}
-                >
-                  {index > 0 && category && (
-                    <img
-                      src={AdvanceCateg}
-                      alt="advance category"
-                      className="w-3 h-3"
-                      style={{
-                        transform: "rotate(180deg)",
-                        marginRight: "2px",
-                        marginLeft: "2px",
-                      }}
-                    />
-                  )}
-                  <p
-                    onClick={() =>
-                      window.location.replace(
-                        `/search/flashcards?categories=${flashcardSet.category}&selected=${category}`
-                      )
-                    }
-                    className="cursor-pointer"
+            {contextUsername !== "admin" && (
+              <div className="flex flex-wrap items-center justify-center">
+                {flashcardSet.category.map((category, index) => (
+                  <span
+                    key={index}
+                    className="text-sm text-sky-400"
+                    style={{ display: "flex", alignItems: "center" }}
                   >
-                    {category}
-                  </p>
-                </span>
-              ))}
-            </div>
-            <CardDescription style={{ textAlign: "center" }} className="mb-4">
-              {flashcardSet.description}
-            </CardDescription>
+                    {index > 0 && category && (
+                      <img
+                        src={AdvanceCateg}
+                        alt="advance category"
+                        className="w-3 h-3"
+                        style={{
+                          transform: "rotate(180deg)",
+                          marginRight: "2px",
+                          marginLeft: "2px",
+                        }}
+                      />
+                    )}
+                    <p
+                      onClick={() =>
+                        window.location.replace(
+                          `/search/flashcards?categories=${flashcardSet.category}&selected=${category}`
+                        )
+                      }
+                      className="cursor-pointer"
+                    >
+                      {category}
+                    </p>
+                  </span>
+                ))}
+              </div>
+            )}
+            {contextUsername !== "admin" && (
+              <CardDescription style={{ textAlign: "center" }} className="mb-4">
+                {flashcardSet.description}
+              </CardDescription>
+            )}
           </CardContent>
           <CardFooter
             className="text-sm text-muted-foreground ml-2 mb-1 mr-2 mt-1 flex-col items-start"
-            style={{ height: "28px" }}
+            style={{ height: contextUsername === "admin" ? "50px" : "28px" }}
           >
-            <div className="flex justify-between items-center w-full">
-              <div className="flex flex-row items-center h-8">
-                {Object.keys(flashcardSet.flashcards).length}
-                &nbsp;
-                <Card
-                  className="border-muted-foreground rounded-sm"
-                  style={{
-                    width: "25px",
-                    height: "17px",
-                    zIndex: 1,
-                    backgroundColor: "#F2D755",
-                  }}
-                ></Card>
-              </div>
-              {flashcardSet.playCount === 1 ? (
-                <div>played 1 time</div>
-              ) : (
-                <div>played {flashcardSet.playCount} times</div>
-              )}
-              {contextUsername !== "admin" && (
+            {contextUsername !== "admin" ? (
+              <div className="flex justify-between items-center w-full">
+                <div className="flex flex-row items-center h-8">
+                  {Object.keys(flashcardSet.flashcards).length}
+                  &nbsp;
+                  <Card
+                    className="border-muted-foreground rounded-sm"
+                    style={{
+                      width: "25px",
+                      height: "17px",
+                      zIndex: 1,
+                      backgroundColor: "#F2D755",
+                    }}
+                  ></Card>
+                </div>
+                {flashcardSet.playCount === 1 ? (
+                  <div>played 1 time</div>
+                ) : (
+                  <div>played {flashcardSet.playCount} times</div>
+                )}
+
                 <div className="flex items-end">
                   {!isSaved ? (
                     <img
@@ -377,8 +399,18 @@ const Post = ({ flashcardSetId }: { flashcardSetId: string }) => {
                     />
                   )}
                 </div>
-              )}
-            </div>
+              </div>
+            ) : (
+              <div className="flex justify-between items-center w-full h-10 pl-8 pr-8">
+                <img src={Delete} alt="confirm" className="w-10 h-7 cursor-pointer"
+                onClick={handleDelete}
+                 />
+                <Button style={{ backgroundColor: "#F987AF" }}>View</Button>
+                <img src={Confirm} alt="delete" className="w-10 h-7 cursor-pointer"
+                onClick={handleApprove}
+                 />
+              </div>
+            )}
           </CardFooter>
         </Card>
       </div>

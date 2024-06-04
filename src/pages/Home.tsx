@@ -72,7 +72,7 @@ const Home = () => {
         />
         <div style={{ position: "relative" }}>
           <div
-            className="flex justify-center items-center pt-20"
+            className="flex justify-center items-center pt-20 pb-3"
             style={{ zIndex: 10, width: "100%" }}
           >
             {window.innerWidth > 768 && <CarouselPlugin />}
@@ -182,7 +182,7 @@ const Home = () => {
             }
             <div className="flex flex-wrap justify-center items-center">
               {feed.map((flashcardSetId) => (
-                <div key={flashcardSetId} className="p-4 flex justify-center">
+                <div key={flashcardSetId} className="flex justify-center">
                   <Post flashcardSetId={flashcardSetId} />
                 </div>
               ))}

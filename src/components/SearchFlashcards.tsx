@@ -107,14 +107,12 @@ export const SearchFlashcards = () => {
       if (event.key === "Enter") {
         if (buttonRef.current) buttonRef.current.click();
       }
-    
-    }
+    };
     window.addEventListener("keydown", handleKeyPress);
     return () => {
       window.removeEventListener("keydown", handleKeyPress);
-    }
-  }
-  , []);
+    };
+  }, []);
 
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
@@ -696,9 +694,11 @@ export const SearchFlashcards = () => {
                 No flashcard sets found
               </h1>
             ) : (
-              <div className={`flex flex-wrap justify-center items-center`}>
+              <div
+                className={`flex flex-wrap justify-center items-center pt-8`}
+              >
                 {flashcardSets.map((flashcardSetId) => (
-                  <div key={flashcardSetId} className="p-8 flex justify-center">
+                  <div key={flashcardSetId} className="flex justify-center">
                     <Post flashcardSetId={flashcardSetId} />
                   </div>
                 ))}

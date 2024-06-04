@@ -4,26 +4,15 @@ import { useEffect, useState, useContext } from "react";
 import { AuthContext } from "@/context";
 import Loading from "@/components/Loading";
 import Background from "@/assets/home-background.svg";
-import { Button } from "@/components/ui/button";
-import Confirm from "@/assets/confirm.svg";
-import Delete from "@/assets/x-delete.svg";
 
 const Verify = () => {
   const [check, setFeed] = useState<string[]>([]);
   const { user, userLoading } = useContext(AuthContext);
   const [loading, setLoading] = useState(true);
-  const [unauthorized, setUnauthorized] = useState(false);
   const [username, setUsername] = useState("");
 
   useEffect(() => {
-    if (!user && !userLoading || user && username !== "admin") {
-      setUnauthorized(true);
-    }
-  }, [user, userLoading, username]);
-
-  useEffect(() => {
-    if (!user) {
-      setLoading(false);
+    if (!user || userLoading) {
       return;
     }
     const fetchFeed = async () => {
@@ -47,6 +36,7 @@ const Verify = () => {
 
     fetchFeed();
     fetchUsername();
+    setLoading(false);
   }, [user]);
 
   return loading ? (
@@ -69,23 +59,27 @@ const Verify = () => {
           }}
         />
         <div className="flex flex-col items-center justify-center h-full w-full">
-            <h1
-              className="text-4xl font-bold text-black mt-4 mb-6 contoured-text"
-              style={{
-                color: "#f987af",
-                textShadow: `-0.5px -0.5px 0 #000, 2px -0.5px 0 #000, -0.5px 1px 0 #000, 2px 1px 0 #000`,
-              }}
-            >
-              Approve or Reject Flashcard Sets
-            </h1>
-            <div className="flex flex-col justify-center items-center">
+          <h1
+            className="text-4xl font-bold text-black mt-4 mb-10 contoured-text"
+            style={{
+              color: "#f987af",
+              textShadow: `-0.5px -0.5px 0 #000, 2px -0.5px 0 #000, -0.5px 1px 0 #000, 2px 1px 0 #000`,
+            }}
+          >
+            {username !== "admin"
+              ? "Only Admins Can Access This Page"
+              : "Approve or Reject Flashcard Sets"}
+          </h1>
+          {username === "admin" && (
+            <div className="flex flex-wrap justify-center items-center">
               {check.map((flashcardSetId) => (
-                <div key={flashcardSetId} className="p-4 flex justify-center">
+                <div key={flashcardSetId} className="flex justify-center">
                   <Post flashcardSetId={flashcardSetId} />
                 </div>
               ))}
             </div>
-          </div>
+          )}
+        </div>
       </div>
     </>
   );

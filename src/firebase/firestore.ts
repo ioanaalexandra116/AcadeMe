@@ -263,7 +263,25 @@ export async function deleteFlashcardSet(setId: string, uid: string) {
   usersSnapshot.forEach((doc) => {
     updateDoc(doc.ref, {
       favorites: arrayRemove(setId),
+      activity: {
+        ...doc.data().activity,
+        [setId]: null,
+      },
+      feed: arrayRemove(setId),
     });
+  });
+  const adminRef = await getAdminId();
+  if (adminRef) {
+    await updateDoc(doc(db, "users", adminRef), {
+      check: arrayRemove(setId),
+    });
+  }
+}
+
+export async function deleteFromCheckAdmin(setId: string, adminId: string) {
+  const docRef = doc(db, "users", adminId);
+  await updateDoc(docRef, {
+    check: arrayRemove(setId),
   });
 }
 

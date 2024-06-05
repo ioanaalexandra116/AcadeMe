@@ -11,6 +11,7 @@ import { AuthContext } from "@/context";
 import { useLocation } from "react-router-dom";
 import Loading from "./Loading";
 import Loader from "./Loader";
+import Admin from "@/assets/admin.svg";
 import { Card } from "./ui/card";
 import Avatar from "./Avatar";
 import { Button } from "./ui/button";
@@ -95,27 +96,22 @@ export const NotificationsList = () => {
       try {
         const users = await Promise.all(
           notifications.map(async (notification) => {
-            const username = await getUsername(notification.id);
-            const avatarProps = await getAvatarProps(notification.id);
-            if (avatarProps) {
-              avatarProps.dimensions = "40px";
-            }
-
-            if (avatarProps) {
+            if (notification.message.includes("following")) {
+              const username = await getUsername(notification.id);
+              const avatarProps = await getAvatarProps(notification.id);
+              if (avatarProps) {
+                avatarProps.dimensions = "40px";
+              }
               return { username, avatarProps };
             } else {
-              return { username, avatarProps: {} as AvatarProperties };
-              // You may replace {} with default values or handle it differently based on your requirements
+              const title = notification.id;
+              return { title, avatarProps: {} as AvatarProperties };
             }
           })
         );
 
-        const filteredUsers = users.filter(
-          (user) => user.avatarProps !== undefined
-        );
-
-        const usernames = filteredUsers.map((user) => user.username);
-        const usersAvatarProps = filteredUsers.map(
+        const usernames = users.map((user) => user.username);
+        const usersAvatarProps = users.map(
           (user) => user.avatarProps as AvatarProperties
         );
 
@@ -134,9 +130,14 @@ export const NotificationsList = () => {
 
   const pressFollowNotification = async (notification: Notification) => {
     try {
-      setLoadingCursor(true);
       await markNotificationAsRead(user.uid, notification.timestamp);
-      window.location.href = `/profile?userId=${notification.id}`;
+      if (notification.message.includes("following")) {
+        setLoadingCursor(true);
+        window.location.href = `/profile?userId=${notification.id}`;
+      } else if (notification.message.includes("modified")) {
+        setLoadingCursor(true);
+        window.location.href = `/profile?userId=${user.uid}`;
+      }
     } catch (error) {
       console.error("Error marking notification as read:", error);
     }
@@ -146,11 +147,47 @@ export const NotificationsList = () => {
     try {
       setAllRead(true);
       await markAllNotificationsAsRead(user.uid);
-      //reload the page to update the UI
     } catch (error) {
       console.error("Error marking all notifications as read:", error);
     }
-  }
+  };
+
+  const formatDate = (timestamp: string) => {
+    const date = new Date(timestamp);
+    const today = new Date();
+    const yesterday = new Date(today);
+    yesterday.setDate(today.getDate() - 1);
+  
+    // Normalize time to 00:00:00 for comparison
+    const normalizeDate = (date: Date) => {
+      return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    };
+  
+    const options: Intl.DateTimeFormatOptions = {
+      hour: "numeric",
+      minute: "numeric",
+      hour12: true,
+    };
+  
+    const normalizedDate = normalizeDate(date);
+    const normalizedToday = normalizeDate(today);
+    const normalizedYesterday = normalizeDate(yesterday);
+  
+    const timeString = date.toLocaleTimeString("ro-RO", options);
+  
+    if (normalizedDate.getTime() === normalizedToday.getTime()) {
+      return `Today at ${timeString}`;
+    } else if (normalizedDate.getTime() === normalizedYesterday.getTime()) {
+      return `Yesterday at ${timeString}`;
+    } else {
+      const dateOptions: Intl.DateTimeFormatOptions = {
+        month: "long",
+        day: "numeric",
+      };
+      const dateString = date.toLocaleDateString("ro-RO", dateOptions);
+      return `${dateString} at ${timeString}`;
+    }
+  };
 
   return loading || loadingCursor ? (
     <Loading />
@@ -176,13 +213,16 @@ export const NotificationsList = () => {
             <Card
               key={notification.timestamp}
               style={{
-                backgroundColor: notification.read || allRead ? "#f9f9f9" : "#F7E3E3",
+                backgroundColor:
+                  notification.read || allRead ? "#f9f9f9" : "#F7E3E3",
                 width: "400px",
                 paddingTop: "12px",
-                paddingBottom: "12px",
+                paddingBottom: "2px",
                 paddingLeft: "20px",
-                paddingRight: "0px",
-                cursor: "pointer",
+                paddingRight: "8px",
+                cursor: notification.message.includes("removed")
+                  ? "default"
+                  : "pointer",
               }}
               onClick={pressFollowNotification.bind(this, notification)}
             >
@@ -197,16 +237,54 @@ export const NotificationsList = () => {
                       ) : (
                         <Avatar {...usersAvatarProps[index]} />
                       )}
-                      <p className="contoured-text font-bold pr-2"
-                      style={{
-                        color: "#E09BAC"
-                      }}>
+                      <p
+                        className="contoured-text font-bold pr-2"
+                        style={{
+                          color: "#E09BAC",
+                        }}
+                      >
                         {usernames[index]}
                       </p>
                     </div>
                   )}
-                <p>{notification.message}</p>
+                {!notification.message.includes("following") && (
+                  <div className="flex items-center space-x-3 pl-2 pr-3">
+                    <img src={Admin} alt="admin" className="w-7 h-7" />
+                    <p
+                      className="contoured-text font-bold pr-2"
+                      style={{
+                        color: "#E09BAC",
+                      }}
+                    >
+                      {usernames[index]}
+                    </p>
+                  </div>
+                )}
+                {notification.message.includes("following") ? (
+                  <p style={{ paddingRight: "12px" }}>{notification.message}</p>
+                ) : (
+                  <p style={{ paddingRight: "12px" }}>
+                    {notification.message.split("flashcard set")[0] +
+                      "flashcard set "}
+                    <div
+                      style={{
+                        color: "#E09BAC",
+                        display: "inline",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      {notification.id}
+                    </div>
+                    {notification.message.split("flashcard set")[1]}
+                  </p>
+                )}
               </div>
+              <p
+                className="flex flex-row items-center justify-end"
+                style={{ color: "gray", fontSize: "12px", marginTop: "4px" }}
+              >
+                {formatDate(notification.timestamp)}
+              </p>
             </Card>
           ))}
           <Button

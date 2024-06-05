@@ -15,6 +15,7 @@ import {
   removeFromFavorites,
   deleteFlashcardSet,
   deleteFromCheckAdmin,
+  addDeleteNotification,
 } from "@/firebase/firestore";
 import { useState, useEffect } from "react";
 import Loader from "./Loader";
@@ -180,6 +181,7 @@ const Post: React.FC<PostProps> = ({ flashcardSetId, verify }) => {
     }
     setIsDeleted(true);
     await deleteFlashcardSet(flashcardSetId, flashcardSet.creator);
+    await addDeleteNotification(flashcardSet.title, flashcardSet.creator);
   };
 
   const handleApprove = async () => {

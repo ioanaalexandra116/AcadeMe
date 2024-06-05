@@ -18,6 +18,8 @@ import {
   getUsername,
   deleteFlashcardSet,
   deleteFromCheckAdmin,
+  addDeleteNotification,
+  addModifyNotification,
 } from "@/firebase/firestore";
 import {
   Select,
@@ -371,13 +373,26 @@ const EditPost = () => {
         flashcard.backContent;
     });
     handleUploadPic();
-    if (!postId) {
+    if (!postId || !flashcardSet) {
       return;
     }
     setLoading(true);
+    if (
+      (flashcardSet?.title !== title ||
+        flashcardSet?.description !== description ||
+        flashcardSet?.cover !== currentPhoto ||
+        flashcardSet?.category[0] !== selectedCategory ||
+        flashcardSet?.category[1] !== selectedSecondCategory ||
+        flashcardSet?.category[2] !== selectedThirdCategory ||
+        JSON.stringify(flashcardSet.flashcards) !==
+          JSON.stringify(newFlashcardSet.flashcards)) &&
+      contextUsername === "admin"
+    ) {
+      await addModifyNotification(flashcardSet.title, flashcardSet.creator);
+    }
     await updateFlashcardSet(postId, newFlashcardSet);
-    await deleteFromCheckAdmin(postId, user.uid);
     if (view) {
+      await deleteFromCheckAdmin(postId, user.uid);
       navigate(`/verify`);
     } else {
       navigate(`/profile?userId=${flashcardSet?.creator}`);
@@ -394,6 +409,7 @@ const EditPost = () => {
     }
     setLoading(true);
     await deleteFlashcardSet(postId, flashcardSet.creator);
+    await addDeleteNotification(flashcardSet.title, flashcardSet.creator);
     navigate(`/verify`);
     setLoading(false);
   };

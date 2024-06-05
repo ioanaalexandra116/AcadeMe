@@ -428,6 +428,34 @@ export async function FollowUser(uid: string, targetUid: string) {
   return "Followed";
 }
 
+export async function addModifyNotification(setTitle: string, userID: string) {
+  const userRef = doc(db, "users", userID);
+  await updateDoc(userRef, {
+    notifications: {
+      ...((await getDoc(userRef)).data()?.notifications || {}),
+      [new Date().toISOString()]: [
+        `${setTitle}`,
+        "Your flashcard set has been modified in order to comply with the policy.",
+        "unread",
+      ],
+    },
+  });
+}
+
+export async function addDeleteNotification(setTitle: string, userID: string) {
+  const userRef = doc(db, "users", userID);
+  await updateDoc(userRef, {
+    notifications: {
+      ...((await getDoc(userRef)).data()?.notifications || {}),
+      [new Date().toISOString()]: [
+        `${setTitle}`,
+        "Your flashcard set has been removed due to policy violation.",
+        "unread",
+      ],
+    },
+  });
+}
+
 export async function UnfollowUser(uid: string, targetUid: string) {
   const userRef = doc(db, "users", uid);
   const targetUserRef = doc(db, "users", targetUid);

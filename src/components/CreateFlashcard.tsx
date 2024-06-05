@@ -13,6 +13,7 @@ interface CreateFlashcardSetProps {
   backValue?: string;
   setFrontValue?: (value: string) => void;
   setBackValue?: (value: string) => void;
+  editable?: boolean;
 }
 
 const StyledCard = styled.div`
@@ -71,6 +72,7 @@ const CreateFlashcard = ({
   backValue,
   setFrontValue,
   setBackValue,
+  editable = true,
 }: CreateFlashcardSetProps) => {
   const [frontContent, setFrontContent] = useState(frontValue || "");
   const [backContent, setBackContent] = useState(backValue || "");
@@ -106,21 +108,27 @@ const CreateFlashcard = ({
     <StyleSheetManager enableVendorPrefixes shouldForwardProp={forwardProp}>
 
     {(window.innerWidth) > 768 ? (
-    <div className="flex flex-row items-center justify-center space-x-5">
+    <div className="flex flex-row items-center justify-center space-x-5"
+    style ={{
+      marginRight: editable ? "0px" : "50px",
+    }}
+    >
       <div className="flex flex-row items-center justify-center space-x-5">
         <Textarea
           placeholder="Complete the front side"
           value={frontContent}
           onChange={(e) => handleFrontContentChange(e.target.value)}
-          style={{ width: "300px", height: "175px", resize: "none"}}
+          style={{ width: "300px", height: "175px", resize: "none", cursor: editable ? "auto" : "default"}}
           className="bg-white rounded-xl"
+          readOnly={!editable}
         />
         <Textarea
           placeholder="Complete the back side"
           value={backContent}
           onChange={(e) => handleBackContentChange(e.target.value)}
-          style={{ width: "300px", height: "175px", resize: "none"}}
+          style={{ width: "300px", height: "175px", resize: "none", cursor: editable ? "auto" : "default"}}
           className="bg-white rounded-xl"
+          readOnly={!editable}
         />
         <img src={RightArrow} alt="right arrow" className="w-10 h-10" />
       </div>
@@ -133,12 +141,13 @@ const CreateFlashcard = ({
           <CardBack>{backContent}</CardBack>
         </CardInner>
       </StyledCard>
-      <Button
+      { editable && 
+      (<Button
         onClick={() => onDelete(flashcardKey)}
         className="text-red-700 bg-red-200 border-red-700 hover:bg-red-700 hover:text-white"
       >
         Remove
-      </Button>
+      </Button>)}
     </div>
   ) : (
     <div className="flex flex-col items-center justify-center space-y-5">

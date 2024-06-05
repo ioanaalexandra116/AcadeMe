@@ -14,7 +14,8 @@ import {
   getCategories,
   getSecondCategories,
   getFlashcardSet,
-  updateFlashcardSet
+  updateFlashcardSet,
+  getUsername,
 } from "@/firebase/firestore";
 import {
   Select,
@@ -28,6 +29,8 @@ import { storage } from "@/firebase/config";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { v4 } from "uuid";
 import UploadPhoto from "../assets/upload-photo.svg";
+import EditPostIcon from "../assets/edit-post.svg";
+import XDelete from "../assets/x-delete.svg";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -95,9 +98,12 @@ const EditPost = () => {
     { id: 4, frontContent: "", backContent: "" },
     { id: 5, frontContent: "", backContent: "" },
   ]);
+  const [contextUsername, setContextUsername] = useState("");
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const postId = queryParams.get("postId");
+  const view = location.pathname.includes("view-post");
+  const [isEditable, setIsEditable] = useState(!view);
 
   useEffect(() => {
     const fetchFlashcardSet = async () => {
@@ -144,11 +150,18 @@ const EditPost = () => {
     if (!user) {
       return;
     }
+    const fetchContextUsername = async () => {
+      const username = await getUsername(user.uid);
+      setContextUsername(username);
+    };
+
     const fetchCategories = async () => {
       const data = await getCategories();
       setCategories(data);
       setLoading(false);
     };
+
+    fetchContextUsername();
     fetchCategories();
   }, [user]);
 
@@ -338,8 +351,8 @@ const EditPost = () => {
       setErr("Flashcard front side must be unique");
       return;
     }
-    const flashcardSet: FlashcardSet = {
-      creator: user.uid,
+    const newFlashcardSet: FlashcardSet = {
+      creator: flashcardSet?.creator || user.uid,
       title,
       description,
       cover: currentPhoto,
@@ -352,14 +365,19 @@ const EditPost = () => {
       playCount: 0,
     };
     flashcardSets.forEach((flashcard) => {
-      flashcardSet.flashcards[flashcard.frontContent] = flashcard.backContent;
+      newFlashcardSet.flashcards[flashcard.frontContent] =
+        flashcard.backContent;
     });
     handleUploadPic();
     if (!postId) {
       return;
     }
-    await updateFlashcardSet(postId, flashcardSet);
-    navigate(`/profile?userId=${user.uid}`);
+    await updateFlashcardSet(postId, newFlashcardSet);
+    if (view) {
+      navigate(`/verify`);
+    } else {
+      navigate(`/profile?userId=${flashcardSet?.creator}`);
+    }
   };
 
   const getSpaceXClass = () => {
@@ -400,8 +418,51 @@ const EditPost = () => {
             textShadow: `-0.5px -0.5px 0 #000, 2px -0.5px 0 #000, -0.5px 1px 0 #000, 2px 1px 0 #000`,
           }}
         >
-          Edit Flashcard Set
+          {isEditable ? "Edit Flashcard Set" : "View Flashcard Set"}
         </h1>
+        {view && (
+          <>
+            <Button
+              style={{
+                position: "fixed",
+                top: "10px",
+                right: "10px",
+                padding: "10px 20px",
+                color: "#000",
+                backgroundColor: "#fff",
+                cursor: "pointer",
+                marginTop: "50px",
+              }}
+              onClick={() => setIsEditable(!isEditable)}
+            >
+              <div className="flex flex-row items-center justify-center space-x-2">
+                {!isEditable ? (
+                  <img src={EditPostIcon} alt="Edit Post" className="w-6 h-4" />
+                ) : (
+                  <img src={XDelete} alt="X Delete" className="w-5 h-5" />
+                )}
+                <p>{isEditable ? "Disable Editing" : "Enable Editing"}</p>
+              </div>
+            </Button>
+            {next && (
+              <Button
+                style={{
+                  position: "fixed",
+                  top: "10px",
+                  left: "10px",
+                  padding: "10px 20px",
+                  color: "#000",
+                  backgroundColor: "#fff",
+                  cursor: "pointer",
+                  marginTop: "50px",
+                }}
+                onClick={() => setNext(false)}
+              >
+                Back
+              </Button>
+            )}
+          </>
+        )}
         {!next ? (
           <AnimatedFirst className="flex flex-col items-center justify-center space-y-5">
             <Card
@@ -433,7 +494,7 @@ const EditPost = () => {
                           alt="Current photo"
                           className="transition-opacity duration-300 ease-in-out"
                           style={
-                            showUploadButton
+                            showUploadButton && isEditable
                               ? {
                                   opacity: 0.5,
                                   maxWidth: "295px",
@@ -442,7 +503,7 @@ const EditPost = () => {
                               : { maxWidth: "295px", maxHeight: "170px" }
                           }
                         />
-                        {showUploadButton && (
+                        {showUploadButton && isEditable && (
                           <img
                             src={UploadPhoto}
                             alt="Upload photo"
@@ -458,31 +519,44 @@ const EditPost = () => {
                         onMouseEnter={() => setShowUploadButton(true)}
                         onMouseLeave={() => setShowUploadButton(false)}
                       >
-                        <img
-                          src={UploadPhoto}
-                          alt="Upload photo"
-                          onClick={handleClickUpload}
-                          className="w-16 h-16 cursor-pointer"
-                        />
+                        {isEditable && (
+                          <img
+                            src={UploadPhoto}
+                            alt="Upload photo"
+                            onClick={handleClickUpload}
+                            className="w-16 h-16 cursor-pointer"
+                          />
+                        )}
                       </Card>
                     )}
 
                     <input
                       type="file"
                       ref={fileInputRef}
-                      style={{ display: "none" }}
+                      style={{
+                        display: "none",
+                        cursor: isEditable ? "pointer" : "default",
+                      }}
                       onChange={handleFileChange}
+                      readOnly={!isEditable}
                     />
                   </div>
                 </div>
                 <div className="flex flex-col space-y-1">
                   <h1 className="text-muted-foreground">Category</h1>
-                  <div className="flex flex-col space-y-2">
+                  <div
+                    className="flex flex-col space-y-2"
+                    style={{ cursor: isEditable ? "pointer" : "default" }}
+                  >
                     <Select
                       value={selectedCategory}
                       onValueChange={handleCategoryChange}
                     >
-                      <SelectTrigger className="w-[300px] rounded-xl">
+                      <SelectTrigger
+                        className="w-[300px] rounded-xl"
+                        disabled={!isEditable}
+                        style={{ cursor: isEditable ? "pointer" : "default" }}
+                      >
                         <SelectValue
                           placeholder={
                             <span className="text-muted-foreground">
@@ -507,7 +581,11 @@ const EditPost = () => {
                         value={selectedSecondCategory}
                         onValueChange={handleSecondCategoryChange}
                       >
-                        <SelectTrigger className="w-[300px] rounded-xl">
+                        <SelectTrigger
+                          className="w-[300px] rounded-xl"
+                          disabled={!isEditable}
+                          style={{ cursor: isEditable ? "pointer" : "default" }}
+                        >
                           <SelectValue
                             placeholder={
                               <span className="text-muted-foreground">
@@ -540,7 +618,11 @@ const EditPost = () => {
                         value={selectedThirdCategory}
                         onValueChange={handleThirdCategoryChange}
                       >
-                        <SelectTrigger className="w-[300px] rounded-xl">
+                        <SelectTrigger
+                          className="w-[300px] rounded-xl"
+                          disabled={!isEditable}
+                          style={{ cursor: isEditable ? "pointer" : "default" }}
+                        >
                           <SelectValue
                             placeholder={
                               <span className="text-muted-foreground">
@@ -575,9 +657,11 @@ const EditPost = () => {
                     style={{
                       border: "1px solid #000",
                       backgroundColor: "#fff",
+                      cursor: isEditable ? "text" : "default",
                     }}
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
+                    readOnly={!isEditable}
                   />
                 </div>
                 <div className="flex flex-col space-y-1">
@@ -589,9 +673,11 @@ const EditPost = () => {
                       border: "1px solid #000",
                       backgroundColor: "#fff",
                       resize: "none",
+                      cursor: isEditable ? "text" : "default",
                     }}
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
+                    readOnly={!isEditable}
                   />
                 </div>
               </CardContent>
@@ -611,18 +697,18 @@ const EditPost = () => {
             {flashcardSets.map((flashcardSet, index) => (
               <div
                 key={flashcardSet.id}
-                className="flex flex-row items-center justify-center space-x-7"
+                className="flex flex-row items-center justify-center space-x-5"
               >
                 <h1
                   className="text-4xl font-bold text-black contoured-text"
                   style={{
                     color: "#f987af",
                     textShadow: `
-          -0.5px -0.5px 0 #000,  
-          2px -0.5px 0 #000,
-          -0.5px  1px 0 #000,
-          2px  1px 0 #000
-        `,
+                      -0.5px -0.5px 0 #000,  
+                      2px -0.5px 0 #000,
+                      -0.5px  1px 0 #000,
+                      2px  1px 0 #000
+                    `,
                     minWidth: "50px",
                     textAlign: "right",
                   }}
@@ -640,56 +726,96 @@ const EditPost = () => {
                   setBackValue={(value) =>
                     handleBackContentChange(flashcardSet.id, value)
                   }
+                  editable={isEditable}
                 />
               </div>
             ))}
-            {window.innerWidth > 768 && (
-              <Button
-                onClick={handlePressButton}
-                className="w-20 h-12 rounded-full"
-                style={{ backgroundColor: "#f987af", marginBottom: "20px" }}
-              >
-                Add
-              </Button>
-            )}
+            {window.innerWidth > 768 &&
+              !view &&
+              contextUsername !== "admin" && (
+                <Button
+                  onClick={handlePressButton}
+                  className="w-20 h-12 rounded-full"
+                  style={{ backgroundColor: "#f987af", marginBottom: "20px" }}
+                >
+                  Add
+                </Button>
+              )}
           </AnimatedNext>
         )}
       </div>
-      {next && (
-        <AnimatedNext
-          className={`flex flex-row items-center justify-center ${getSpaceXClass()}`}
-        >
-          <div className="flex z-10 mb-7 mt-5">
-            <Button
-              onClick={() => setNext(false)}
-              className="w-32 h-12 text-white rounded-full"
-              style={{ backgroundColor: "#f987af" }}
-            >
-              Back
-            </Button>
-          </div>
-          {window.innerWidth < 768 && (
+      {next &&
+        (!view ? (
+          <AnimatedNext
+            className={`flex flex-row items-center justify-center ${getSpaceXClass()}`}
+          >
             <div className="flex z-10 mb-7 mt-5">
               <Button
-                onClick={handlePressButton}
-                className="w-32 h-12 rounded-full"
+                onClick={() => setNext(false)}
+                className="w-32 h-12 text-white rounded-full"
                 style={{ backgroundColor: "#f987af" }}
               >
-                Add
+                Back
               </Button>
             </div>
-          )}
-          <div className="flex z-10 mb-7 mt-5">
-            <Button
-              onClick={handleEdit}
-              className="w-32 h-12 text-white rounded-full"
-              style={{ backgroundColor: "#f987af" }}
-            >
-              Save changes
-            </Button>
-          </div>
-        </AnimatedNext>
-      )}
+            {window.innerWidth < 768 &&
+              !view &&
+              contextUsername !== "admin" && (
+                <div className="flex z-10 mb-7 mt-5">
+                  <Button
+                    onClick={handlePressButton}
+                    className="w-32 h-12 rounded-full"
+                    style={{ backgroundColor: "#f987af" }}
+                  >
+                    Add
+                  </Button>
+                </div>
+              )}
+            <div className="flex z-10 mb-7 mt-5">
+              <Button
+                onClick={handleEdit}
+                className="w-32 h-12 text-white rounded-full"
+                style={{ backgroundColor: "#f987af" }}
+              >
+                Save changes
+              </Button>
+            </div>
+          </AnimatedNext>
+        ) : (
+          <>
+          <div className="flex z-10 mt-5 justify-center ites-center">
+              <Button
+                onClick={() => navigate(`/verify`)}
+                className="w-44 h-12 rounded-full"
+                style={{ backgroundColor: "#f987af" }}
+              >
+                Go back to Verify Page
+              </Button>
+            </div>
+          <AnimatedNext
+            className={`flex flex-row items-center justify-center ${getSpaceXClass()}`}
+          >
+            <div className="flex z-10 mb-7 mt-5">
+              <Button
+                onClick={handleEdit}
+                className="w-32 h-12 text-white rounded-full"
+                style={{ backgroundColor: "#f987af" }}
+              >
+                Reject
+              </Button>
+            </div>
+            <div className="flex z-10 mb-7 mt-5">
+              <Button
+                onClick={handleEdit}
+                className="w-32 h-12 text-white rounded-full"
+                style={{ backgroundColor: "#f987af" }}
+              >
+                Approve
+              </Button>
+            </div>
+          </AnimatedNext>
+          </>
+        ))}
     </div>
   );
 };

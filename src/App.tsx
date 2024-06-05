@@ -61,6 +61,10 @@ const router = createBrowserRouter([
             element: <EditPost />,
           },
           {
+            path: "/view-post",
+            element: <EditPost />,
+          },
+          {
             path: "/edit-profile",
             element: <EditProfile />,
           },
@@ -87,7 +91,7 @@ const router = createBrowserRouter([
           {
             path: "/verify",
             element: <VerifyPage />,
-          }
+          },
         ],
       },
     ],

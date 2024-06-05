@@ -41,7 +41,12 @@ import AdvanceCateg from "../assets/advance-categ.svg";
 import UnauthorizedPopup from "./UnauthorizedPopup";
 import { Button } from "./ui/button";
 
-const Post = ({ flashcardSetId }: { flashcardSetId: string }) => {
+interface PostProps {
+  flashcardSetId: string;
+  verify?: boolean;
+}
+
+const Post: React.FC<PostProps> = ({ flashcardSetId, verify }) => {
   const { user, userLoading } = useContext(AuthContext);
   const [contextUsername, setContextUsername] = useState<string>("");
   const navigate = useNavigate();
@@ -99,7 +104,7 @@ const Post = ({ flashcardSetId }: { flashcardSetId: string }) => {
     if (!user) {
       return;
     }
-    if (flashcardSet.creator === user.uid || contextUsername === "admin") {
+    if (flashcardSet.creator === user.uid || contextUsername === "admin" && verify !== true) {
       setShowMore(true);
     }
   }, [user, flashcardSet.creator]);
@@ -183,7 +188,7 @@ const Post = ({ flashcardSetId }: { flashcardSetId: string }) => {
     }
     setIsDeleted(true);
     await deleteFromCheckAdmin(flashcardSetId, user.uid);
-  }
+  };
 
   return !isDeleted ? (
     <>
@@ -195,7 +200,7 @@ const Post = ({ flashcardSetId }: { flashcardSetId: string }) => {
           className="flex flex-col border-black rounded-xl"
           style={{
             width: "370px",
-            height: contextUsername === "admin" ? "370px" : "470px",
+            height: verify ? "380px" : "470px",
             backgroundColor: "#fff",
           }}
         >
@@ -317,7 +322,7 @@ const Post = ({ flashcardSetId }: { flashcardSetId: string }) => {
                 />
               )}
             </div>
-            {contextUsername !== "admin" && (
+            {!verify && (
               <div className="flex flex-wrap items-center justify-center">
                 {flashcardSet.category.map((category, index) => (
                   <span
@@ -351,7 +356,7 @@ const Post = ({ flashcardSetId }: { flashcardSetId: string }) => {
                 ))}
               </div>
             )}
-            {contextUsername !== "admin" && (
+            {!verify && (
               <CardDescription style={{ textAlign: "center" }} className="mb-4">
                 {flashcardSet.description}
               </CardDescription>
@@ -359,9 +364,9 @@ const Post = ({ flashcardSetId }: { flashcardSetId: string }) => {
           </CardContent>
           <CardFooter
             className="text-sm text-muted-foreground ml-2 mb-1 mr-2 mt-1 flex-col items-start"
-            style={{ height: contextUsername === "admin" ? "50px" : "28px" }}
+            style={{ height: verify ? "50px" : "28px" }}
           >
-            {contextUsername !== "admin" ? (
+            {!verify ? (
               <div className="flex justify-between items-center w-full">
                 <div className="flex flex-row items-center h-8">
                   {Object.keys(flashcardSet.flashcards).length}
@@ -382,33 +387,42 @@ const Post = ({ flashcardSetId }: { flashcardSetId: string }) => {
                   <div>played {flashcardSet.playCount} times</div>
                 )}
 
-                <div className="flex items-end">
-                  {!isSaved ? (
-                    <img
-                      src={SaveIcon}
-                      alt="save icon"
-                      className="relative w-9 h-8 cursor-pointer"
-                      onClick={handleSave}
-                    />
-                  ) : (
-                    <img
-                      src={SavedIcon}
-                      alt="saved icon"
-                      className="relative w-9 h-8 cursor-pointer"
-                      onClick={handleSave}
-                    />
-                  )}
-                </div>
+                {contextUsername !== "admin" && (
+                  <div className="flex items-end">
+                    {!isSaved ? (
+                      <img
+                        src={SaveIcon}
+                        alt="save icon"
+                        className="relative w-9 h-8 cursor-pointer"
+                        onClick={handleSave}
+                      />
+                    ) : (
+                      <img
+                        src={SavedIcon}
+                        alt="saved icon"
+                        className="relative w-9 h-8 cursor-pointer"
+                        onClick={handleSave}
+                      />
+                    )}
+                  </div>
+                )}
               </div>
             ) : (
               <div className="flex justify-between items-center w-full h-10 pl-8 pr-8">
-                <img src={Delete} alt="confirm" className="w-10 h-7 cursor-pointer"
-                onClick={handleDelete}
-                 />
-                <Button style={{ backgroundColor: "#F987AF" }}>View</Button>
-                <img src={Confirm} alt="delete" className="w-10 h-7 cursor-pointer"
-                onClick={handleApprove}
-                 />
+                <img
+                  src={Delete}
+                  alt="confirm"
+                  className="w-10 h-7 cursor-pointer"
+                  onClick={handleDelete}
+                />
+                <Button style={{ backgroundColor: "#F987AF" }}
+                onClick={() => navigate(`/view-post?postId=${flashcardSetId}`)}>View</Button>
+                <img
+                  src={Confirm}
+                  alt="delete"
+                  className="w-10 h-7 cursor-pointer"
+                  onClick={handleApprove}
+                />
               </div>
             )}
           </CardFooter>

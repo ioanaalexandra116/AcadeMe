@@ -74,7 +74,7 @@ const Verify = () => {
             <div className="flex flex-wrap justify-center items-center">
               {check.map((flashcardSetId) => (
                 <div key={flashcardSetId} className="flex justify-center">
-                  <Post flashcardSetId={flashcardSetId} />
+                  <Post flashcardSetId={flashcardSetId} verify={true} />
                 </div>
               ))}
             </div>

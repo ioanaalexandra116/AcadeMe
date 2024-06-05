@@ -16,6 +16,8 @@ import {
   getFlashcardSet,
   updateFlashcardSet,
   getUsername,
+  deleteFlashcardSet,
+  deleteFromCheckAdmin,
 } from "@/firebase/firestore";
 import {
   Select,
@@ -158,7 +160,6 @@ const EditPost = () => {
     const fetchCategories = async () => {
       const data = await getCategories();
       setCategories(data);
-      setLoading(false);
     };
 
     fetchContextUsername();
@@ -176,6 +177,7 @@ const EditPost = () => {
       } else {
         console.error("Data is null");
       }
+      setLoading(false);
     };
     fetchSecondCategories();
   }, [selectedCategory]);
@@ -372,12 +374,28 @@ const EditPost = () => {
     if (!postId) {
       return;
     }
+    setLoading(true);
     await updateFlashcardSet(postId, newFlashcardSet);
+    await deleteFromCheckAdmin(postId, user.uid);
     if (view) {
       navigate(`/verify`);
     } else {
       navigate(`/profile?userId=${flashcardSet?.creator}`);
     }
+    setLoading(false);
+  };
+
+  const handleDelete = async () => {
+    if (!postId || !flashcardSet) {
+      return;
+    }
+    if (!user) {
+      return;
+    }
+    setLoading(true);
+    await deleteFlashcardSet(postId, flashcardSet.creator);
+    navigate(`/verify`);
+    setLoading(false);
   };
 
   const getSpaceXClass = () => {
@@ -388,7 +406,9 @@ const EditPost = () => {
     }
   };
 
-  return (
+  return loading || !flashcardSet ? (
+    <Loading />
+  ) : (
     <div className="flex flex-col relative">
       <div className="absolute inset-0 z-0">
         <BubbleBackground contentHeight={contentHeight} />
@@ -783,7 +803,7 @@ const EditPost = () => {
           </AnimatedNext>
         ) : (
           <>
-          <div className="flex z-10 mt-5 justify-center ites-center">
+            <div className="flex z-10 mt-5 justify-center ites-center">
               <Button
                 onClick={() => navigate(`/verify`)}
                 className="w-44 h-12 rounded-full"
@@ -792,28 +812,28 @@ const EditPost = () => {
                 Go back to Verify Page
               </Button>
             </div>
-          <AnimatedNext
-            className={`flex flex-row items-center justify-center ${getSpaceXClass()}`}
-          >
-            <div className="flex z-10 mb-7 mt-5">
-              <Button
-                onClick={handleEdit}
-                className="w-32 h-12 text-white rounded-full"
-                style={{ backgroundColor: "#f987af" }}
-              >
-                Reject
-              </Button>
-            </div>
-            <div className="flex z-10 mb-7 mt-5">
-              <Button
-                onClick={handleEdit}
-                className="w-32 h-12 text-white rounded-full"
-                style={{ backgroundColor: "#f987af" }}
-              >
-                Approve
-              </Button>
-            </div>
-          </AnimatedNext>
+            <AnimatedNext
+              className={`flex flex-row items-center justify-center ${getSpaceXClass()}`}
+            >
+              <div className="flex z-10 mb-7 mt-5">
+                <Button
+                  onClick={handleDelete}
+                  className="w-32 h-12 text-white rounded-full"
+                  style={{ backgroundColor: "#f987af" }}
+                >
+                  Reject
+                </Button>
+              </div>
+              <div className="flex z-10 mb-7 mt-5">
+                <Button
+                  onClick={handleEdit}
+                  className="w-32 h-12 text-white rounded-full"
+                  style={{ backgroundColor: "#f987af" }}
+                >
+                  Approve
+                </Button>
+              </div>
+            </AnimatedNext>
           </>
         ))}
     </div>

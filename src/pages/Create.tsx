@@ -31,7 +31,6 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { FlashcardSet, ErrorMessasge } from "@/interfaces/interfaces";
-import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { CustomToaster } from "@/components/ui/sonner";
 import styled, { keyframes } from "styled-components";
@@ -80,7 +79,6 @@ const Create = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [next, setNext] = useState(false);
-  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [imageUpload, setImageUpload] = useState<File | null>(null);
   const [currentPhoto, setCurrentPhoto] = useState("");
@@ -315,7 +313,7 @@ const Create = () => {
     handleUploadPic();
     const response = await createFlashcardSet(flashcardSet, user.uid);
     if (response) {
-      navigate(`/profile?userId=${user.uid}`);
+      window.location.replace(`/profile?userId=${user.uid}`);
     }
     setLoading(false);
   };

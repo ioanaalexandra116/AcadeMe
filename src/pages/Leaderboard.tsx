@@ -1,6 +1,6 @@
 import LeaderboardList from "@/components/LeaderboardList";
 
-import Background from "@/assets/leaderboard-background.svg";
+import Background from "@/assets/official-leaderboard-background.svg";
 
 const Leaderboard = () => {
     const smallScreen = window.innerWidth < 780;

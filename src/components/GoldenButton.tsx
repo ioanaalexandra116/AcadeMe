@@ -14,7 +14,7 @@ const GoldenButton = styled.button`
   font-size: 1em;
   box-sizing: border-box;
   border: none;
-  border-radius: 0.3em;
+  border-radius: 2rem;
   height: 2.75em;
   width: 10em;
   line-height: 2.5em;

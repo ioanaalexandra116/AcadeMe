@@ -1,6 +1,6 @@
 import FollowList from "@/components/FollowList";
 
-import Background from "@/assets/follow-background.svg";
+import Background from "@/assets/home-background.svg";
 
 const Follow = () => {
     const smallScreen = window.innerWidth < 780;

@@ -1,21 +1,9 @@
 import NotificationsList from "../components/NotificationsList";
-import Background from "@/assets/notif-background.svg";
+import Background from "@/assets/home-background.svg";
 
 const Notifications = () => {
-    const smallScreen = window.innerWidth < 780;
     return (
-      <div style={{ position: "relative" }}>
-        <div
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            width: smallScreen ? screen.width : "100vw",
-            height: smallScreen ? screen.height : "100vh",
-            backgroundColor: "rgba(164,222,247,0.3)",
-            overflow: "hidden",
-          }}
-        />
+        
   
         <div
           style={{
@@ -27,14 +15,13 @@ const Notifications = () => {
             height: "100vh",
             zIndex: 1,
             position: "relative",
-            overflow: "hidden",
+            overflow: "auto",
           }}
         >
           <div className="pt-16">
             <NotificationsList />
           </div>
         </div>
-      </div>
     );
   };
 

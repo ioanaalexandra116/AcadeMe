@@ -14,7 +14,7 @@ import styled, { keyframes, css } from "styled-components";
 import { useLocation } from "react-router-dom";
 import SadHamster from "@/assets/sad-hamster.png";
 import HappyHamster from "@/assets/happy-hamster.png";
-import PreviewCreate from "@/assets/preview-create.svg";
+import Background from "@/assets/laptop-background.svg";
 import Navbar from "@/components/Navbar";
 
 const myAnim = keyframes`
@@ -304,10 +304,20 @@ const Play = () => {
     <>
     <Navbar />
     <div
-      className="bg-cover bg-center h-screen w-screen flex flex-col space-y-10 pt-16 relative"
-      style={{ backgroundImage: `url(${PreviewCreate})` }}
-    >
-      <div className="flex flex-row justify-between">
+            className="absolute w-screen h-screen z-0"
+            style={{ backgroundColor: "#A4DEF7", opacity: 0.5 }}
+          >
+            <div
+              className="absolute top-0 left-0 w-screen h-screen bg-no-repeat bg-center z-0 bg-cover"
+              style={{
+                backgroundImage: `url(${Background})`,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+                opacity: 0.5,
+              }}
+            ></div>
+          </div>
+      <div className="flex flex-row justify-between pt-16 pb-12 z-10">
         {window.innerWidth > 786
           ? !unauthorized && (
               <h1
@@ -315,6 +325,7 @@ const Play = () => {
                 style={{
                   color: "#F987AF",
                   textShadow: `-0.5px -0.5px 0 #000, 2px -0.5px 0 #000, -0.5px 1px 0 #000, 2px 1px 0 #000`,
+                  zIndex: 10,
                 }}
               >
                 {score} exp
@@ -326,6 +337,7 @@ const Play = () => {
                 style={{
                   color: "#F987AF",
                   textShadow: `-0.5px -0.5px 0 #000, 2px -0.5px 0 #000, -0.5px 1px 0 #000, 2px 1px 0 #000`,
+                  zIndex: 10,
                 }}
               >
                 {score} exp
@@ -337,6 +349,7 @@ const Play = () => {
             style={{
               color: "#F987AF",
               textShadow: `-0.5px -0.5px 0 #000, 2px -0.5px 0 #000, -0.5px 1px 0 #000, 2px 1px 0 #000`,
+              zIndex: 10,
             }}
           >
             {" "}
@@ -349,6 +362,7 @@ const Play = () => {
             style={{
               color: "#F987AF",
               textShadow: `-0.5px -0.5px 0 #000, 2px -0.5px 0 #000, -0.5px 1px 0 #000, 2px 1px 0 #000`,
+              zIndex: 10,
             }}
           >
             {" "}
@@ -357,12 +371,14 @@ const Play = () => {
           </h1>
         )}
       </div>
+      <div style={{display: "flex", justifyContent: "center", alignItems: "center"}}>
       {window.innerWidth > 786 ? (
         <h1
-          className="text-4xl font-bold text-black mb-5 contoured-text flex justify-center"
+          className="text-4xl font-bold text-black mb-5 contoured-text flex justify-center pb-5 z-10"
           style={{
             color: "#F987AF",
             textShadow: `-0.5px -0.5px 0 #000, 2px -0.5px 0 #000, -0.5px 1px 0 #000, 2px 1px 0 #000`,
+            zIndex: 10,
           }}
         >
           {flashcardSet?.title}
@@ -373,11 +389,14 @@ const Play = () => {
           style={{
             color: "#F987AF",
             textShadow: `-0.5px -0.5px 0 #000, 2px -0.5px 0 #000, -0.5px 1px 0 #000, 2px 1px 0 #000`,
+            zIndex: 10,
           }}
         >
           {flashcardSet?.title}
         </h1>
+        
       )}
+      </div>
       <AnimatedFirst className="flex flex-col items-center justify-center space-y-5 relative z-10">
         {" "}
         {/* Adjusted z-index */}
@@ -511,7 +530,6 @@ const Play = () => {
           )}
         </div>
       )}
-    </div>
     </>
   );
 };

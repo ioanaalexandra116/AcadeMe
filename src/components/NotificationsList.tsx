@@ -157,24 +157,24 @@ export const NotificationsList = () => {
     const today = new Date();
     const yesterday = new Date(today);
     yesterday.setDate(today.getDate() - 1);
-  
+
     // Normalize time to 00:00:00 for comparison
     const normalizeDate = (date: Date) => {
       return new Date(date.getFullYear(), date.getMonth(), date.getDate());
     };
-  
+
     const options: Intl.DateTimeFormatOptions = {
       hour: "numeric",
       minute: "numeric",
       hour12: true,
     };
-  
+
     const normalizedDate = normalizeDate(date);
     const normalizedToday = normalizeDate(today);
     const normalizedYesterday = normalizeDate(yesterday);
-  
+
     const timeString = date.toLocaleTimeString("ro-RO", options);
-  
+
     if (normalizedDate.getTime() === normalizedToday.getTime()) {
       return `Today at ${timeString}`;
     } else if (normalizedDate.getTime() === normalizedYesterday.getTime()) {
@@ -184,7 +184,7 @@ export const NotificationsList = () => {
         month: "long",
         day: "numeric",
       };
-      const dateString = date.toLocaleDateString("ro-RO", dateOptions);
+      const dateString = date.toLocaleDateString("en-US", dateOptions);
       return `${dateString} at ${timeString}`;
     }
   };
@@ -293,7 +293,7 @@ export const NotificationsList = () => {
               color: "black",
               marginTop: "20px",
               position: "fixed",
-              right: "20px",
+              right: "30px",
               bottom: "20px",
             }}
             onClick={pressMarkAllAsRead}

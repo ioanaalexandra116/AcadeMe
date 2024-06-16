@@ -23,10 +23,10 @@ const AnimatedBubbles = styled.div<AnimatedBubblesProps>`
     left: -50%;
     width: 200%;
     height: 200%;
-    background: radial-gradient(circle, #A4DEF7 10%, transparent 20%), #3498db
-      radial-gradient(circle, transparent 10%, #A4DEF7 20%);
+    background: radial-gradient(circle, #F7F3E2 10%, transparent 20%), #9B7960
+      radial-gradient(circle, transparent 10%, #F7F3E2 20%);
     background-size: 30px 30px; /* Adjust the size of the pattern */
-    animation: moveBackground 80s linear infinite; /* Adjust the animation duration and timing function */
+    animation: moveBackground 120s linear infinite; /* Adjust the animation duration and timing function */
   }
 
   @keyframes moveBackground {

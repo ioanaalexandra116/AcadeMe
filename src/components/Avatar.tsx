@@ -74,14 +74,6 @@ const Avatar = ({
     left: 0,
   };
 
-  // const bigAvatarTop: string = dimensions === "300px" ? "30" : "17.54";
-  // const bigAvatarLeft: string = dimensions === "300px" ? "42" : "24.56";
-
-  // const bowTop: string = window.innerWidth > 700 ? bigAvatarTop : 
-  // dimensions === "300px" ? "28.5" : "17.54";
-  // const bowLeft: string = window.innerWidth > 700 ? bigAvatarLeft : 
-  // dimensions === "300px" ? "40.5" : "24.56";
-
   const numberDimensions: number = parseInt(dimensions);
 
   const smallBowTop: string = (numberDimensions * 28.5) / 300 + "";

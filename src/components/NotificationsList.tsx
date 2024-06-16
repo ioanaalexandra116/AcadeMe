@@ -15,6 +15,7 @@ import Admin from "@/assets/admin.svg";
 import { Card } from "./ui/card";
 import Avatar from "./Avatar";
 import { Button } from "./ui/button";
+import Navbar from "./Navbar";
 
 export const NotificationsList = () => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -192,7 +193,9 @@ export const NotificationsList = () => {
   return loading || loadingCursor ? (
     <Loading />
   ) : (
-    <div className="flex flex-col items-center">
+    <>
+    <Navbar allRead={allRead}/>
+    <div className="flex flex-col items-center pt-16">
       <h1
         className="text-4xl font-bold text-black mt-5 mb-10 contoured-text"
         style={{
@@ -303,6 +306,7 @@ export const NotificationsList = () => {
         </div>
       )}
     </div>
+    </>
   );
 };
 

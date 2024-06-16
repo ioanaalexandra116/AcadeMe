@@ -46,13 +46,17 @@ import Cards from "../assets/cards.svg";
 import Admin from "../assets/admin.svg";
 import UnauthorizedPopup from "./UnauthorizedPopup";
 
+interface NavbarProps {
+  allRead?: boolean;
+}
+
 type MenuItems = {
   title: string;
   href: string;
   img: string;
 };
 
-export default function Navbar() {
+export default function Navbar ({ allRead }: NavbarProps) {
   const defaultCharacterProperties: AvatarProperties = {
     gender: "man",
     backgroundColor: "#000",
@@ -362,7 +366,7 @@ export default function Navbar() {
                       <img src={Bell} alt="notifications" className="h-5 w-6" />
                       {smallScreen ? "" : "Notifications"}
                     </div>
-                    {notifications.some((notif) => !notif.read) && (
+                    {!allRead && notifications.some((notif) => !notif.read) && (
                       <div
                         style={{
                           position: "absolute",

@@ -46,6 +46,10 @@ const router = createBrowserRouter([
         element: <SearchFlashcardSets />,
       },
       {
+        path: "/notifications",
+        element: <Notifications />,
+      },
+      {
         element: <PrivateRoute />,
         children: [
           {
@@ -67,10 +71,6 @@ const router = createBrowserRouter([
           {
             path: "/edit-profile",
             element: <EditProfile />,
-          },
-          {
-            path: "/notifications",
-            element: <Notifications />,
           },
           {
             path: "/followers",

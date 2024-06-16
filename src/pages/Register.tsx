@@ -52,12 +52,35 @@ const Register = () => {
     setErr(null);
   }, [err]);
 
+  function checkPassword(password: string) {
+    const minLength = 7;
+    const specialCharacterRegex = /[!@#$%^&*(),.?":{}|<>]/;
+    const uppercaseLetterRegex = /[A-Z]/;
+    const numberRegex = /[0-9]/;
+
+    if (password.length < minLength) {
+      return "Password must be at least 7 characters long";
+    }
+    if (!specialCharacterRegex.test(password)) {
+      return "Password must contain at least one special character";
+    }
+    if (!uppercaseLetterRegex.test(password)) {
+      return "Password must contain at least one uppercase letter";
+    }
+    if (!numberRegex.test(password)) {
+      return "Password must contain at least one number";
+    }
+
+    return true;
+  }
+
   const handleRegister = async (formData: {
     username?: string;
     email: string;
     password: string;
   }) => {
     const { username, email, password } = formData;
+    const passwordResult = checkPassword(password);
     setErr(null);
     if (!username) {
       setErr("Username is required");
@@ -75,8 +98,8 @@ const Register = () => {
       setErr("Username must be at least 3 characters long");
       return;
     }
-    if (password.length < 6) {
-      setErr("Password must be at least 7 characters long");
+    if (passwordResult !== true) {
+      setErr(passwordResult);
       return;
     }
     if ((await checkUsername(username)) === false) {
@@ -151,7 +174,7 @@ const Register = () => {
           <CustomToaster
             toastOptions={{
               classNames: {
-                toast: `group toast group-[.toaster]:bg-red-200 group-[.toaster]:text-red-700 group-[.toaster]:border-red-700 group-[.toaster]:rounded-xl`
+                toast: `group toast group-[.toaster]:bg-red-200 group-[.toaster]:text-red-700 group-[.toaster]:border-red-700 group-[.toaster]:rounded-xl`,
               },
             }}
           />

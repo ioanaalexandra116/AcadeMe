@@ -1,32 +1,25 @@
-import styled from "styled-components";
+import styled from 'styled-components';
 
-interface AnimatedBubblesProps {
-    height: number;
-  }
-
-// Define the styled component
-const AnimatedBubbles = styled.div<AnimatedBubblesProps>`
-  /* Basic dimensions and centering */
-  width: 100%;
-  height: 100%;
-  max-height: ${(props) => props.height}px;
-  min-height: 100vh;
-  background: lightblue; /* Default background color */
-  position: relative;
+const BackgroundPattern = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 300%;
+  height: 300%;
   overflow: hidden;
+  z-index: -1; /* Ensures the background doesn't interfere with other content */
 
-  /* Radial gradient background */
-  &::before {
-    content: "";
+  &:before {
+    content: '';
     position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle, #F7F3E2 10%, transparent 20%), #9B7960
-      radial-gradient(circle, transparent 10%, #F7F3E2 20%);
-    background-size: 30px 30px; /* Adjust the size of the pattern */
-    animation: moveBackground 120s linear infinite; /* Adjust the animation duration and timing function */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(#A4DEF7 5%, #0000 6%), radial-gradient(#85C9E8 5%, #0000 6%);
+    background-position: 0 0, 25px 25px; /* Adjust the background position as needed */
+    background-size: 50px 50px; /* Adjust the size of the pattern */
+    animation: moveBackground 400s linear infinite;
   }
 
   @keyframes moveBackground {
@@ -34,13 +27,9 @@ const AnimatedBubbles = styled.div<AnimatedBubblesProps>`
       transform: translate(0, 0);
     }
     100% {
-      transform: translate(20%, 20%);
+      transform: translate(-50%, -50%);
     }
   }
 `;
 
-const BubbleBackground = ({ contentHeight }: { contentHeight: number }) => {
-  return <AnimatedBubbles height={contentHeight} />;
-};
-
-export default BubbleBackground;
+export default BackgroundPattern;

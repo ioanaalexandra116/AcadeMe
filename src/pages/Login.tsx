@@ -63,10 +63,7 @@ const Login = () => {
     modalHandler();
   }, []);
 
-  const handleLogin = async (formData: {
-    email: string;
-    password: string;
-  }) => {
+  const handleLogin = async (formData: { email: string; password: string }) => {
     const { email, password } = formData;
 
     if (!email || !password) {
@@ -87,31 +84,30 @@ const Login = () => {
       }
 
       navigate("/");
-
     } catch (error: unknown) {
-        console.error(error);
-        toast(formatErrorMessage((error as FirebaseError).message));
+      console.error(error);
+      toast(formatErrorMessage((error as FirebaseError).message));
     }
   };
 
   return (
     <div className="grid place-items-center h-screen">
-        <AuthCard
-            onFormSubmit={handleLogin}
-            title="Sign In"
-            description="Log in to your account"
-            showUsernameInput={false}
-            customText="You don't have an account? "
-            customLink="/register"
-            linkAppearance="Sign Up"
-          />
-          <CustomToaster
-            toastOptions={{
-              classNames: {
-                toast: `group toast group-[.toaster]:bg-red-200 group-[.toaster]:text-red-700 group-[.toaster]:border-red-700 group-[.toaster]:rounded-xl`
-              },
-            }}
-          />
+      <AuthCard
+        onFormSubmit={handleLogin}
+        title="Sign In"
+        description="Log in to your account"
+        showUsernameInput={false}
+        customText="You don't have an account? "
+        customLink="/register"
+        linkAppearance="Sign Up"
+      />
+      <CustomToaster
+        toastOptions={{
+          classNames: {
+            toast: `group toast group-[.toaster]:bg-red-200 group-[.toaster]:text-red-700 group-[.toaster]:border-red-700 group-[.toaster]:rounded-xl`,
+          },
+        }}
+      />
     </div>
   );
 };

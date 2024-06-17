@@ -22,7 +22,7 @@ import {
   UserData,
 } from "../interfaces";
 
-export async function createUserCollection(user: User, username: string) {
+export async function createFirestoreUser(user: User, username: string) {
   const docRef = doc(db, "users", user.uid);
   const defaultCharacterProperties: AvatarProperties = {
     gender: "man",
@@ -49,7 +49,7 @@ export async function createUserCollection(user: User, username: string) {
     activity: {},
     notifications: {},
     avatarProps: defaultCharacterProperties,
-  };
+  } as UserData;
   setDoc(docRef, data)
     .then()
     .catch((error) => {
@@ -122,6 +122,16 @@ export async function getUsername(uid: string) {
   } else {
     console.log("No such document!");
   }
+}
+
+export async function getAllUsernames() {
+  const collectionRef = collection(db, "users");
+  const querySnapshot = await getDocs(collectionRef);
+  const usernames = <string[]>[];
+  querySnapshot.forEach((doc) => {
+    usernames.push(doc.data().username);
+  });
+  return usernames;
 }
 
 export async function addAvatarProps(

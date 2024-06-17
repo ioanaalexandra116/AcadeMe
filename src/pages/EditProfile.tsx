@@ -1,7 +1,11 @@
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "@/context";
 import Loading from "@/components/Loading";
-import { getUserData, updateProfile } from "@/firebase/firestore";
+import {
+  getUserData,
+  updateProfile,
+  getAllUsernames,
+} from "@/firebase/firestore";
 import Background from "@/assets/strawberry-background.svg";
 import { useLocation, useNavigate } from "react-router-dom";
 import Avatar from "@/components/Avatar";
@@ -50,6 +54,7 @@ const AnimatedFirst = styled.div`
 const EditProfile = () => {
   const { user, userLoading } = useContext(AuthContext);
   const navigate = useNavigate();
+  const [initialUsername, setInitialUsername] = useState<string>("");
   const [username, setUsername] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const location = useLocation();
@@ -73,6 +78,8 @@ const EditProfile = () => {
   const [editAvatarComp, setEditAvatarComp] = useState<boolean>(false);
   const [imageLoaded, setImageLoaded] = useState<boolean>(false);
   const [fullWidth, setFullWidth] = useState<boolean>(window.innerWidth > 700);
+  const [alreadyExists, setAlreadyExists] = useState<boolean>(false);
+  const [allUsernames, setAllUsernames] = useState<string[]>([]);
 
   if (!user || userLoading) {
     return <Loading />;
@@ -89,6 +96,7 @@ const EditProfile = () => {
         if (userData) {
           userData.avatarProps.dimensions = "175px";
           setCharacterProperties(userData.avatarProps);
+          setInitialUsername(userData.username);
           setUsername(userData.username);
           setDescription(userData.description);
         }
@@ -97,10 +105,26 @@ const EditProfile = () => {
       }
       setLoadingAvatar(false);
     };
+
+    const fetchUsernames = async () => {
+      const usernames = await getAllUsernames();
+      console.log(usernames);
+      setAllUsernames(usernames);
+    };
+
+    fetchUsernames();
     fetchUserData();
   }, [user]);
 
+  const handleUsernameChange = async (value: string) => {
+    setUsername(value);
+    setAlreadyExists(allUsernames.includes(value) && value !== initialUsername);
+  };
+
   const handleSaveChanges = () => {
+    if (alreadyExists) {
+      return;
+    }
     updateProfile(user.uid, username, description, characterProperties);
     navigate(`/profile?userId=${user.uid}`);
   };
@@ -187,12 +211,19 @@ const EditProfile = () => {
                 placeholder="Username"
                 className="w-[300px] rounded-xl"
                 style={{
-                  border: "1px solid #000",
-                  backgroundColor: "#fff",
+                  border: alreadyExists
+                    ? "1px solid #B71F21"
+                    : "1px solid #000",
+                  backgroundColor: alreadyExists ? "#F2CACE" : "#fff",
                 }}
                 value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                onChange={(e) => handleUsernameChange(e.target.value)}
               />
+              {alreadyExists && (
+                <div className="absolute right-0 top-16 flex justify-end text-red-700 text-xs mr-2">
+                  Username already taken
+                </div>
+              )}
             </div>
             <div className="flex flex-col space-y-1 relative bottom-8">
               <h1 className="text-muted-foreground">Description</h1>

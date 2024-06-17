@@ -6,7 +6,7 @@ import {
 } from "firebase/auth";
 import { auth, actionCodeSettings } from "../firebase/config";
 import {
-  createUserCollection,
+  createFirestoreUser,
   checkUsername,
   formatErrorMessage,
 } from "../firebase/firestore";
@@ -71,7 +71,7 @@ const Register = () => {
       return "Password must contain at least one number";
     }
 
-    return true;
+    return "Success";
   }
 
   const handleRegister = async (formData: {
@@ -98,7 +98,7 @@ const Register = () => {
       setErr("Username must be at least 3 characters long");
       return;
     }
-    if (passwordResult !== true) {
+    if (passwordResult !== "Success") {
       setErr(passwordResult);
       return;
     }
@@ -119,7 +119,7 @@ const Register = () => {
         await sendEmailVerification(userCredential.user, actionCodeSettings);
         setSuccess(true);
         setLoading(false);
-        await createUserCollection(userCredential.user, username);
+        await createFirestoreUser(userCredential.user, username);
       }
     } catch (error) {
       console.error(error);

@@ -1,6 +1,6 @@
 import {
   getCategories,
-  getSecondCategories,
+  getNextCategories,
   getFlashcardSetsIdsByCategory,
   getAllFlashcardSetsIds,
   getFlashcardSetsIdsByTitle,
@@ -151,7 +151,7 @@ export const SearchFlashcards = () => {
       try {
         const updatedComponents = await Promise.all(
           categories.map(async (category) => {
-            const firebaseSubcategories = await getSecondCategories(category);
+            const firebaseSubcategories = await getNextCategories(category);
 
             if (!firebaseSubcategories) return null;
 

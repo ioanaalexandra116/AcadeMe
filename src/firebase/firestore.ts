@@ -172,7 +172,7 @@ export async function getCategories() {
   return categories;
 }
 
-export async function getSecondCategories(category: string) {
+export async function getNextCategories(category: string) {
   const docRef = doc(db, "categories", category);
 
   try {

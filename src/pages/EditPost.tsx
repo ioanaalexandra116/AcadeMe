@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import BubbleBackground from "@/components/BubbleBackground";
 import {
   getCategories,
-  getSecondCategories,
+  getNextCategories,
   getFlashcardSet,
   updateFlashcardSet,
   getUsername,
@@ -173,7 +173,7 @@ const EditPost = () => {
       return;
     }
     const fetchSecondCategories = async () => {
-      const data = await getSecondCategories(selectedCategory);
+      const data = await getNextCategories(selectedCategory);
       if (data !== null) {
         setSecondCategories(data);
       } else {

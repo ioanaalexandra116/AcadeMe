@@ -2,7 +2,6 @@ import CreateFlashcard from "@/components/CreateFlashcard";
 import {
   useState,
   useEffect,
-  useLayoutEffect,
   useContext,
   useRef,
 } from "react";
@@ -12,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import BubbleBackground from "@/components/BubbleBackground";
 import {
   getCategories,
-  getSecondCategories,
+  getNextCategories,
   createFlashcardSet,
 } from "@/firebase/firestore";
 import {
@@ -69,7 +68,6 @@ const AnimatedFirst = styled.div`
 
 const Create = () => {
   const [err, setErr] = useState<ErrorMessasge>(null);
-  const [contentHeight, setContentHeight] = useState(0);
   const { user, userLoading } = useContext(AuthContext);
   const [categories, setCategories] = useState<string[]>([]);
   const [secondCategories, setSecondCategories] = useState<string[][]>([]);
@@ -120,7 +118,7 @@ const Create = () => {
       return;
     }
     const fetchSecondCategories = async () => {
-      const data = await getSecondCategories(selectedCategory);
+      const data = await getNextCategories(selectedCategory);
       if (data !== null) {
         setSecondCategories(data);
       } else {
@@ -132,6 +130,8 @@ const Create = () => {
 
   const handleCategoryChange = (newValue: string) => {
     setSelectedCategory(newValue);
+    setSelectedSecondCategory("");
+    setSelectedThirdCategory("");
   };
 
   const handleSecondCategoryChange = (newValue: string) => {
@@ -208,10 +208,6 @@ const Create = () => {
     }
   }, [removedCard, flashcardSets]);
 
-  useLayoutEffect(() => {
-    const height = document.body.scrollHeight;
-    setContentHeight(height);
-  }, [flashcardSets, selectedCategory, selectedSecondCategory, next]);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -315,7 +311,6 @@ const Create = () => {
     if (response) {
       window.location.replace(`/profile?userId=${user.uid}`);
     }
-    setLoading(false);
   };
 
   const getSpaceXClass = () => {
@@ -331,7 +326,7 @@ const Create = () => {
   ) : (
     <div className="flex flex-col relative">
       <div className="absolute inset-0 z-0">
-        <BubbleBackground contentHeight={contentHeight} />
+        <BubbleBackground/>
       </div>
       {window.innerWidth < 768 && !next ? (
         <CustomToaster

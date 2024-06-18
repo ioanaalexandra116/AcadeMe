@@ -106,91 +106,165 @@ const CreateFlashcard = ({
 
   return (
     <StyleSheetManager enableVendorPrefixes shouldForwardProp={forwardProp}>
-
-    {(window.innerWidth) > 768 ? (
-    <div className="flex flex-row items-center justify-center space-x-5"
-    style ={{
-      marginRight: editable ? "0px" : "50px",
-    }}
-    >
-      <div className="flex flex-row items-center justify-center space-x-5">
-        <Textarea
-          placeholder="Complete the front side"
-          value={frontContent}
-          onChange={(e) => handleFrontContentChange(e.target.value)}
-          style={{ width: "300px", height: "175px", resize: "none", cursor: editable ? "auto" : "default"}}
-          className="bg-white rounded-xl"
-          readOnly={!editable}
-        />
-        <Textarea
-          placeholder="Complete the back side"
-          value={backContent}
-          onChange={(e) => handleBackContentChange(e.target.value)}
-          style={{ width: "300px", height: "175px", resize: "none", cursor: editable ? "auto" : "default"}}
-          className="bg-white rounded-xl"
-          readOnly={!editable}
-        />
-        <img src={RightArrow} alt="right arrow" className="w-10 h-10" />
-      </div>
-      <StyledCard className="flex flex-row items-center justify-center w-300 h-175 cursor-pointer">
-        <CardInner
-          isPressed={isPressed}
-          onClick={() => setIsPressed(!isPressed)}
+      {window.innerWidth > 768 ? (
+        <div
+          className="flex flex-row items-center justify-center space-x-5"
+          style={{
+            marginRight: editable ? "0px" : "50px",
+          }}
         >
-          <CardFront>{frontContent}</CardFront>
-          <CardBack>{backContent}</CardBack>
-        </CardInner>
-      </StyledCard>
-      { editable && 
-      (<Button
-        onClick={() => onDelete(flashcardKey)}
-        className="text-red-700 bg-red-200 border-red-700 hover:bg-red-700 hover:text-white"
-      >
-        Remove
-      </Button>)}
-    </div>
-  ) : (
-    <div className="flex flex-col items-center justify-center space-y-5">
-      <StyledCard className="flex flex-row items-center justify-center w-300 h-175">
-        <CardInner isPressed={isPressed} onClick={() => setIsPressed(isPressed)}>
-          <CardFront className="flex flex-col items-center justify-center space-y-5">
-            <Textarea
-              placeholder="Complete the front side"
-              value={frontContent}
-              onChange={(e) => handleFrontContentChange(e.target.value)}
-              style={{ width: "300px", height: "175px", resize: "none"}}
-              className="bg-white rounded-xl"
-            />
-          </CardFront>
-          <CardBack className="flex flex-col items-center justify-center space-y-5">
-            <Textarea
-              placeholder="Complete the back side"
-              value={backContent}
-              onChange={(e) => handleBackContentChange(e.target.value)}
-              style={{ width: "300px", height: "175px" }}
-              className="bg-green-200 rounded-xl"
-            />
-          </CardBack>
-        </CardInner>
-      </StyledCard>
-      <div className="flex flex-row items-center justify-center space-x-5">
-        <Button
-          onClick={() => setIsPressed(!isPressed)}
-          style={{ width: "86px", backgroundColor: "#3498db", color: "#A4DEF7" }}
-        >
-          Flip
-        </Button>
-        <Button
-          onClick={() => onDelete(flashcardKey)}
-          className="text-red-700 bg-red-200 border-red-700 hover:bg-red-700 hover:text-white"
-          style={{ width: "86px" }}
-        >
-          Remove
-        </Button>
-      </div>
-    </div>
-  )}
-  </StyleSheetManager>
+          <div className="flex flex-row items-center justify-center space-x-5">
+            <div style={{ position: "relative", display: "inline-block" }}>
+              <Textarea
+                placeholder="Complete the front side"
+                value={frontContent}
+                onChange={(e) => handleFrontContentChange(e.target.value)}
+                style={{
+                  width: "300px",
+                  height: "175px",
+                  resize: "none",
+                  cursor: editable ? "auto" : "default",
+                }}
+                className="bg-white rounded-xl"
+                readOnly={!editable}
+                maxLength={240}
+              />
+              <div
+                style={{
+                  position: "absolute",
+                  bottom: "0px",
+                  right: "5px",
+                  fontSize: "12px",
+                  color: "#888",
+                }}
+              >
+                {frontContent.length}/240
+              </div>
+            </div>
+            <div style={{ position: "relative", display: "inline-block" }}>
+              <Textarea
+                placeholder="Complete the back side"
+                value={backContent}
+                onChange={(e) => handleBackContentChange(e.target.value)}
+                style={{
+                  width: "300px",
+                  height: "175px",
+                  resize: "none",
+                  cursor: editable ? "auto" : "default",
+                }}
+                className="bg-white rounded-xl"
+                readOnly={!editable}
+                maxLength={240}
+              />
+              <div
+                style={{
+                  position: "absolute",
+                  bottom: "0px",
+                  right: "5px",
+                  fontSize: "12px",
+                  color: "#888",
+                }}
+              >
+                {backContent.length}/240
+              </div>
+            </div>
+            <img src={RightArrow} alt="right arrow" className="w-10 h-10" />
+          </div>
+          <StyledCard className="flex flex-row items-center justify-center w-300 h-175 cursor-pointer">
+            <CardInner
+              isPressed={isPressed}
+              onClick={() => setIsPressed(!isPressed)}
+            >
+              <CardFront>{frontContent}</CardFront>
+              <CardBack>{backContent}</CardBack>
+            </CardInner>
+          </StyledCard>
+          {editable && (
+            <Button
+              onClick={() => onDelete(flashcardKey)}
+              className="text-red-700 bg-red-200 border-red-700 hover:bg-red-700 hover:text-white"
+            >
+              Remove
+            </Button>
+          )}
+        </div>
+      ) : (
+        <div className="flex flex-col items-center justify-center space-y-5">
+          <StyledCard className="flex flex-row items-center justify-center w-300 h-175">
+            <CardInner
+              isPressed={isPressed}
+              onClick={() => setIsPressed(isPressed)}
+            >
+              <CardFront className="flex flex-col items-center justify-center space-y-5">
+                <div style={{ position: "relative", display: "inline-block" }}>
+                  <Textarea
+                    placeholder="Complete the front side"
+                    value={frontContent}
+                    onChange={(e) => handleFrontContentChange(e.target.value)}
+                    style={{ width: "300px", height: "175px", resize: "none" }}
+                    className="bg-white rounded-xl"
+                    maxLength={100}
+                  />
+                  <div
+                    style={{
+                      position: "absolute",
+                      bottom: "0px",
+                      right: "5px",
+                      fontSize: "12px",
+                      color: "#888",
+                    }}
+                  >
+                    {frontContent.length}/240
+                  </div>
+                </div>
+              </CardFront>
+              <CardBack className="flex flex-col items-center justify-center space-y-5">
+                <div style={{ position: "relative", display: "inline-block" }}>
+                  <Textarea
+                    placeholder="Complete the back side"
+                    value={backContent}
+                    onChange={(e) => handleBackContentChange(e.target.value)}
+                    style={{ width: "300px", height: "175px" }}
+                    className="bg-green-200 rounded-xl"
+                    maxLength={240}
+                  />
+                  <div
+                    style={{
+                      position: "absolute",
+                      bottom: "0px",
+                      right: "5px",
+                      fontSize: "12px",
+                      color: "#888",
+                    }}
+                  >
+                    {backContent.length}/240
+                  </div>
+                </div>
+              </CardBack>
+            </CardInner>
+          </StyledCard>
+          <div className="flex flex-row items-center justify-center space-x-5">
+            <Button
+              onClick={() => setIsPressed(!isPressed)}
+              style={{
+                width: "86px",
+                backgroundColor: "#3498db",
+                color: "#A4DEF7",
+              }}
+            >
+              Flip
+            </Button>
+            <Button
+              onClick={() => onDelete(flashcardKey)}
+              className="text-red-700 bg-red-200 border-red-700 hover:bg-red-700 hover:text-white"
+              style={{ width: "86px" }}
+            >
+              Remove
+            </Button>
+          </div>
+        </div>
+      )}
+    </StyleSheetManager>
   );
 };
 

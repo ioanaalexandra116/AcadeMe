@@ -45,6 +45,7 @@ import { Button } from "./ui/button";
 interface PostProps {
   flashcardSetId: string;
   verify?: boolean;
+  onDelete?: (flashcardId: string) => void;
 }
 
 const Post: React.FC<PostProps> = ({ flashcardSetId, verify }) => {
@@ -105,7 +106,10 @@ const Post: React.FC<PostProps> = ({ flashcardSetId, verify }) => {
     if (!user) {
       return;
     }
-    if (flashcardSet.creator === user.uid || contextUsername === "admin" && verify !== true) {
+    if (
+      flashcardSet.creator === user.uid ||
+      (contextUsername === "admin" && verify !== true)
+    ) {
       setShowMore(true);
     }
   }, [user, flashcardSet.creator]);
@@ -181,7 +185,9 @@ const Post: React.FC<PostProps> = ({ flashcardSetId, verify }) => {
     }
     setIsDeleted(true);
     await deleteFlashcardSet(flashcardSetId, flashcardSet.creator);
-    await addDeleteNotification(flashcardSet.title, flashcardSet.creator);
+    if (contextUsername === "admin") {
+      await addDeleteNotification(flashcardSet.title, flashcardSet.creator);
+    }
   };
 
   const handleApprove = async () => {
@@ -417,8 +423,14 @@ const Post: React.FC<PostProps> = ({ flashcardSetId, verify }) => {
                   className="w-10 h-7 cursor-pointer"
                   onClick={handleDelete}
                 />
-                <Button style={{ backgroundColor: "#F987AF" }}
-                onClick={() => navigate(`/view-post?postId=${flashcardSetId}`)}>View</Button>
+                <Button
+                  style={{ backgroundColor: "#F987AF" }}
+                  onClick={() =>
+                    navigate(`/view-post?postId=${flashcardSetId}`)
+                  }
+                >
+                  View
+                </Button>
                 <img
                   src={Confirm}
                   alt="delete"

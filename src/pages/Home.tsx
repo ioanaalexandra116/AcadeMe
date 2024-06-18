@@ -164,7 +164,7 @@ const Home = () => {
                         alignItems: "center",
                       }}
                     >
-                      You are an admin. You can verify flashcard sets, delete the inappropriate ones or edit them.
+                      You are the admin. You can verify flashcard sets, delete the inappropriate ones or edit them.
                     </h1>
                   </div>
                   <Button

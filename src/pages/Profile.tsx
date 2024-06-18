@@ -128,6 +128,10 @@ const Profile = () => {
     setFollowed(false);
   };
 
+  const onDelete = (flashcardSetId: string) => {
+    setFlashcardSets(flashcardSets.filter((id) => id !== flashcardSetId));
+  }
+
   return (
     <div className="flex flex-col items-center justify-center pt-16">
       <div className="absolute inset-0 z-1">
@@ -308,7 +312,7 @@ const Profile = () => {
           ) : (
             flashcardSets.map((flashcardSetId) => (
               <div key={flashcardSetId} className="flex justify-center">
-                <Post flashcardSetId={flashcardSetId} />
+                <Post flashcardSetId={flashcardSetId} onDelete={onDelete} />
               </div>
             ))
           )}
@@ -346,7 +350,7 @@ const Profile = () => {
           ) : (
             favorites.map((flashcardSetId) => (
               <div key={flashcardSetId} className="flex justify-center">
-                <Post flashcardSetId={flashcardSetId} />
+                <Post flashcardSetId={flashcardSetId} onDelete={onDelete}/>
               </div>
             ))
           )}

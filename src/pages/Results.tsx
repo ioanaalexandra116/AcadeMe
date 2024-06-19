@@ -362,7 +362,7 @@ const Results = () => {
           >
             {unauthorized
               ? "Results"
-              : `You gained {scores[scores.length - 1]} exp`}
+              : `You gained ${scores[scores.length - 1]} exp`}
           </h1>
           <h1 className="z-10 mb-2">Accuracy</h1>
           <Card
@@ -440,7 +440,7 @@ const Results = () => {
                         },
                       ]}
                       type="line"
-                      width={500}
+                      width={window.innerWidth - 10}
                     />
                   </Card>
                 </div>

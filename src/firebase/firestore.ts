@@ -579,10 +579,20 @@ export async function getUserRanking() {
   const querySnapshot = await getDocs(collectionRef);
   let users = <UserData[]>[];
   querySnapshot.forEach((doc) => {
-    if (doc.data().username !== "admin") users.push(doc.data() as UserData);
+    if (doc.data().username !== "admin" && doc.data().exp > 0)
+      users.push(doc.data() as UserData);
   });
   users.sort((a, b) => b.exp - a.exp);
   return users as UserData[];
+}
+
+export async function doesUserHaveExp(uid: string) {
+  const docRef = doc(db, "users", uid);
+  const docSnap = await getDoc(docRef);
+  if (!docSnap.exists()) {
+    return false;
+  }
+  return docSnap.data().exp > 0;
 }
 
 export async function addForeignLanguages() {

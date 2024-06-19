@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState, ReactNode } from "react";
 import { AuthContext } from "@/context";
 import Loading from "@/components/Loading";
 import { getUserData, FollowUser, UnfollowUser, getUsername } from "@/firebase/firestore";
@@ -17,6 +17,34 @@ import SaveIcon from "@/assets/favorite-posts.svg";
 import EditProfile from "@/assets/edit-profile.svg";
 import Posts from "@/assets/posts.svg";
 import { Button } from "@/components/ui/button";
+
+interface ResponsiveContainerProps {
+  children: ReactNode;
+}
+
+const ResponsiveContainer: React.FC<ResponsiveContainerProps> = ({ children }) => {
+  const [isSmallScreen, setIsSmallScreen] = useState(window.innerWidth < 768);
+
+  useEffect(() => {
+      const handleResize = () => {
+          setIsSmallScreen(window.innerWidth < 768);
+      };
+
+      window.addEventListener('resize', handleResize);
+
+      // Cleanup event listener on component unmount
+      return () => {
+          window.removeEventListener('resize', handleResize);
+      };
+  }, []);
+
+  return (
+      <div className={isSmallScreen ? "flex flex-row justify-center items-center space-x-8 p-4" : "flex flex-row justify-center items-center space-x-20 p-4"}>
+          {children}
+      </div>
+  );
+};
+
 
 const Profile = () => {
   const { user, userLoading } = useContext(AuthContext);
@@ -139,10 +167,12 @@ const Profile = () => {
       </div>
       <Card
         className="relative flex justify-center items-center border border-black mt-4"
-        style={{ backgroundColor: "#fff", height: "240px", maxWidth: "480px" }}
+        style={{ backgroundColor: "#fff", height: "240px", maxWidth: window.innerWidth < 768 ? "400px" : "480px"
+
+         }}
         cardWidth={460}
       >
-        <div className="flex flex-row justify-center items-center space-x-20 p-4">
+        <ResponsiveContainer>
           <div className="flex flex-col items-center justify-center space-y-2">
             {loadingAvatar ? <Loader /> : <Avatar {...characterProperties} />}
             {userId === user.uid && (
@@ -202,7 +232,7 @@ const Profile = () => {
             </div>
             <div className="absolute bottom-2 right-2"></div>
           </div>
-        </div>
+        </ResponsiveContainer>
       </Card>
       {userId === user.uid && (
         <div

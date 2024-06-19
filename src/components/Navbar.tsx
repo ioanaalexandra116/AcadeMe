@@ -462,10 +462,10 @@ export default function Navbar ({ allRead }: NavbarProps) {
                       }}
                       className="flex items-center justify-start mt-4 z-10"
                     >
-                      {exp > 70 && (
+                      {exp % 1000 > 70 && (
                         <Card
                           style={{
-                            width: (exp / 1000) * 150 + "px",
+                            width: (exp % 1000 / 1000) * 150 + "px",
                             height: "10px",
                             backgroundColor: "#D09FDE",
                             zIndex: 10,
@@ -487,7 +487,7 @@ export default function Navbar ({ allRead }: NavbarProps) {
               >
                 <div className="flex justify-center items-center">
                   <p className="text-xs text-center">
-                    {1000 - exp} EXP to Level {lower + 2}
+                    {1000 - exp % 1000} EXP to Level {lower / 1000 + 2}
                   </p>
                 </div>
               </p>

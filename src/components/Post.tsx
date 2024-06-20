@@ -46,9 +46,11 @@ interface PostProps {
   flashcardSetId: string;
   verify?: boolean;
   onDelete?: (flashcardId: string) => void;
+  onRemoveFavorite?: (flashcardId: string) => void;
+  onAddFavorite?: (flashcardId: string) => void;
 }
 
-const Post: React.FC<PostProps> = ({ flashcardSetId, verify }) => {
+const Post: React.FC<PostProps> = ({ flashcardSetId, verify, onAddFavorite, onRemoveFavorite }) => {
   const { user, userLoading } = useContext(AuthContext);
   const [contextUsername, setContextUsername] = useState<string>("");
   const navigate = useNavigate();
@@ -174,9 +176,11 @@ const Post: React.FC<PostProps> = ({ flashcardSetId, verify }) => {
     setIsSaved(!isSaved);
     if (isSaved) {
       removeFromFavorites(user.uid, flashcardSetId);
+      if (onRemoveFavorite) onRemoveFavorite(flashcardSetId);
       return;
     }
     addToFavorites(user.uid, flashcardSetId);
+    if (onAddFavorite) onAddFavorite(flashcardSetId);
   };
 
   const handleDelete = async () => {

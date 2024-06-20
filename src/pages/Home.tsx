@@ -90,17 +90,16 @@ const Home = () => {
             {unauthorized && (
               <div
                 className="flex flex-col justify-center items-center space-y-4"
-                style={{ height: "180px" }}
               >
                 <div className="flex justify-center items-center">
                   <h1
-                    className="text-3xl font-bold contoured-text pt-4"
+                    className="text-3xl font-bold contoured-text"
                     style={{
                       background: "linear-gradient(90deg, #F4D201, #DC0B72)",
                       WebkitBackgroundClip: "text",
                       WebkitTextFillColor: "transparent",
                       textAlign: "center",
-                      width: "400px",
+                      width: window.innerWidth > 768 ? "400px" : "380px",
                       alignItems: "center",
                     }}
                   >
@@ -119,22 +118,20 @@ const Home = () => {
             {!unauthorized && feed.length === 0 && username !== "admin" && (
               <div
                 className="flex flex-col justify-center items-center space-y-4"
-                style={{ height: "180px" }}
               >
                 <div className="flex justify-center items-center">
                   <h1
-                    className="text-3xl font-bold contoured-text pt-4"
+                    className="text-3xl font-bold contoured-text"
                     style={{
                       background: "linear-gradient(90deg, #F4D201, #DC0B72)",
                       WebkitBackgroundClip: "text",
                       WebkitTextFillColor: "transparent",
                       textAlign: "center",
-                      width: "650px",
+                      width: window.innerWidth > 800 ? "650px" : "380px",
                       alignItems: "center",
                     }}
                   >
-                    Your feed is empty. Follow your favorite creators to see
-                    their posts here!
+                    Your feed is empty. Follow your favorite creators to see their posts here!
                   </h1>
                 </div>
                 <Button
@@ -150,17 +147,16 @@ const Home = () => {
               username === "admin" && (
                 <div
                   className="flex flex-col justify-center items-center space-y-4"
-                  style={{ height: "180px" }}
                 >
                   <div className="flex justify-center items-center">
                     <h1
-                      className="text-3xl font-bold contoured-text pt-4"
+                      className="text-3xl font-bold contoured-text"
                       style={{
                         background: "linear-gradient(90deg, #F4D201, #DC0B72)",
                         WebkitBackgroundClip: "text",
                         WebkitTextFillColor: "transparent",
                         textAlign: "center",
-                        width: "680px",
+                        width: window.innerWidth > 768 ? "680px" : "380px",
                         alignItems: "center",
                       }}
                     >

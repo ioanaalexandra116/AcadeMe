@@ -135,26 +135,6 @@ export function CarouselPlugin() {
       >
         <CarouselPrevious />
         <CarouselContent>
-          <CarouselItem key={"logo"}>
-            <div className="p-0.5 z-10">
-              <Card
-                style={{ width: 880, height: 400 }}
-                className="relative overflow-hidden"
-              >
-                <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-yellow-100 via-white to-pink-100 z-0"></div>
-                <CardContent className="flex items-center justify-center h-full">
-                  <img
-                    src={GirlTitle}
-                    style={{
-                      width: "400px",
-                      height: "400px",
-                      zIndex: 10,
-                    }}
-                  />
-                </CardContent>
-              </Card>
-            </div>
-          </CarouselItem>
           {contextUsername !== "admin" && (
             <CarouselItem key={"podium"}>
               <div className="p-0.5">
@@ -221,7 +201,6 @@ export function CarouselPlugin() {
 
                     <div className="flex flex-row items-center justify-center">
                       <div className="flex flex-col items-center justify-center w-full h-full">
-                        {/* Second place (left) */}
                         <div className="flex flex-col items-center justify-center">
                           <div
                             className="absolute cursor-pointer bg-transparent rounded-full"
@@ -345,6 +324,27 @@ export function CarouselPlugin() {
               </div>
             </CarouselItem>
           )}
+
+          <CarouselItem key={"logo"}>
+            <div className="p-0.5 z-10">
+              <Card
+                style={{ width: 880, height: 400 }}
+                className="relative overflow-hidden"
+              >
+                <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-yellow-100 via-white to-pink-100 z-0"></div>
+                <CardContent className="flex items-center justify-center h-full">
+                  <img
+                    src={GirlTitle}
+                    style={{
+                      width: "400px",
+                      height: "400px",
+                      zIndex: 10,
+                    }}
+                  />
+                </CardContent>
+              </Card>
+            </div>
+          </CarouselItem>
 
           {contextUsername !== "admin" && (
             <CarouselItem key={"most-played"}>

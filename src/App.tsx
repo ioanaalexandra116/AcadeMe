@@ -16,6 +16,7 @@ import Follow from "./pages/Follow";
 import SearchUserPage from "./pages/SearchUserPage";
 import Leaderboard from "./pages/Leaderboard";
 import VerifyPage from "./pages/VerifyPage";
+import Navbar from "./components/Navbar";
 
 const router = createBrowserRouter([
   {
@@ -45,52 +46,103 @@ const router = createBrowserRouter([
         path: "/search/flashcards",
         element: <SearchFlashcardSets />,
       },
-      {
-        path: "/notifications",
-        element: <Notifications />,
-      },
+
       {
         element: <PrivateRoute />,
         children: [
           {
             path: "/profile",
-            element: <Profile />,
+            element: (
+              <>
+                <Navbar />
+                <Profile />
+              </>
+            ),
           },
           {
             path: "/create",
-            element: <Create />,
+            element: (
+              <>
+                <Navbar />
+                <Create />
+              </>
+            ),
           },
           {
             path: "/edit-post",
-            element: <EditPost />,
+            element: (
+              <>
+                <Navbar />
+                <EditPost />
+              </>
+            ),
           },
           {
             path: "/view-post",
-            element: <EditPost />,
+            element: (
+              <>
+                <Navbar />
+                <EditPost />
+              </>
+            ),
           },
           {
             path: "/edit-profile",
-            element: <EditProfile />,
+            element: (
+              <>
+                <Navbar />
+                <EditProfile />
+              </>
+            ),
           },
           {
             path: "/followers",
-            element: <Follow />,
+            element: (
+              <>
+                <Navbar />
+                <Follow />
+              </>
+            ),
           },
           {
             path: "/following",
-            element: <Follow />,
+            element: (
+              <>
+                <Navbar />
+                <Follow />
+              </>
+            ),
           },
           {
             path: "/search/people",
-            element: <SearchUserPage />,
+            element: (
+              <>
+                <Navbar />
+                <SearchUserPage />
+              </>
+            ),
           },
           {
             path: "/leaderboard",
-            element: <Leaderboard />,
+            element: (
+              <>
+                <Navbar />
+                <Leaderboard />
+              </>
+            ),
           },
           {
             path: "/verify",
-            element: <VerifyPage />,
+            element: (
+              <>
+                <Navbar />
+                <VerifyPage />
+              </>
+            ),
+          },
+          {
+            path: "/notifications",
+            element: <Notifications />,
           },
         ],
       },

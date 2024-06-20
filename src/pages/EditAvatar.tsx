@@ -70,7 +70,10 @@ const EditAvatar = () => {
       try {
         const avatarProps = await getAvatarProps(user.uid);
         if (avatarProps) {
-          setCharacterProperties(avatarProps);
+          setCharacterProperties({
+            ...avatarProps,
+            dimensions: "40px",
+          });
         }
       } catch (error) {
         console.error("Error fetching avatar properties:", error);
@@ -99,6 +102,16 @@ const EditAvatar = () => {
     navigate(`/edit-profile`);
   };
 
+  useEffect(() => {
+    // Disable scrolling
+    document.body.style.overflow = 'hidden';
+
+    // Clean up and re-enable scrolling when component unmounts
+    return () => {
+      document.body.style.overflow = 'hidden';  
+    };
+  }, []);
+
   if (loading) {
     return <Loading />;
   }
@@ -106,7 +119,7 @@ const EditAvatar = () => {
   return fullWidth ? (
     <div
       className="bg-cover bg-center h-screen w-screen flex items-center justify-center"
-      style={{ backgroundImage: `url(${Background})`, backgroundColor: "#000" }}
+      style={{ backgroundImage: `url(${Background})`, backgroundColor: "#fff" }}
     >
       <div
         style={cardStyles}

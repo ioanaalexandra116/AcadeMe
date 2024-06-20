@@ -271,14 +271,22 @@ export async function deleteFlashcardSet(setId: string, uid: string) {
   const usersRef = collection(db, "users");
   const usersSnapshot = await getDocs(usersRef);
   usersSnapshot.forEach((doc) => {
-    updateDoc(doc.ref, {
-      favorites: arrayRemove(setId),
-      activity: {
-        ...doc.data().activity,
-        [setId]: null,
-      },
-      feed: arrayRemove(setId),
-    });
+    const activity = doc.data().activity;
+    if (activity && setId in activity) {
+      const updatedActivity = { ...activity };
+      delete updatedActivity[setId];
+
+      updateDoc(doc.ref, {
+        favorites: arrayRemove(setId),
+        activity: updatedActivity,
+        feed: arrayRemove(setId),
+      });
+    } else {
+      updateDoc(doc.ref, {
+        favorites: arrayRemove(setId),
+        feed: arrayRemove(setId),
+      });
+    }
   });
   const adminRef = await getAdminId();
   if (adminRef) {

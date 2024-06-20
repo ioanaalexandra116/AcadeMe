@@ -2,7 +2,6 @@ import CreateFlashcard from "@/components/CreateFlashcard";
 import {
   useState,
   useEffect,
-  useLayoutEffect,
   useContext,
   useRef,
 } from "react";
@@ -79,7 +78,6 @@ const AnimatedFirst = styled.div`
 
 const EditPost = () => {
   const [err, setErr] = useState<ErrorMessasge>(null);
-  const [contentHeight, setContentHeight] = useState(0);
   const { user, userLoading } = useContext(AuthContext);
   const [categories, setCategories] = useState<string[]>([]);
   const [secondCategories, setSecondCategories] = useState<string[][]>([]);
@@ -262,19 +260,6 @@ const EditPost = () => {
     }
   }, [removedCard, flashcardSets]);
 
-  useLayoutEffect(() => {
-    if (!next) {
-      const cardContainer = document.getElementById("card-container");
-      if (cardContainer) {
-        const height = cardContainer.offsetHeight + 300;
-        setContentHeight(height);
-      }
-    } else {
-      const height = document.body.scrollHeight;
-      setContentHeight(height);
-    }
-  }, [flashcardSets, next, flashcardSet]);
-
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -427,7 +412,7 @@ const EditPost = () => {
   ) : (
     <div className="flex flex-col relative">
       <div className="absolute inset-0 z-0">
-        <BubbleBackground contentHeight={contentHeight} />
+        <BubbleBackground />
       </div>
       {window.innerWidth < 768 && !next ? (
         <CustomToaster

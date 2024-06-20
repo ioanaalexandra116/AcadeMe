@@ -104,11 +104,11 @@ const Results = () => {
             ></div>
           </div>
           <h1
-            className="text-4xl font-bold text-black mb-4 contoured-text flex justify-center z-10 relative"
+            className="text-4xl font-bold text-black mb-4 contoured-text flex justify-center z-10 relative pt-16"
             style={{
               color: "#F987AF",
               textShadow: `-0.5px -0.5px 0 #000, 2px -0.5px 0 #000, -0.5px 1px 0 #000, 2px 1px 0 #000`,
-              top: unauthorized ? "70px" : "0px",
+              top: unauthorized ? "50px" : "0px",
             }}
           >
             {unauthorized
@@ -118,7 +118,7 @@ const Results = () => {
           <h1
             className="z-10 mb-2 relative"
             style={{
-              top: unauthorized ? "70px" : "0px",
+              top: unauthorized || scores.length < 2 ? "50px" : "0px",
             }}
           >
             Accuracy
@@ -133,7 +133,7 @@ const Results = () => {
               borderRight: "1px solid black",
               borderTop: "1px solid black",
               borderBottom: "1px solid black",
-              top: unauthorized ? "70px" : "0",
+              top: unauthorized || scores.length < 2 ? "50px" : "0",
             }}
             className="flex items-center justify-start relative mb-10"
           >
@@ -262,7 +262,8 @@ const Results = () => {
                     />
                   </div>
                 </div>
-              ) : (
+              ) : scores.length > 1 ?
+              (
                 <h1
                   className="text-black contoured-text z-20 mb-10"
                   style={{
@@ -272,16 +273,30 @@ const Results = () => {
                 >
                   Progress
                 </h1>
-              )}
+              ) : (
+                <h1
+                    className="text-2xl font-bold text-black contoured-text z-20 relative top-40"
+                    style={{
+                      background: "linear-gradient(90deg, #F4D201, #DC0B72)",
+                      WebkitBackgroundClip: "text",
+                      WebkitTextFillColor: "transparent",
+                      textAlign: "center",
+                      width: "350px",
+                    }}
+                  >
+                    Play more than once to track your progress
+                  </h1>
+              )
+            }
               <div className="z-10">
                 <Card
                   style={{
                     width: "540px",
                     height: "360px",
                     backgroundColor: "#fff",
-                    filter: unauthorized ? "blur(6px)" : "none",
-                    zIndex: unauthorized ? 0 : 10,
-                    transform: unauthorized ? "scale(0.9)" : "scale(1)",
+                    filter: unauthorized || scores.length < 2 ? "blur(6px)" : "none",
+                    zIndex: unauthorized || scores.length < 2 ? 0 : 10,
+                    transform: unauthorized || scores.length < 2 ? "scale(0.9)" : "scale(1)",
                     bottom: unauthorized ? "74px" : "40px",
                   }}
                   className="flex items-center justify-center border border-black relative"
@@ -319,7 +334,7 @@ const Results = () => {
                     type="line"
                     width={500}
                   />
-                  {unauthorized && (
+                  {unauthorized || scores.length < 2 && (
                     <div
                       style={{
                         position: "absolute",
@@ -391,60 +406,137 @@ const Results = () => {
                 }}
                 className="flex justify-center items-center border border-black"
               >
-                <p className="text-xs">{percentage + "%"}</p>
+                <p className="text-xs">{Math.floor(percentage) + "%"}</p>
               </Card>
             )}
           </Card>
 
           <div className="flex flex-col items-center justify-center">
             <div className="flex flex-col items-center justify-center">
-              <div className="flex flex-col items-center justify-center">
-                <h1 className="z-10 mb-2">Progress</h1>
-                <div className="z-10">
-                  <Card
-                    style={{
-                      width: window.innerWidth - 10 + "px",
-                      height: window.innerHeight / 4 + "px",
-                      backgroundColor: "#fff",
-                    }}
-                    className="flex items-center justify-center border border-black mb-4"
-                  >
-                    <ReactApexChart
-                      options={{
-                        colors: ["#F987AF"],
-                        chart: {
-                          id: "score graph",
-                          toolbar: {
-                            show: false,
-                          },
-                        },
-                        xaxis: {
-                          categories: scores.map((_, index) => index + 1),
-                        },
-                        yaxis: {
-                          min: 0,
-                          max:
-                            flashcardSet && flashcardSet.flashcards
-                              ? Object.keys(flashcardSet.flashcards).length * 10
-                              : 100,
-                          tickAmount:
-                            (flashcardSet && flashcardSet.flashcards
-                              ? Object.keys(flashcardSet.flashcards).length * 10
-                              : 100) / 10,
-                        },
-                      }}
-                      series={[
-                        {
-                          name: "Score",
-                          data: scores,
-                        },
-                      ]}
-                      type="line"
-                      width={window.innerWidth - 10}
+            <div className="flex flex-col items-center">
+              {unauthorized ? (
+                <div className="flex flex-col items-center justify-center">
+                  {locked ? (
+                    <img
+                      src={Lock}
+                      alt="lock"
+                      className="w-8 h-8 z-20 relative top-24"
                     />
-                  </Card>
+                  ) : (
+                    <img
+                      src={Unlock}
+                      alt="unlock"
+                      className="w-8 h-8 z-20 relative top-24 left-1"
+                    />
+                  )}
+                  <h1
+                    className="text-2xl font-bold text-black contoured-text z-20 relative top-24"
+                    style={{
+                      background: "linear-gradient(90deg, #F4D201, #DC0B72)",
+                      WebkitBackgroundClip: "text",
+                      WebkitTextFillColor: "transparent",
+                      textAlign: "center",
+                      width: "350px",
+                    }}
+                  >
+                    Create an account to track your progress
+                  </h1>
+                  <div className="z-20 relative top-28">
+                    <FancyButton
+                      message="UNLOCK"
+                      onClick={() => navigate("/register")}
+                      onMouseEnter={() => setLocked(false)}
+                      onMouseLeave={() => setLocked(true)}
+                    />
+                  </div>
                 </div>
+              ) : scores.length > 1 ?
+              (
+                <h1
+                  className="text-black contoured-text z-20 mb-10"
+                  style={{
+                    textAlign: "center",
+                    width: "350px",
+                  }}
+                >
+                  Progress
+                </h1>
+              ) : (
+                <h1
+                    className="text-2xl font-bold text-black contoured-text z-20 relative top-24"
+                    style={{
+                      background: "linear-gradient(90deg, #F4D201, #DC0B72)",
+                      WebkitBackgroundClip: "text",
+                      WebkitTextFillColor: "transparent",
+                      textAlign: "center",
+                      width: "320px",
+                    }}
+                  >
+                    Play more than once to track your progress
+                  </h1>
+              )
+            }
+              <div className="z-10">
+                <Card
+                  style={{
+                    width: "380px",
+                    height: "220px",
+                    backgroundColor: "#fff",
+                    filter: unauthorized || scores.length < 2 ? "blur(6px)" : "none",
+                    zIndex: unauthorized || scores.length < 2 ? 0 : 10,
+                    transform: unauthorized || scores.length < 2 ? "scale(0.9)" : "scale(1)",
+                    bottom: unauthorized ? "74px" : "40px",
+                  }}
+                  className="flex items-center justify-center border border-black relative"
+                >
+                  <ReactApexChart
+                    options={{
+                      colors: ["#F987AF"],
+                      chart: {
+                        id: "score graph",
+                        toolbar: {
+                          show: false,
+                        },
+                      },
+                      xaxis: {
+                        categories: scores.map((_, index) => index + 1),
+                      },
+                      yaxis: {
+                        min: 0,
+                        max:
+                          flashcardSet && flashcardSet.flashcards
+                            ? Object.keys(flashcardSet.flashcards).length * 10
+                            : 100,
+                        tickAmount:
+                          (flashcardSet && flashcardSet.flashcards
+                            ? Object.keys(flashcardSet.flashcards).length * 10
+                            : 100) / 10,
+                      },
+                    }}
+                    series={[
+                      {
+                        name: "Score",
+                        data: scores,
+                      },
+                    ]}
+                    type="line"
+                    width={360}
+                  />
+                  {unauthorized || scores.length < 2 && (
+                    <div
+                      style={{
+                        position: "absolute",
+                        top: 0,
+                        left: 0,
+                        width: "100%",
+                        height: "100%",
+                        zIndex: 20,
+                      }}
+                    />
+                  )}
+                </Card>
               </div>
+            </div>
               <h1
                 className="text-3xl font-bold text-black mb-2 contoured-text flex justify-center z-10 items-center"
                 style={{

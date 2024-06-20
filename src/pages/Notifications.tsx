@@ -1,8 +1,18 @@
 import NotificationsList from "../components/NotificationsList";
 import Background from "@/assets/home-background.svg";
+import Navbar from "@/components/Navbar";
+import { useState } from "react";
 
 const Notifications = () => {
+  const [allRead, setAllRead] = useState(false);
+
+  const updateDot = () => {
+    setAllRead(true);
+  }
+
   return (
+    <>
+    <Navbar allRead={allRead} />
     <div
       style={{
         backgroundImage: `url(${Background})`,
@@ -16,8 +26,9 @@ const Notifications = () => {
         overflow: "auto",
       }}
     >
-      <NotificationsList />
+      <NotificationsList updateDot={updateDot} allRead={allRead} />
     </div>
+    </>
   );
 };
 

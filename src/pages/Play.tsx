@@ -175,10 +175,6 @@ const Play = () => {
   const [updated, setUpdated] = useState(false);
   const [resultsPressed, setResultsPressed] = useState(false);
 
-  //   if (userLoading) {
-  //   return <Loading />;
-  // }
-
   useEffect(() => {
     if (!user && !userLoading) {
       setUnauthorized(true);
@@ -251,8 +247,7 @@ const Play = () => {
             setResult(result);
           })
           .catch((error) => console.error("Error updating activity:", error));
-      }
-      else if (unauthorized) {
+      } else if (unauthorized) {
         setUpdated(true);
         setResult(score);
       }
@@ -302,21 +297,22 @@ const Play = () => {
     <Loading />
   ) : (
     <>
-    <Navbar />
-    <div
-            className="absolute w-screen h-screen z-0"
-            style={{ backgroundColor: "#A4DEF7", opacity: 0.5 }}
-          >
-            <div
-              className="absolute top-0 left-0 w-screen h-screen bg-no-repeat bg-center z-0 bg-cover"
-              style={{
-                backgroundImage: `url(${Background})`,
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-                opacity: 0.5,
-              }}
-            ></div>
-          </div>
+      {showSadHamster || (showHappyHamster && <div />)}
+      <Navbar />
+      <div
+        className="absolute w-screen h-screen z-0"
+        style={{ backgroundColor: "#A4DEF7", opacity: 0.5 }}
+      >
+        <div
+          className="absolute top-0 left-0 w-screen h-screen bg-no-repeat bg-center z-0 bg-cover"
+          style={{
+            backgroundImage: `url(${Background})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            opacity: 0.5,
+          }}
+        ></div>
+      </div>
       <div className="flex flex-row justify-between pt-16 pb-12 z-10">
         {window.innerWidth > 786
           ? !unauthorized && (
@@ -371,31 +367,36 @@ const Play = () => {
           </h1>
         )}
       </div>
-      <div style={{display: "flex", justifyContent: "center", alignItems: "center"}}>
-      {window.innerWidth > 786 ? (
-        <h1
-          className="text-4xl font-bold text-black mb-5 contoured-text flex justify-center pb-5 z-10"
-          style={{
-            color: "#F987AF",
-            textShadow: `-0.5px -0.5px 0 #000, 2px -0.5px 0 #000, -0.5px 1px 0 #000, 2px 1px 0 #000`,
-            zIndex: 10,
-          }}
-        >
-          {flashcardSet?.title}
-        </h1>
-      ) : (
-        <h1
-          className="text-3xl font-bold text-black mb-5 contoured-text flex justify-center"
-          style={{
-            color: "#F987AF",
-            textShadow: `-0.5px -0.5px 0 #000, 2px -0.5px 0 #000, -0.5px 1px 0 #000, 2px 1px 0 #000`,
-            zIndex: 10,
-          }}
-        >
-          {flashcardSet?.title}
-        </h1>
-        
-      )}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        {window.innerWidth > 786 ? (
+          <h1
+            className="text-4xl font-bold text-black mb-5 contoured-text flex justify-center pb-5 z-10"
+            style={{
+              color: "#F987AF",
+              textShadow: `-0.5px -0.5px 0 #000, 2px -0.5px 0 #000, -0.5px 1px 0 #000, 2px 1px 0 #000`,
+              zIndex: 10,
+            }}
+          >
+            {flashcardSet?.title}
+          </h1>
+        ) : (
+          <h1
+            className="text-3xl font-bold text-black mb-5 contoured-text flex justify-center"
+            style={{
+              color: "#F987AF",
+              textShadow: `-0.5px -0.5px 0 #000, 2px -0.5px 0 #000, -0.5px 1px 0 #000, 2px 1px 0 #000`,
+              zIndex: 10,
+            }}
+          >
+            {flashcardSet?.title}
+          </h1>
+        )}
       </div>
       <AnimatedFirst className="flex flex-col items-center justify-center space-y-5 relative z-10">
         {" "}
@@ -523,7 +524,7 @@ const Play = () => {
               <StyledImage
                 src={correct ? HappyHamster : SadHamster}
                 alt="Hamster"
-                className="w-[250px]"
+                className="w-[150px]"
                 animate={Date.now() - timeEnd > 2000 || next ? false : true}
               />
             </div>

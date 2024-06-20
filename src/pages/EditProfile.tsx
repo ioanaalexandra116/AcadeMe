@@ -173,11 +173,12 @@ const EditProfile = () => {
 
   return (
     <div
-      className="bg-cover bg-center h-screen w-screen flex items-center justify-center"
+      className="bg-cover bg-center h-screen w-screen flex items-center justify-center overflow-y-auto overflow-x-hidden"
       onLoad={() => setImageLoaded(true)}
       style={{
         backgroundImage: `url(${Background})`,
-        backgroundColor: imageLoaded ? "#000" : "#transparent",
+        backgroundColor: imageLoaded ? "#F987AF" : "#transparent",
+        backgroundRepeat: 'repeat-y',
       }}
     >
       {!editAvatarComp ? (
@@ -286,7 +287,7 @@ const EditProfile = () => {
           >
             <div className="flex flex-col items-center justify-center space-y-20">
               <div className="bg-transparent rounded-full shadow-2xl flex flex-col items-center justify-center border-0">
-                <Avatar {...characterProperties} />
+                <Avatar {...characterProperties} dimensions="300px" />
               </div>
               <Button
                 style={{
@@ -309,15 +310,12 @@ const EditProfile = () => {
         //-----------------------------edit-avatar-phone--------------------------
         <AnimatedNext
           style={cardStyles}
-          className="flex flex-col items-center justify-center space-y-8"
+          className="flex flex-col items-center justify-center space-y-4"
         >
+          <div className="flex flex-row items-center justify-center space-x-2">
           <div className="bg-transparent rounded-full shadow-2xl">
-            <Avatar {...characterProperties} />
+            <Avatar {...characterProperties} dimensions="190px" />
           </div>
-          <CustomAvatarTabs
-            onCharacterPropertiesChange={handleCharacterProperties}
-            recievedCharacterProperties={characterProperties}
-          />
           <Button
             style={{
               backgroundColor: "#F987AF",
@@ -327,6 +325,12 @@ const EditProfile = () => {
           >
             Back to Edit Profile
           </Button>
+        </div>
+          <CustomAvatarTabs
+            onCharacterPropertiesChange={handleCharacterProperties}
+            recievedCharacterProperties={characterProperties}
+          />
+          
         </AnimatedNext>
       )}
     </div>

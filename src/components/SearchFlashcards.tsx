@@ -68,7 +68,7 @@ const AnimatedOpenMenu = styled.div<{ openMenu: boolean }>`
   left: 280px;
   z-index: 10;
   background-color: "#FFFFFF";
-  backdrop-filter: blur(3px);
+  backdrop-filter: window.innerWidth > 768 ? "blur(3px)" : "blur(10px)";
 `;
 
 export const SearchFlashcards = () => {
@@ -643,7 +643,7 @@ export const SearchFlashcards = () => {
                 value={searchInTitle}
                 onChange={(e) => setSearchInTitle(e.target.value)}
                 style={{
-                  width: "320px",
+                  width: window.innerWidth > 768 ? "320px" : "250px",
                   backgroundColor: "#FFFFFF",
                   border: "0.5px solid #AA7D8C",
                   paddingRight: "30px",

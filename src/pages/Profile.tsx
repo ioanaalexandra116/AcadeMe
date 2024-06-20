@@ -32,14 +32,13 @@ const ResponsiveContainer: React.FC<ResponsiveContainerProps> = ({ children }) =
 
       window.addEventListener('resize', handleResize);
 
-      // Cleanup event listener on component unmount
       return () => {
           window.removeEventListener('resize', handleResize);
       };
   }, []);
 
   return (
-      <div className={isSmallScreen ? "flex flex-row justify-center items-center space-x-8 p-4" : "flex flex-row justify-center items-center space-x-20 p-4"}>
+      <div className={isSmallScreen ? "flex flex-row justify-center items-center space-x-4 p-4" : "flex flex-row justify-center items-center space-x-20 p-4"}>
           {children}
       </div>
   );
@@ -56,9 +55,7 @@ const Profile = () => {
   const [level, setLevel] = useState<number>(1);
   const [showPosts, setShowPosts] = useState<boolean>(true);
   const [favorites, setFavorites] = useState<string[]>([]);
-  const [following, setFollowing] = useState<string[]>([]);
   const [followingNum, setFollowingNum] = useState<number>(0);
-  const [followers, setFollowers] = useState<string[]>([]);
   const [followersNum, setFollowersNum] = useState<number>(0);
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
@@ -85,6 +82,16 @@ const Profile = () => {
     return <Loading />;
   }
 
+  const handleAddFavorite = (flashcardSetId: string) => {
+    setFavorites((prevFavorites) => [...prevFavorites, flashcardSetId]);
+  };
+
+  const handleRemoveFavorite = (flashcardSetId: string) => {
+    setFavorites((prevFavorites) =>
+      prevFavorites.filter((id) => id !== flashcardSetId)
+    );
+  };
+
   useEffect(() => {
     if (!user) {
       return;
@@ -95,17 +102,19 @@ const Profile = () => {
         const userData = await getUserData(userId || user.uid);
         console.log("userData: ", userData);
         if (userData) {
-          userData.avatarProps.dimensions = "175px";
+          if (window.innerWidth > 768) {
+            userData.avatarProps.dimensions = "175px";
+          } else {
+            userData.avatarProps.dimensions = "130px";
+          }
           setCharacterProperties(userData.avatarProps);
           setFlashcardSets(userData.posts.reverse());
           setFavorites(userData.favorites);
           setUsername(userData.username);
           setDescription(userData.description);
-          setLevel(Math.floor(userData.exp / 1000) * 1000);
-          setFollowing(userData.following);
+          setLevel(Math.floor(userData.exp / 1000));
           setFollowingNum(userData.following.length);
           console.log("followingNum: ", userData.following.length);
-          setFollowers(userData.followers);
           setFollowersNum(userData.followers.length);
           if (userData.followers.includes(user.uid || "")) {
             setFollowed(true);
@@ -167,7 +176,7 @@ const Profile = () => {
       </div>
       <Card
         className="relative flex justify-center items-center border border-black mt-4"
-        style={{ backgroundColor: "#fff", height: "240px", maxWidth: window.innerWidth < 768 ? "400px" : "480px"
+        style={{ backgroundColor: "#fff", height: "240px", maxWidth: window.innerWidth < 768 ? "360px" : "480px"
 
          }}
         cardWidth={460}
@@ -342,7 +351,8 @@ const Profile = () => {
           ) : (
             flashcardSets.map((flashcardSetId) => (
               <div key={flashcardSetId} className="flex justify-center">
-                <Post flashcardSetId={flashcardSetId} onDelete={onDelete} />
+                <Post flashcardSetId={flashcardSetId} onDelete={onDelete} onAddFavorite={handleAddFavorite}
+          onRemoveFavorite={handleRemoveFavorite} />
               </div>
             ))
           )}
@@ -380,7 +390,8 @@ const Profile = () => {
           ) : (
             favorites.map((flashcardSetId) => (
               <div key={flashcardSetId} className="flex justify-center">
-                <Post flashcardSetId={flashcardSetId} onDelete={onDelete}/>
+                <Post flashcardSetId={flashcardSetId} onDelete={onDelete} onAddFavorite={handleAddFavorite}
+          onRemoveFavorite={handleRemoveFavorite}/>
               </div>
             ))
           )}

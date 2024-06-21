@@ -1,10 +1,5 @@
 import CreateFlashcard from "@/components/CreateFlashcard";
-import {
-  useState,
-  useEffect,
-  useContext,
-  useRef,
-} from "react";
+import { useState, useEffect, useContext, useRef } from "react";
 import { AuthContext } from "@/context";
 import Loading from "@/components/Loading";
 import { Button } from "@/components/ui/button";
@@ -19,6 +14,7 @@ import {
   deleteFromCheckAdmin,
   addDeleteNotification,
   addModifyNotification,
+  isAllowed,
 } from "@/firebase/firestore";
 import {
   Select,
@@ -43,6 +39,7 @@ import { toast } from "sonner";
 import { CustomToaster } from "@/components/ui/sonner";
 import styled, { keyframes } from "styled-components";
 import { useLocation } from "react-router-dom";
+import ErrorPage from "./ErrorPage";
 
 const myAnim = keyframes`
   0% {
@@ -106,6 +103,7 @@ const EditPost = () => {
   const postId = queryParams.get("postId");
   const view = location.pathname.includes("view-post");
   const [isEditable, setIsEditable] = useState(!view);
+  const [allowed, setAllowed] = useState(false);
 
   useEffect(() => {
     const fetchFlashcardSet = async () => {
@@ -133,8 +131,26 @@ const EditPost = () => {
       setFlashcardSets(flashcards);
       setLoading(false);
     };
+
+    const checkAllowed = async () => {
+      if (!postId || !user) {
+        console.log("no post id or user");
+        return;
+      }
+      const allowed = await isAllowed(user.uid, postId);
+      console.log("allowed: ", allowed);
+      setAllowed(allowed);
+      if (contextUsername === "admin") {
+        setAllowed(true);
+      }
+      if (view) {
+        setAllowed(contextUsername === "admin");
+      }
+    };
+
+    checkAllowed();
     fetchFlashcardSet();
-  }, [postId]);
+  }, [postId, user, contextUsername]);
   const [removedCard, setRemovedCard] = useState<number | null>(null);
 
   if (!user || userLoading) {
@@ -409,7 +425,7 @@ const EditPost = () => {
 
   return loading || !flashcardSet ? (
     <Loading />
-  ) : (
+  ) : allowed || (view && contextUsername === "admin") ? (
     <div className="flex flex-col relative">
       <div className="absolute inset-0 z-0">
         <BubbleBackground />
@@ -838,6 +854,8 @@ const EditPost = () => {
           </>
         ))}
     </div>
+  ) : (
+    <ErrorPage />
   );
 };
 

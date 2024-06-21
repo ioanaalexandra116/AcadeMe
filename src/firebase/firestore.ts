@@ -603,6 +603,21 @@ export async function doesUserHaveExp(uid: string) {
   return docSnap.data().exp > 0;
 }
 
+export async function isAllowed(uid: string, setId: string) {
+  // set is created by the user
+  const userRef = doc(db, "users", uid);
+  const userDoc = await getDoc(userRef);
+  if (userDoc.data()?.username === "admin") {
+    return true;
+  }
+  const userPosts = userDoc.data()?.posts || [];
+  if (userPosts.includes(setId)) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
 export async function addForeignLanguages() {
   const collectionRef = collection(db, "categories");
   const docRef = doc(collectionRef, "Foreign Languages");

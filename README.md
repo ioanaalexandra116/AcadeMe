@@ -1,1 +1,1 @@
-Learning app available at [Link text](https://academe-116.firebaseapp.com/)
+Learning app available at [AcadeMe](https://academe-116.firebaseapp.com/)

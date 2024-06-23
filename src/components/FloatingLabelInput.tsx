@@ -11,6 +11,10 @@ interface StyledLabelProps {
 interface FloatingLabelInputProps extends InputProps {
   label: string;
   onValueChange: (value: string) => void;
+  isFloating?: number;
+  handleFocus?: () => void;
+  handleBlur?: () => void;
+  floatingSetter?: (value: number) => void;
 }
 
 const FloatingLabelGroup = styled.div`
@@ -62,6 +66,10 @@ const FloatingLabelInput: React.FC<FloatingLabelInputProps> = ({
   type,
   className,
   onValueChange,
+  handleFocus,
+  handleBlur,
+  isFloating,
+  floatingSetter,
   ...props
 }) => {
   const [isfloating, setIsfloating] = useState(0);
@@ -70,19 +78,13 @@ const FloatingLabelInput: React.FC<FloatingLabelInputProps> = ({
   );
 
   useEffect(() => {
+    if (floatingSetter) {
+      floatingSetter(!!props.value ? 1 : 0);
+    } else {
     setIsfloating(!!props.value ? 1 : 0);
+    }
     setInputValue(props.value !== undefined ? String(props.value) : undefined);
   }, [props.value]);
-
-  const handleFocus = () => {
-    setIsfloating(1);
-  };
-
-  const handleBlur = () => {
-    if (!inputValue) {
-      setIsfloating(0);
-    }
-  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
@@ -96,18 +98,29 @@ const FloatingLabelInput: React.FC<FloatingLabelInputProps> = ({
     setIsPasswordVisible(!isPasswordVisible);
   };
 
+  const handleFocusBasic = () => {
+    setIsfloating(1);
+  };
+
+  const handleBlurBasic = () => {
+    if (!inputValue) {
+      setIsfloating(0);
+    }
+  };
+
   return (
     <FloatingLabelGroup>
-      <StyledLabel htmlFor={id} isfloating={!!isfloating ? 1 : 0}>
-        {label}
-      </StyledLabel>
+        <StyledLabel htmlFor={id} isfloating={isFloating || isfloating}>
+          {label}
+        </StyledLabel>
+      
       <StyledInput
         id={id}
         type={isPasswordVisible ? "text" : type}
         {...props}
         className={`${className}`}
-        onFocus={handleFocus}
-        onBlur={handleBlur}
+        onFocus={type === "password" ? handleFocus : handleFocusBasic}
+        onBlur={type === "password" ? handleBlur : handleBlurBasic}
         onChange={handleChange}
       />
       {type === "password" && (

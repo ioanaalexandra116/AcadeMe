@@ -104,7 +104,7 @@ export const Leaderboard: React.FC = () => {
           Leaderboard
         </h1>
         <span className="leaderboard-title z-10 relative">Leaderboard</span>
-        <Card className="relative" style={{ bottom: "87px", width: "400px" }}>
+        <Card className="relative" style={{ bottom: "80px", width: "400px" }}>
           {userRanking?.map((user, index) => (
             <div
               key={index}

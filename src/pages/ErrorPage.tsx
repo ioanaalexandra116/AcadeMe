@@ -35,7 +35,7 @@ const ErrorPage = () => {
             height: "200px",
         }}
         >
-        🤕
+        🤕 
         </h1>
       </div>
     </div>

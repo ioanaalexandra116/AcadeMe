@@ -1,22 +1,31 @@
-import 'firebase/firestore';
-import { getFirestore } from 'firebase/firestore';
-import { initializeApp } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
-import { getStorage } from 'firebase/storage';
+import { initializeApp } from "firebase/app";
+import { getAuth } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
+import { getStorage } from "firebase/storage";
 
-// Your web app's Firebase configuration
 const firebaseConfig = {
-    apiKey: 'AIzaSyAAb87LoI3b4cBmqdwjWoKDaya0SVwx8P8',
-    authDomain: 'academe-116.firebaseapp.com',
-    projectId: 'academe-116',
-    storageBucket: 'academe-116.appspot.com',
-    messagingSenderId: '123396535979',
-    appId: '1:123396535979:web:1005e809761a310b6f29ee',
+  apiKey: import.meta.env.VITE_API_KEY as string,
+  authDomain: import.meta.env.VITE_AUTH_DOMAIN as string,
+  projectId: import.meta.env.VITE_PROJECT_ID as string,
+  storageBucket: import.meta.env.VITE_STORAGE_BUCKET as string,
+  messagingSenderId: import.meta.env.VITE_MESSAGING_SENDER_ID as string,
+  appId: import.meta.env.VITE_APP_ID as string,
 };
 
+if (
+  !firebaseConfig.apiKey ||
+  !firebaseConfig.authDomain ||
+  !firebaseConfig.projectId ||
+  !firebaseConfig.storageBucket ||
+  !firebaseConfig.messagingSenderId ||
+  !firebaseConfig.appId
+) {
+  throw new Error("Missing Firebase configuration environment variables");
+}
+
 export const actionCodeSettings = {
-    url: 'http://academe-116.web.app/login',
-    handleCodeInApp: true,
+  url: "http://academe-116.web.app/login",
+  handleCodeInApp: true,
 };
 
 const app = initializeApp(firebaseConfig);

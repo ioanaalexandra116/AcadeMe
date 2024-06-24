@@ -136,6 +136,48 @@ export function AuthCard({
                       handleBlur={handleBlur}
                     />
                   </div>
+                  {title === "Sign Up" && isPasswordFocused &&(!isSpecialCharacter || !isLength || !isNumber || !isUppercaseLetter) && (
+          <div
+            className="absolute z-50 mt-36 ml-32 p-1 rounded-xl text-xs text-center flex flex-col justify-end items-end"
+            style={{ backgroundColor: "transparent",
+              marginTop: "140px",
+              marginLeft: window.innerWidth > 780 ? "9%" : "20%",
+             }}
+          >
+            <p style={{ color: "#F987AF" }} className="flex flex-row space-x-1">
+              <div
+                style={{ color: isLength ? "#AEDBAD" : "#F987AF" }}
+              >
+                7 characters long,
+              </div>
+              <div
+                style={{
+                  color: isSpecialCharacter
+                    ? "#AEDBAD"
+                    : "#F987AF",
+                }}
+              >
+                1 special character
+              </div>
+            </p>
+            <p style={{ color: "#F987AF" }} className="flex flex-row space-x-1">
+              <div
+                style={{
+                  color: isUppercaseLetter ? "#AEDBAD" : "#F987AF",
+                }}
+              >
+                1 uppercase letter,
+              </div>
+              <div
+                style={{
+                  color: isNumber ? "#AEDBAD" : "#F987AF",
+                }}
+              >
+                1 digit
+              </div>
+            </p>
+          </div>
+        )}
                   <div
                     className="flex flex-col space-y-1"
                     onFocus={() => setIsPasswordFocused(true)}
@@ -182,49 +224,7 @@ export function AuthCard({
             </CardContent>
           </Card>
         </div>
-        {title === "Sign Up" && isPasswordFocused && (!isSpecialCharacter || !isLength || !isNumber || !isUppercaseLetter) && (
-          <div
-            className="absolute z-50 mt-16 p-1 rounded-xl text-xs text-center flex flex-col justify-end items-end"
-            style={{
-              backgroundColor: "transparent",
-              marginBlockEnd: "1rem",
-              left: "41rem",
-            }}
-          >
-            <p style={{ color: "#F987AF" }} className="flex flex-row space-x-1">
-              <div
-                style={{ color: isLength ? "#AEDBAD" : "#F987AF" }}
-              >
-                7 characters long,
-              </div>
-              <div
-                style={{
-                  color: isSpecialCharacter
-                    ? "#AEDBAD"
-                    : "#F987AF",
-                }}
-              >
-                1 special character
-              </div>
-            </p>
-            <p style={{ color: "#F987AF" }} className="flex flex-row space-x-1">
-              <div
-                style={{
-                  color: isUppercaseLetter ? "#AEDBAD" : "#F987AF",
-                }}
-              >
-                1 uppercase letter,
-              </div>
-              <div
-                style={{
-                  color: isNumber ? "#AEDBAD" : "#F987AF",
-                }}
-              >
-                1 digit
-              </div>
-            </p>
-          </div>
-        )}
+        
       </div>
     </div>
   );

@@ -79,7 +79,6 @@ export function CarouselPlugin() {
     const fetchPodium = async () => {
       try {
         const ranking = await getUserRanking();
-        console.log(ranking);
         setTopUsers(ranking.slice(0, 3));
         for (let i = 0; i < 3; i++) {
           let avatarProps = ranking[i].avatarProps;

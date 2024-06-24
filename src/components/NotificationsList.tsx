@@ -123,7 +123,6 @@ export const NotificationsList = ({ allRead, updateDot }: NotifProps) => {
         setLoading(false);
         setUsersAvatarProps(usersAvatarProps);
         setAvatarsLoading(false);
-        console.log("usersAvatarProps", usersAvatarProps);
       } catch (error) {
         console.error("Error fetching users details:", error);
       }

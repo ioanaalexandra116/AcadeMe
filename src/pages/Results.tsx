@@ -74,7 +74,6 @@ const Results = () => {
   }, [flashcardSet, scores, unauthorizedScore, unauthorized]);
 
   useEffect(() => {
-    console.log(percentage);
     if (percentage < 40) {
       setBarColor("#F6675E");
     } else if (percentage < 70) {

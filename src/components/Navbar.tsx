@@ -181,7 +181,6 @@ export default function Navbar ({ allRead }: NavbarProps) {
             ...updatedNotifications,
           ]);
         }
-        console.log("notifications: ", notifications);
       } catch (error) {
         console.error("Error fetching notifications:", error);
       } finally {
@@ -193,9 +192,6 @@ export default function Navbar ({ allRead }: NavbarProps) {
     fetchNotifications();
   }, [user, location.pathname]);
 
-  useEffect(() => {
-    console.log("notifications updated: ", notifications);
-  }, [notifications]);
 
   useEffect(() => {
     if (!user) {

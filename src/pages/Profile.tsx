@@ -100,7 +100,6 @@ const Profile = () => {
     const fetchUserData = async () => {
       try {
         const userData = await getUserData(userId || user.uid);
-        console.log("userData: ", userData);
         if (userData) {
           if (window.innerWidth > 768) {
             userData.avatarProps.dimensions = "175px";
@@ -114,7 +113,6 @@ const Profile = () => {
           setDescription(userData.description);
           setLevel(Math.floor(userData.exp / 1000));
           setFollowingNum(userData.following.length);
-          console.log("followingNum: ", userData.following.length);
           setFollowersNum(userData.followers.length);
           if (userData.followers.includes(user.uid || "")) {
             setFollowed(true);

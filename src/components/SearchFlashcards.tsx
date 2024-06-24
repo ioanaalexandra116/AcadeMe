@@ -120,7 +120,6 @@ export const SearchFlashcards = () => {
     const selected = searchParams.get("selected");
 
     setCategsFromUrl(categories);
-    console.log("categories: ", categories);
     setSelectedFromUrl(selected);
     setChosenCategory(selected);
     if (selected == categories[1]) {
@@ -132,7 +131,6 @@ export const SearchFlashcards = () => {
   }, [location.search]);
 
   useEffect(() => {
-    console.log("reading categories");
     const fetchCategories = async () => {
       try {
         const fetchedCategories = await getCategories();
@@ -146,7 +144,6 @@ export const SearchFlashcards = () => {
   }, []);
 
   useEffect(() => {
-    console.log("reading subcategories");
     const fetchSubcategories = async () => {
       try {
         const updatedComponents = await Promise.all(
@@ -234,9 +231,7 @@ export const SearchFlashcards = () => {
   };
 
   useEffect(() => {
-    if (chosenCategory) {
-      console.log(chosenCategory);
-    } else {
+    if (!chosenCategory) {
       const fetchAllFlashcardSets = async () => {
         try {
           const fetchedFlashcardSets = await getAllFlashcardSetsIds();
@@ -328,7 +323,6 @@ export const SearchFlashcards = () => {
       try {
         const fetchedFlashcardSets = await getAllFlashcardSetsIds();
         setFlashcardSets(fetchedFlashcardSets.reverse());
-        console.log(fetchedFlashcardSets);
       } catch (error) {
         console.error("Error fetching flashcard sets:", error);
       }

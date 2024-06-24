@@ -412,7 +412,6 @@ export async function getFlashcardSetsIdsByTitle(
   querySnapshot.forEach((doc) => {
     TitleIdPairs[doc.data().title.toLowerCase()] = doc.id;
   });
-  console.log(TitleIdPairs);
   for (let key in TitleIdPairs) {
     for (let word of words) {
       if (key.includes(word)) {

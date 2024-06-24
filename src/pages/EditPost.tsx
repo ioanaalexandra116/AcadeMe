@@ -138,7 +138,6 @@ const EditPost = () => {
         return;
       }
       const allowed = await isAllowed(user.uid, postId);
-      console.log("allowed: ", allowed);
       setAllowed(allowed);
       if (contextUsername === "admin") {
         setAllowed(true);

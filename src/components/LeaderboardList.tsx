@@ -33,7 +33,6 @@ export const Leaderboard: React.FC = () => {
     const fetchPodium = async () => {
       try {
         const ranking = await getUserRanking();
-        console.log(ranking);
         for (let i = 0; i < ranking.length; i++) {
           let avatarProps = ranking[i].avatarProps;
           avatarProps = {

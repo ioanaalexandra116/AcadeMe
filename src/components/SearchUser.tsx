@@ -43,7 +43,6 @@ const SearchUser = () => {
       user.username.toLowerCase().startsWith(usernameInput.toLowerCase())
     );
     setFilteredUsers(filteredUsersList);
-    console.log(filteredUsers);
   }, [usernameInput, users]);
 
   return (

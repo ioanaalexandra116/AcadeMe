@@ -108,7 +108,6 @@ const EditProfile = () => {
 
     const fetchUsernames = async () => {
       const usernames = await getAllUsernames();
-      console.log(usernames);
       setAllUsernames(usernames);
     };
 

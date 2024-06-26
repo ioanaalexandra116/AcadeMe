@@ -111,28 +111,33 @@ export const Leaderboard: React.FC = () => {
             >
               <div
                 className="flex flex-row items-center w-full space-x-4"
-                style={{ marginLeft: index + 1 > 3 ? "0.5rem" : "0" }}
+                style={{ marginLeft: index + 1 > 3 && index + 1 < 10 ? "0.4rem" : "0rem",
+                  textAlign: "right"
+                 }}
               >
                 <p
                   style={{
-                    marginRight: index + 1 > 3 ? "0.3rem" : "0",
+                    marginRight: index + 1 < 10 ? "1rem" : "0.9rem",
                     cursor: "default",
+                    textAlign: "right",
                   }}
                 >
                   {index === 0
-                    ? "🥇"
+                    ? "🥇 "
                     : index === 1
-                    ? "🥈"
+                    ? "🥈 "
                     : index === 2
-                    ? "🥉"
+                    ? "🥉 "
                     : index + 1}
                 </p>
                 <div
                   className="flex flex-row items-center space-x-2 cursor-pointer"
                   onClick={() => navigate(`/profile?userId=${user.id}`)}
+                  style = {{marginLeft: index + 1 > 3 ? "0.5rem" : "0rem"}}
                 >
                   <Avatar {...user.avatarProps} />
-                  <p>{user.username}</p>
+                  <p style={{ marginLeft: "1rem" }}
+                  >{user.username}</p>
                 </div>
               </div>
               <div className="flex flex-row space-x-2 cursor-default">
